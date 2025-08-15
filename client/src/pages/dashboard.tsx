@@ -7,6 +7,7 @@ import ResponseGrid from "@/components/response-grid";
 import BulkActions from "@/components/bulk-actions";
 import ConversationHistory from "@/components/conversation-history";
 import CredentialsModal from "@/components/credentials-modal";
+import HelpModal from "@/components/help-modal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +21,7 @@ export default function Dashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("ask");
+  const [activeTab, setActiveTab] = useState("freestyle");
   const { toast } = useToast();
 
   // Poll for response updates when we have a conversation
@@ -172,44 +173,192 @@ export default function Dashboard() {
       {/* Swimming Lane Divider */}
       <div className="h-2 lane-divider"></div>
 
-      {/* Main Content */}
+      {/* Olympic Swimming Events */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Combined Query Input with AI Selection */}
-          <QueryInput
-            onSubmit={handleQuerySubmit}
-            selectedAIs={selectedAIs}
-            onSelectionChange={setSelectedAIs}
-            isLoading={isSubmitting}
-          />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          {/* Event Selection Podium */}
+          <div className="bg-white rounded-xl shadow-lg border-4 border-yellow-400 p-4">
+            <TabsList className="grid w-full grid-cols-3 gap-4 bg-gradient-to-r from-blue-100 to-blue-50 p-2 rounded-lg">
+              <TabsTrigger 
+                value="freestyle" 
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
+                data-testid="tab-freestyle"
+              >
+                <div className="text-2xl">🏊‍♂️</div>
+                <div className="text-center">
+                  <span className="font-bold text-lg">Freestyle</span>
+                  <p className="text-xs opacity-75">Fast & Direct Queries</p>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="backstroke" 
+                className="data-[state=active]:bg-green-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
+                data-testid="tab-backstroke"
+              >
+                <div className="text-2xl">🤾‍♂️</div>
+                <div className="text-center">
+                  <span className="font-bold text-lg">Backstroke</span>
+                  <p className="text-xs opacity-75">Look Back & Verify</p>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="relay" 
+                className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
+                data-testid="tab-relay"
+              >
+                <div className="text-2xl">🏃‍♂️🏃‍♀️</div>
+                <div className="text-center">
+                  <span className="font-bold text-lg">Relay</span>
+                  <p className="text-xs opacity-75">Team Collaboration</p>
+                </div>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          {/* Response Grid */}
-          <ResponseGrid
-            responses={responses}
-            onFactCheck={handleFactCheck}
-            onReply={handleReply}
-          />
+          {/* Freestyle Event - Main Competition Pool */}
+          <TabsContent value="freestyle" className="space-y-8">
+            <Card className="bg-gradient-to-r from-blue-50 to-cyan-100 border-blue-300 border-2">
+              <CardHeader className="text-center pb-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
+                <CardTitle className="text-3xl font-bold flex items-center justify-center space-x-3">
+                  <span className="text-4xl">🏊‍♂️</span>
+                  <span>Freestyle Competition</span>
+                </CardTitle>
+                <CardDescription className="text-blue-100 text-lg">
+                  Launch your query and watch AI swimmers race across multiple lanes for the fastest, most accurate responses
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                <QueryInput
+                  onSubmit={handleQuerySubmit}
+                  selectedAIs={selectedAIs}
+                  onSelectionChange={setSelectedAIs}
+                  isLoading={isSubmitting}
+                />
+              </CardContent>
+            </Card>
 
-          {/* Bulk Actions */}
-          {responses.length > 0 && (
-            <BulkActions
+            <ResponseGrid
               responses={responses}
-              onSubmitAllToGroup={handleBulkSubmitToGroup}
-              onFactCheckAll={handleBulkFactCheck}
+              onFactCheck={handleFactCheck}
+              onReply={handleReply}
             />
-          )}
 
-          {/* Conversation History */}
-          <ConversationHistory
-            onOpenConversation={handleOpenConversation}
-          />
-        </div>
+            {responses.length > 0 && (
+              <Card className="bg-gradient-to-r from-yellow-50 to-orange-100 border-yellow-300">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-yellow-800">
+                    <span className="text-2xl">🏆</span>
+                    <span>Race Results & Actions</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <BulkActions
+                    responses={responses}
+                    onSubmitAllToGroup={handleBulkSubmitToGroup}
+                    onFactCheckAll={handleBulkFactCheck}
+                  />
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Backstroke Event - Verification Pool */}
+          <TabsContent value="backstroke" className="space-y-8">
+            <Card className="bg-gradient-to-r from-green-50 to-emerald-100 border-green-300 border-2">
+              <CardHeader className="text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
+                <CardTitle className="text-3xl font-bold flex items-center justify-center space-x-3">
+                  <span className="text-4xl">🤾‍♂️</span>
+                  <span>Backstroke Verification</span>
+                </CardTitle>
+                <CardDescription className="text-green-100 text-lg">
+                  Look back and verify accuracy - check facts, cross-reference sources, and ensure reliability
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center py-16">
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-5xl">🔍</span>
+                </div>
+                <h3 className="text-2xl font-bold text-green-800 mb-4">Starting Blocks Ready</h3>
+                <p className="text-green-600 max-w-lg mx-auto text-lg leading-relaxed">
+                  Advanced fact-checking lanes are being prepared. Soon you'll be able to verify AI responses 
+                  against multiple sources, check citations, and identify potential inaccuracies.
+                </p>
+                <div className="mt-8 flex justify-center space-x-4">
+                  <div className="bg-green-200 px-4 py-2 rounded-full">
+                    <span className="text-green-800 font-semibold">🚧 Lane 1: Source Verification</span>
+                  </div>
+                  <div className="bg-green-200 px-4 py-2 rounded-full">
+                    <span className="text-green-800 font-semibold">🚧 Lane 2: Cross-Reference Check</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Relay Event - Collaboration Pool */}
+          <TabsContent value="relay" className="space-y-8">
+            <Card className="bg-gradient-to-r from-purple-50 to-pink-100 border-purple-300 border-2">
+              <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+                <CardTitle className="text-3xl font-bold flex items-center justify-center space-x-3">
+                  <span className="text-4xl">🏃‍♂️🏃‍♀️</span>
+                  <span>AI Relay Team</span>
+                </CardTitle>
+                <CardDescription className="text-purple-100 text-lg">
+                  Team up multiple AI swimmers for collaborative problem-solving and iterative refinement
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center py-16">
+                <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-5xl">🤝</span>
+                </div>
+                <h3 className="text-2xl font-bold text-purple-800 mb-4">Team Formation</h3>
+                <p className="text-purple-600 max-w-lg mx-auto text-lg leading-relaxed">
+                  Multi-AI relay features are warming up. Soon you'll be able to chain conversations, 
+                  pass the baton between different AI models, and achieve collaborative excellence.
+                </p>
+                <div className="mt-8 grid grid-cols-2 gap-4 max-w-md mx-auto">
+                  <div className="bg-purple-200 p-4 rounded-lg">
+                    <span className="text-purple-800 font-semibold">🚧 Conversation Chains</span>
+                  </div>
+                  <div className="bg-purple-200 p-4 rounded-lg">
+                    <span className="text-purple-800 font-semibold">🚧 Iterative Refinement</span>
+                  </div>
+                  <div className="bg-purple-200 p-4 rounded-lg">
+                    <span className="text-purple-800 font-semibold">🚧 Team Strategies</span>
+                  </div>
+                  <div className="bg-purple-200 p-4 rounded-lg">
+                    <span className="text-purple-800 font-semibold">🚧 Baton Passing</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Olympic Records - Race History */}
+          <Card className="bg-gradient-to-r from-slate-50 to-gray-100 border-slate-300">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-3 text-slate-800">
+                <span className="text-2xl">📊</span>
+                <span>Olympic Records & History</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ConversationHistory
+                onOpenConversation={handleOpenConversation}
+              />
+            </CardContent>
+          </Card>
+        </Tabs>
       </div>
 
-      {/* Credentials Modal */}
+      {/* Modals */}
       <CredentialsModal
         open={credentialsModalOpen}
         onClose={() => setCredentialsModalOpen(false)}
+      />
+      <HelpModal 
+        open={helpModalOpen}
+        onOpenChange={setHelpModalOpen}
       />
     </div>
   );

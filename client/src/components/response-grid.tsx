@@ -39,17 +39,17 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
   });
 
   const getProviderIcon = (provider: string) => {
-    const icons: Record<string, string> = {
-      openai: '🤖',
-      anthropic: '🧠',
-      google: '🔍',
-      microsoft: '💼',
-      perplexity: '🔮',
-      deepseek: '🔬',
-      grok: '🚀',
-      llama: '🦙'
+    const iconStyles: Record<string, { icon: string; bgColor: string; textColor: string }> = {
+      openai: { icon: 'GPT', bgColor: 'bg-emerald-600', textColor: 'text-white' },
+      anthropic: { icon: 'C', bgColor: 'bg-orange-500', textColor: 'text-white' },
+      google: { icon: 'G', bgColor: 'bg-blue-600', textColor: 'text-white' },
+      microsoft: { icon: 'MS', bgColor: 'bg-blue-700', textColor: 'text-white' },
+      perplexity: { icon: 'P', bgColor: 'bg-purple-600', textColor: 'text-white' },
+      deepseek: { icon: 'DS', bgColor: 'bg-gray-800', textColor: 'text-white' },
+      grok: { icon: 'X', bgColor: 'bg-black', textColor: 'text-white' },
+      llama: { icon: 'L', bgColor: 'bg-blue-500', textColor: 'text-white' }
     };
-    return icons[provider] || '🤖';
+    return iconStyles[provider] || { icon: 'AI', bgColor: 'bg-gray-500', textColor: 'text-white' };
   };
 
   const getProviderName = (provider: string) => {
@@ -144,8 +144,8 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
             <div className="border-b border-slate-200 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 ${getProviderColor(response.aiProvider)} rounded-lg flex items-center justify-center text-white text-lg`}>
-                    {getProviderIcon(response.aiProvider)}
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold ${getProviderIcon(response.aiProvider).bgColor} ${getProviderIcon(response.aiProvider).textColor}`}>
+                    {getProviderIcon(response.aiProvider).icon}
                   </div>
                   <div>
                     <h3 className="font-semibold text-slate-900" data-testid={`text-provider-name-${response.id}`}>
