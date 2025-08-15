@@ -109,7 +109,7 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
         <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-slate-400 text-2xl">💭</span>
         </div>
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Ready for Analysis</h3>
+        <h3 className="text-lg font-varsity text-slate-900 mb-2">Ready for Analysis</h3>
         <p className="text-slate-600 max-w-md mx-auto">
           Submit your query above to get diverse perspectives from multiple AI models. 
           Compare accuracy and insights across different approaches.
@@ -121,7 +121,7 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900">AI Responses</h2>
+        <h2 className="text-xl font-varsity-bold text-slate-900">AI Responses</h2>
         <div className="text-sm text-slate-600">
           {responses.filter(r => r.status === 'complete').length} of {responses.length} complete
         </div>

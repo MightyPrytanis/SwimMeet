@@ -64,7 +64,7 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
 
 
 
-  const availableProviders = providers.filter(p => p.status === 'connected' || !p.requiresApiKey);
+  const availableProviders = providers; // Show all providers
 
   return (
     <div className="bg-white border-2 border-blue-200 rounded-xl shadow-lg">
@@ -76,7 +76,7 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
               <Shield className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Ask Multiple AIs</h1>
+              <h1 className="text-2xl font-varsity-bold text-slate-900">Ask Multiple AIs</h1>
               <p className="text-slate-600">Get diverse, accurate perspectives from leading AI models</p>
             </div>
           </div>

@@ -8,6 +8,7 @@ import BulkActions from "@/components/bulk-actions";
 import ConversationHistory from "@/components/conversation-history";
 import CredentialsModal from "@/components/credentials-modal";
 import HelpModal from "@/components/help-modal";
+import { EventIcon } from "@/components/event-icons";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -135,8 +136,8 @@ export default function Dashboard() {
                   <Waves className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-white tracking-wide">Swim Meet</h1>
-                  <p className="text-blue-100 text-sm">AI Racing Platform • Compare • Compete • Collaborate</p>
+                  <h1 className="text-3xl font-varsity-bold text-white tracking-wide">Swim Meet</h1>
+                  <p className="text-blue-100 text-sm">AI Analysis Platform • Compare • Verify • Collaborate</p>
                 </div>
               </div>
             </div>
@@ -184,10 +185,10 @@ export default function Dashboard() {
                 className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-freestyle"
               >
-                <div className="text-2xl">🏊‍♂️</div>
+                <EventIcon event="freestyle" className="w-8 h-8" />
                 <div className="text-center">
-                  <span className="font-bold text-lg">Freestyle</span>
-                  <p className="text-xs opacity-75">Fast & Direct Queries</p>
+                  <span className="font-varsity text-lg">Freestyle</span>
+                  <p className="text-xs opacity-75">Direct Analysis</p>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
@@ -195,10 +196,10 @@ export default function Dashboard() {
                 className="data-[state=active]:bg-green-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-backstroke"
               >
-                <div className="text-2xl">🤾‍♂️</div>
+                <EventIcon event="backstroke" className="w-8 h-8" />
                 <div className="text-center">
-                  <span className="font-bold text-lg">Backstroke</span>
-                  <p className="text-xs opacity-75">Look Back & Verify</p>
+                  <span className="font-varsity text-lg">Backstroke</span>
+                  <p className="text-xs opacity-75">Verification</p>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
@@ -206,10 +207,10 @@ export default function Dashboard() {
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-relay"
               >
-                <div className="text-2xl">🏃‍♂️🏃‍♀️</div>
+                <EventIcon event="relay" className="w-8 h-8" />
                 <div className="text-center">
-                  <span className="font-bold text-lg">Relay</span>
-                  <p className="text-xs opacity-75">Team Collaboration</p>
+                  <span className="font-varsity text-lg">Relay</span>
+                  <p className="text-xs opacity-75">Collaboration</p>
                 </div>
               </TabsTrigger>
             </TabsList>
@@ -219,12 +220,12 @@ export default function Dashboard() {
           <TabsContent value="freestyle" className="space-y-8">
             <Card className="bg-gradient-to-r from-blue-50 to-cyan-100 border-blue-300 border-2">
               <CardHeader className="text-center pb-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
-                <CardTitle className="text-3xl font-bold flex items-center justify-center space-x-3">
-                  <span className="text-4xl">🏊‍♂️</span>
-                  <span>Freestyle Competition</span>
+                <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
+                  <EventIcon event="freestyle" className="w-10 h-10" />
+                  <span>Freestyle Analysis</span>
                 </CardTitle>
                 <CardDescription className="text-blue-100 text-lg">
-                  Launch your query and watch AI swimmers race across multiple lanes for the fastest, most accurate responses
+                  Submit queries for comprehensive multi-model analysis and comparison
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-8">

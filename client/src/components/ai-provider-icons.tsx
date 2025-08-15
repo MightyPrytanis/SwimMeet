@@ -40,7 +40,7 @@ export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProvider
       return (
         <div className={`${baseClasses} ${className} bg-blue-700 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
+            <path d="M12 2C13.1 2 14 2.9 14 4V10C14 11.1 13.1 12 12 12H6C4.9 12 4 11.1 4 10V4C4 2.9 4.9 2 6 2H12ZM12 14C13.1 14 14 14.9 14 16V20C14 21.1 13.1 22 12 22H6C4.9 22 4 21.1 4 20V16C4 14.9 4.9 14 6 14H12ZM18 2C19.1 2 20 2.9 20 4V10C20 11.1 19.1 12 18 12H16C14.9 12 14 11.1 14 10V4C14 2.9 14.9 2 16 2H18ZM18 14C19.1 14 20 14.9 20 16V20C20 21.1 19.1 22 18 22H16C14.9 22 14 21.1 14 20V16C14 14.9 14.9 14 16 14H18Z"/>
           </svg>
         </div>
       );
@@ -76,7 +76,7 @@ export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProvider
       return (
         <div className={`${baseClasses} ${className} bg-blue-500 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M23.5 6.5C23.5 3.74 21.26 1.5 18.5 1.5S13.5 3.74 13.5 6.5v11c0 2.76 2.24 5 5 5s5-2.24 5-5v-11zM.5 6.5C.5 3.74 2.74 1.5 5.5 1.5S10.5 3.74 10.5 6.5v11c0 2.76-2.24 5-5 5s-5-2.24-5-5v-11z"/>
+            <path d="M12 2L9 5H7C5.9 5 5 5.9 5 7V17C5 18.1 5.9 19 7 19H17C18.1 19 19 18.1 19 17V7C19 5.9 18.1 5 17 5H15L12 2ZM12 4.4L13.6 6H10.4L12 4.4ZM7 7H17V17H7V7ZM12 9C10.3 9 9 10.3 9 12S10.3 15 12 15S15 13.7 15 12S13.7 9 12 9ZM12 11C12.6 11 13 11.4 13 12S12.6 13 12 13S11 12.6 11 12S11.4 11 12 11Z"/>
           </svg>
         </div>
       );
