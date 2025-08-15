@@ -7,6 +7,7 @@ import { NotebookPen, Shield, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getProviders } from "@/lib/api";
+import { AIProviderIcon, getProviderDisplayName } from "@/components/ai-provider-icons";
 import type { AIProvider } from "@shared/schema";
 
 interface QueryInputProps {
@@ -61,19 +62,7 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
     }
   };
 
-  const getProviderIcon = (id: string) => {
-    const iconStyles: Record<string, { icon: string; bgColor: string; textColor: string }> = {
-      openai: { icon: 'GPT', bgColor: 'bg-emerald-600', textColor: 'text-white' },
-      anthropic: { icon: 'C', bgColor: 'bg-orange-500', textColor: 'text-white' },
-      google: { icon: 'G', bgColor: 'bg-blue-600', textColor: 'text-white' },
-      microsoft: { icon: 'MS', bgColor: 'bg-blue-700', textColor: 'text-white' },
-      perplexity: { icon: 'P', bgColor: 'bg-purple-600', textColor: 'text-white' },
-      deepseek: { icon: 'DS', bgColor: 'bg-gray-800', textColor: 'text-white' },
-      grok: { icon: 'X', bgColor: 'bg-black', textColor: 'text-white' },
-      llama: { icon: 'L', bgColor: 'bg-blue-500', textColor: 'text-white' }
-    };
-    return iconStyles[id] || { icon: 'AI', bgColor: 'bg-gray-500', textColor: 'text-white' };
-  };
+
 
   const availableProviders = providers.filter(p => p.status === 'connected' || !p.requiresApiKey);
 
@@ -121,10 +110,8 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
                   disabled={provider.status === 'error'}
                   data-testid={`checkbox-${provider.id}`}
                 />
-                <div className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold ${getProviderIcon(provider.id).bgColor} ${getProviderIcon(provider.id).textColor}`}>
-                  {getProviderIcon(provider.id).icon}
-                </div>
-                <span className="text-sm font-medium">{provider.name}</span>
+                <AIProviderIcon provider={provider.id} className="w-6 h-6" />
+                <span className="text-sm font-medium">{getProviderDisplayName(provider.id)}</span>
                 <div className={`w-2 h-2 rounded-full ${
                   provider.status === 'connected' ? 'bg-emerald-500' : 'bg-slate-400'
                 }`} />
