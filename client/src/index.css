@@ -4,6 +4,58 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Swimming Pool Theme Variables */
+:root {
+  /* Pool blues and water tones */
+  --pool-blue: hsl(195, 100%, 45%);
+  --deep-water: hsl(195, 85%, 25%);
+  --pool-light: hsl(195, 100%, 85%);
+  --chlorine-foam: hsl(195, 40%, 95%);
+  --lane-rope: hsl(45, 95%, 55%);
+  --starting-block: hsl(0, 0%, 15%);
+  --pool-deck: hsl(30, 15%, 85%);
+  
+  /* Brand colors for AI providers */
+  --openai-green: hsl(150, 100%, 35%);
+  --anthropic-orange: hsl(25, 95%, 55%);
+  --google-blue: hsl(215, 100%, 55%);
+  --microsoft-blue: hsl(210, 100%, 45%);
+  --meta-blue: hsl(220, 100%, 50%);
+  --x-black: hsl(0, 0%, 5%);
+  --perplexity-purple: hsl(270, 75%, 45%);
+}
+
+/* Swimming theme animations */
+@keyframes wave {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.wave-animation {
+  animation: wave 2s ease-in-out infinite;
+}
+
+.ripple-effect {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Pool lane styling */
+.lane-divider {
+  background: linear-gradient(90deg, 
+    var(--lane-rope) 0%, 
+    var(--lane-rope) 45%, 
+    white 45%, 
+    white 55%, 
+    var(--lane-rope) 55%, 
+    var(--lane-rope) 100%);
+  background-size: 20px 100%;
+}
+
 :root {
   --background: hsl(0 0% 100%);
   --foreground: hsl(210 25% 7.8431%);

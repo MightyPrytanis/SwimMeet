@@ -8,7 +8,9 @@ import BulkActions from "@/components/bulk-actions";
 import ConversationHistory from "@/components/conversation-history";
 import CredentialsModal from "@/components/credentials-modal";
 import { Button } from "@/components/ui/button";
-import { Settings, History } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Settings, History, MessageSquare, Search, Users, HelpCircle, Play, BookOpen, Waves } from "lucide-react";
 import type { AIResponse } from "@shared/schema";
 
 export default function Dashboard() {
@@ -17,6 +19,8 @@ export default function Dashboard() {
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false);
+  const [helpModalOpen, setHelpModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("ask");
   const { toast } = useToast();
 
   // Poll for response updates when we have a conversation
@@ -119,45 +123,54 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+      {/* Swimming Pool Header */}
+      <header className="bg-gradient-to-r from-blue-600 to-blue-800 border-b-4 border-yellow-400 sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-slate-800">Swim Meet</h1>
-                <p className="text-xs text-slate-500">Multi-AI Query Platform</p>
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center wave-animation">
+                  <Waves className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-white tracking-wide">Swim Meet</h1>
+                  <p className="text-blue-100 text-sm">AI Racing Platform • Compare • Compete • Collaborate</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            
+            <div className="flex items-center space-x-3">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {/* Navigate to history */}}
-                className="text-slate-600 hover:text-slate-900"
-                data-testid="button-history"
+                onClick={() => setHelpModalOpen(true)}
+                className="text-blue-100 hover:text-white hover:bg-blue-700"
+                data-testid="button-help"
               >
-                <History className="h-4 w-4 mr-2" />
-                History
+                <HelpCircle className="h-4 w-4 mr-2" />
+                Help
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCredentialsModalOpen(true)}
-                className="text-slate-600 hover:text-slate-900"
+                className="text-blue-100 hover:text-white hover:bg-blue-700"
                 data-testid="button-api-keys"
               >
                 <Settings className="h-4 w-4 mr-2" />
-                API Keys
+                Setup
               </Button>
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">U</span>
+              <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white">
+                <span className="text-blue-800 text-sm font-bold">SW</span>
               </div>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Swimming Lane Divider */}
+      <div className="h-2 lane-divider"></div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
