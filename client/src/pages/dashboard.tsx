@@ -25,7 +25,7 @@ export default function Dashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("freestyle");
+  const [activeTab, setActiveTab] = useState("dive");
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const { toast } = useToast();
 
@@ -125,7 +125,7 @@ export default function Dashboard() {
     // This will trigger the query to fetch responses for this conversation
   };
 
-  const handleBackstrokeVerification = async (responseToVerify: AIResponse) => {
+  const handleTurnVerification = async (responseToVerify: AIResponse) => {
     if (!currentQuery || !responseToVerify.content) {
       toast({
         title: "Cannot Verify",
@@ -157,7 +157,7 @@ export default function Dashboard() {
       const verificationResult = await submitQuery(verificationPrompt, availableVerifiers);
       setCurrentConversationId(verificationResult.conversationId);
       setResponses(verificationResult.responses);
-      setActiveTab("freestyle"); // Switch to show verification results
+      setActiveTab("dive"); // Switch to show verification results
       
       toast({
         title: "Verification Started",
@@ -174,7 +174,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleRelaySubmit = async (query: string) => {
+  const handleWorkSubmit = async (query: string) => {
     if (selectedAIs.length < 2) {
       toast({
         title: "Need Multiple AIs",
@@ -188,7 +188,7 @@ export default function Dashboard() {
     await handleQuerySubmit(query);
   };
 
-  const handleRelayRefinement = async () => {
+  const handleWorkRefinement = async () => {
     if (!currentQuery || responses.length === 0) {
       toast({
         title: "Cannot Continue Relay",
@@ -248,7 +248,7 @@ Please synthesize and improve upon what has been shared so far.`;
     }
   };
 
-  const handleRelaySynthesis = async () => {
+  const handleWorkSynthesis = async () => {
     if (!currentQuery || responses.length < 2) {
       toast({
         title: "Need More Responses",
@@ -382,57 +382,58 @@ This is the final leg of the relay - make it count!`;
           <div className="bg-white rounded-xl shadow-lg border-4 border-yellow-400 p-4">
             <TabsList className="grid w-full grid-cols-3 gap-4 bg-gradient-to-r from-blue-100 to-blue-50 p-2 rounded-lg">
               <TabsTrigger 
-                value="freestyle" 
+                value="dive" 
                 className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
-                data-testid="tab-freestyle"
+                data-testid="tab-dive"
               >
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v4c0 1-1 2-2 2H5c-1 0-2-1-2-2v-4z"/>
-                  <path d="M10 8c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z"/>
-                  <path d="M15 12l6 2-6 2v-4z"/>
-                  <path d="M9 14h4v2H9v-2z"/>
+                  {/* Swimmer diving from starting block - literal dive action */}
+                  <rect x="2" y="16" width="6" height="2" rx="1"/> {/* Starting block */}
+                  <circle cx="12" cy="6" r="2"/> {/* Head */}
+                  <path d="M10 8 C10 8 8 10 6 12 C8 14 12 16 16 14 C18 12 16 10 14 8"/> {/* Body in dive position */}
+                  <path d="M8 10 L6 12 M16 10 L18 12"/> {/* Arms extended */}
+                  <path d="M20 18 L22 20 M20 20 L22 18"/> {/* Water splash */}
                 </svg>
                 <div className="text-center">
-                  <span className="font-varsity text-lg">Freestyle</span>
+                  <span className="font-varsity text-lg">Dive</span>
                   <p className="text-xs opacity-75">Direct Analysis</p>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
-                value="backstroke" 
+                value="turn" 
                 className="data-[state=active]:bg-green-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
-                data-testid="tab-backstroke"
+                data-testid="tab-turn"
               >
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 8c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z"/>
-                  <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v4c0 1-1 2-2 2H5c-1 0-2-1-2-2v-4z"/>
-                  <path d="M1 12l4-2v4l-4-2z"/>
-                  <path d="M14 6l2 2 4-4"/>
-                  <path d="M14 14l2 2 4-4"/>
+                  {/* Swimmer doing underwater flip turn - literal turn action */}
+                  <circle cx="12" cy="12" r="2"/> {/* Head */}
+                  <path d="M10 12 C8 10 6 12 8 14 C10 16 14 16 16 14 C18 12 16 10 14 12"/> {/* Body curled in flip */}
+                  <path d="M2 20 L22 20"/> {/* Pool wall */}
+                  <path d="M8 8 Q12 6 16 8"/> {/* Curved motion line */}
+                  <path d="M6 16 Q12 18 18 16"/> {/* Water ripples */}
                 </svg>
                 <div className="text-center">
-                  <span className="font-varsity text-lg">Backstroke</span>
+                  <span className="font-varsity text-lg">Turn</span>
                   <p className="text-xs opacity-75">Verification</p>
                 </div>
               </TabsTrigger>
               <TabsTrigger 
-                value="relay" 
+                value="work" 
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
-                data-testid="tab-relay"
+                data-testid="tab-work"
               >
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="4" cy="8" r="2"/>
-                  <circle cx="12" cy="8" r="2"/>
-                  <circle cx="20" cy="8" r="2"/>
-                  <path d="M2 12h4v2H2v-2z"/>
-                  <path d="M10 12h4v2h-4v-2z"/>
-                  <path d="M18 12h4v2h-4v-2z"/>
-                  <path d="M6 10l4 0-1-1"/>
-                  <path d="M6 11l4 0-1 1"/>
-                  <path d="M14 10l4 0-1-1"/>
-                  <path d="M14 11l4 0-1 1"/>
+                  {/* Group of swimmers doing breaststroke - literal work action */}
+                  <circle cx="6" cy="8" r="1.5"/> {/* Swimmer 1 head */}
+                  <circle cx="12" cy="8" r="1.5"/> {/* Swimmer 2 head */}
+                  <circle cx="18" cy="8" r="1.5"/> {/* Swimmer 3 head */}
+                  <path d="M4 10 C3 11 3 13 5 13 C7 13 7 11 6 10"/> {/* Swimmer 1 breaststroke arms */}
+                  <path d="M10 10 C9 11 9 13 11 13 C13 13 13 11 12 10"/> {/* Swimmer 2 breaststroke arms */}
+                  <path d="M16 10 C15 11 15 13 17 13 C19 13 19 11 18 10"/> {/* Swimmer 3 breaststroke arms */}
+                  <path d="M2 16 L22 16"/> {/* Water line */}
                 </svg>
                 <div className="text-center">
-                  <span className="font-varsity text-lg">Relay</span>
+                  <span className="font-varsity text-lg">Work</span>
                   <p className="text-xs opacity-75">Collaboration</p>
                 </div>
               </TabsTrigger>
