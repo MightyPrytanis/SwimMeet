@@ -44,13 +44,25 @@
   animation: ripple 0.6s ease-out;
 }
 
-/* Varsity Block Letter Typography */
+/* Varsity Block Letter Typography - Enhanced for better legibility */
 .font-varsity {
   font-family: 'Alfa Slab One', 'Oswald', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+/* Enhanced block letter style for the main logo */
+.font-varsity-bold {
+  font-family: 'Alfa Slab One', 'Bowlby One', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 
+    3px 3px 0px rgba(0,0,0,0.5),
+    1px 1px 0px rgba(255,255,255,0.3);
+  -webkit-text-stroke: 1px rgba(0,0,0,0.2);
 }
 
 .font-varsity-bold {

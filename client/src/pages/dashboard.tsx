@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getConversationResponses, submitQuery } from "@/lib/api";
 import { getProviderDisplayName, AIProviderIcon } from "@/components/ai-provider-icons";
+import { createTruthfulnessPrompt } from "@/components/truthfulness-standards";
 import QueryInput from "@/components/query-input";
 import ResponseGrid from "@/components/response-grid";
 import BulkActions from "@/components/bulk-actions";
@@ -149,21 +150,10 @@ export default function Dashboard() {
       return;
     }
 
-    const verificationPrompt = `FACT-CHECK TASK: Please analyze and fact-check the following AI response to the query "${currentQuery}".
-
-Original Query: "${currentQuery}"
-
-AI Response to Verify (from ${getProviderDisplayName(responseToVerify.aiProvider)}):
-"${responseToVerify.content}"
-
-Please provide:
-1. ACCURACY ASSESSMENT: Overall accuracy rating (1-10)
-2. FACTUAL ERRORS: Any specific incorrect statements
-3. MISSING INFORMATION: Important points that should be included
-4. SOURCES: What sources would support or contradict these claims
-5. CONFIDENCE: Your confidence level in this assessment
-
-Be thorough and objective in your verification.`;
+    const verificationPrompt = createTruthfulnessPrompt(currentQuery).replace(
+      '[RESPONSE TO BE ANALYZED]', 
+      `${getProviderDisplayName(responseToVerify.aiProvider)}: "${responseToVerify.content}"`
+    );
 
     setIsSubmitting(true);
     try {
