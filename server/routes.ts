@@ -128,17 +128,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit query to multiple AIs
   app.post("/api/query", async (req, res) => {
     try {
-      const { query, selectedAIs, conversationId } = req.body as QueryRequest;
+      console.log("Request body:", JSON.stringify(req.body, null, 2));
+      const { prompt, providers, query, selectedAIs, conversationId } = req.body as QueryRequest & { prompt?: string, providers?: string[] };
       const userId = req.body.userId || "default-user";
+      
+      // Support both old and new request formats
+      const actualQuery = prompt || query;
+      const actualProviders = providers || selectedAIs;
+      
+      console.log("Parsed values:", { actualQuery, actualProviders });
+      
+      if (!actualQuery) {
+        return res.status(400).json({ message: "Query or prompt is required" });
+      }
+      
+      if (!actualProviders || !Array.isArray(actualProviders) || actualProviders.length === 0) {
+        return res.status(400).json({ message: "Providers array is required" });
+      }
       
       // Create conversation if not provided
       let convId = conversationId;
       if (!convId) {
+        console.log("Creating conversation with query:", actualQuery);
         const conversation = await storage.createConversation(userId, {
-          title: query.substring(0, 50) + (query.length > 50 ? "..." : ""),
-          query
+          title: actualQuery.substring(0, 50) + (actualQuery.length > 50 ? "..." : ""),
+          query: actualQuery
         });
         convId = conversation.id;
+        console.log("Created conversation with ID:", convId);
       }
 
       // Get user credentials
@@ -156,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const aiService = new AIService(credentials);
 
       // Create pending responses
-      const responsePromises = selectedAIs.map(async (aiProvider) => {
+      const responsePromises = actualProviders.map(async (aiProvider) => {
         const response = await storage.createResponse({
           conversationId: convId!,
           aiProvider,
@@ -166,7 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Query AI in background
         setImmediate(async () => {
-          const result = await aiService.queryMultiple(query, [aiProvider]);
+          const result = await aiService.queryMultiple(actualQuery, [aiProvider]);
           const aiResult = result[aiProvider];
           
           if (aiResult.success && aiResult.content) {
