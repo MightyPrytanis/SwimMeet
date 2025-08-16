@@ -21,6 +21,7 @@ export class AIService {
   private gemini: GoogleGenAI | null = null;
   private perplexity: OpenAI | null = null;
   private grok: OpenAI | null = null;
+  private copilotApiKey: string | null = null;
 
   constructor(credentials: Record<string, string>) {
     this.initializeClients(credentials);
@@ -33,6 +34,7 @@ export class AIService {
     const geminiKey = credentials.google || process.env.GEMINI_API_KEY;
     const perplexityKey = credentials.perplexity || process.env.PERPLEXITY_API_KEY;
     const xaiKey = credentials.grok || process.env.XAI_API_KEY;
+    const copilotKey = credentials.microsoft || process.env.COPILOT_API_KEY || "dfa5965f91msh742cae2064e8d2bp13f2a9jsn65b7d5c83e6b";
 
     if (openaiKey) {
       this.openai = new OpenAI({ apiKey: openaiKey });
@@ -58,6 +60,10 @@ export class AIService {
         baseURL: "https://api.x.ai/v1", 
         apiKey: xaiKey 
       });
+    }
+
+    if (copilotKey) {
+      this.copilotApiKey = copilotKey;
     }
   }
 
@@ -133,8 +139,42 @@ export class AIService {
   }
 
   async queryMicrosoft(prompt: string): Promise<AIServiceResponse> {
-    // Microsoft Copilot doesn't have a direct API - return a placeholder
-    return { success: false, error: "Microsoft Copilot API not available" };
+    if (!this.copilotApiKey) {
+      return { success: false, error: "Microsoft Copilot API key not configured" };
+    }
+
+    try {
+      const response = await fetch("https://copilot5.p.rapidapi.com/copilot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-rapidapi-host": "copilot5.p.rapidapi.com",
+          "x-rapidapi-key": this.copilotApiKey,
+        },
+        body: JSON.stringify({
+          message: prompt,
+          conversation_id: null,
+          mode: "CHAT",
+          markdown: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        success: true,
+        content: data.data || data.message || "No response generated",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `Microsoft Copilot error: ${error.message}`,
+      };
+    }
   }
 
   async queryPerplexity(prompt: string): Promise<AIServiceResponse> {
