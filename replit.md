@@ -12,6 +12,8 @@
 ✓ **Varsity Typography**: Enhanced block letter styling using Google Fonts for authentic collegiate/varsity appearance throughout the interface
 ✓ **Functional Response Actions**: Complete implementations of fact-check, humanize, and reply features with modal dialogs and real AI processing
 ✓ **Deep Blue Aquatic Theme**: Maintained sophisticated underwater/natatorium design aesthetic with swimming event terminology and icons
+⚠️ **Critical Issue Identified**: User reported that deployed site has non-functional UI elements despite working code. Investigation revealed that dropdown buttons, rating system, and Backstroke/Relay tabs appear broken in production while code exists and works locally.
+⚠️ **Status**: All functionality exists in codebase but deployment may have runtime errors preventing interactive elements from working
 
 ## User Preferences
 

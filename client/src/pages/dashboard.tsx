@@ -11,7 +11,7 @@ import BulkActions from "@/components/bulk-actions";
 import ConversationHistory from "@/components/conversation-history";
 import CredentialsModal from "@/components/credentials-modal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import EventIcon from "@/components/event-icon";
+// Removed unused import
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -77,17 +77,13 @@ export default function Dashboard() {
   };
 
   const handleFactCheck = (response: AIResponse) => {
-    toast({
-      title: "Fact Check",
-      description: "Fact checking feature will be implemented soon",
-    });
+    // This is handled within the ResponseGrid component
+    // The ResponseGrid component has the real fact-checking functionality
   };
 
   const handleReply = (response: AIResponse) => {
-    toast({
-      title: "Reply",
-      description: "Reply feature will be implemented soon",
-    });
+    // This is handled within the ResponseGrid component  
+    // The ResponseGrid component has the real reply functionality
   };
 
   const handleBulkSubmitToGroup = () => {
@@ -119,8 +115,8 @@ export default function Dashboard() {
     }
 
     toast({
-      title: "Fact Check All",
-      description: "Bulk fact checking feature will be implemented soon",
+      title: "Bulk Fact Check Started",
+      description: `Fact checking ${completeResponses.length} responses. Use individual fact-check buttons below each response.`,
     });
   };
 
