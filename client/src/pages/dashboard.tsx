@@ -178,7 +178,7 @@ export default function Dashboard() {
     if (selectedAIs.length < 2) {
       toast({
         title: "Need Multiple AIs",
-        description: "Select at least 2 AI models for relay collaboration",
+        description: "Select at least 2 AI models for work collaboration",
         variant: "destructive",
       });
       return;
@@ -191,7 +191,7 @@ export default function Dashboard() {
   const handleWorkRefinement = async () => {
     if (!currentQuery || responses.length === 0) {
       toast({
-        title: "Cannot Continue Relay",
+        title: "Cannot Continue Work",
         description: "No previous responses to build upon",
         variant: "destructive",
       });
@@ -202,7 +202,7 @@ export default function Dashboard() {
     if (completeResponses.length === 0) {
       toast({
         title: "Wait for Responses",
-        description: "Wait for initial responses before continuing the relay",
+        description: "Wait for initial responses before continuing the work",
         variant: "destructive",
       });
       return;
@@ -212,7 +212,7 @@ export default function Dashboard() {
       `${getProviderDisplayName(r.aiProvider)}: ${r.content?.substring(0, 300)}...`
     ).join('\n\n');
 
-    const refinementPrompt = `RELAY REFINEMENT TASK: Building on previous AI responses to improve the answer to "${currentQuery}".
+    const refinementPrompt = `WORK REFINEMENT TASK: Building on previous AI responses to improve the answer to "${currentQuery}".
 
 Original Query: "${currentQuery}"
 
@@ -234,13 +234,13 @@ Please synthesize and improve upon what has been shared so far.`;
       setResponses(refinementResult.responses);
       
       toast({
-        title: "Relay Continued",
+        title: "Work Continued",
         description: "AI agents are building on previous responses",
       });
     } catch (error: any) {
       toast({
         title: "Refinement Failed",
-        description: error.message || "Failed to continue relay",
+        description: error.message || "Failed to continue work",
         variant: "destructive",
       });
     } finally {
@@ -272,7 +272,7 @@ Please synthesize and improve upon what has been shared so far.`;
       `${getProviderDisplayName(r.aiProvider)}: ${r.content}`
     ).join('\n\n---\n\n');
 
-    const synthesisPrompt = `RELAY SYNTHESIS TASK: Create the final, best possible answer by synthesizing all team responses to "${currentQuery}".
+    const synthesisPrompt = `WORK SYNTHESIS TASK: Create the final, best possible answer by synthesizing all team responses to "${currentQuery}".
 
 Original Query: "${currentQuery}"
 
@@ -286,7 +286,7 @@ Your task: Provide the ultimate synthesized answer that:
 4. Presents a clear, comprehensive, and authoritative final answer
 5. Acknowledges the collaborative process
 
-This is the final leg of the relay - make it count!`;
+This is the final stage of the work - make it count!`;
 
     // Use just one AI (preferably Anthropic or OpenAI) for synthesis to avoid confusion
     const synthesisAI = selectedAIs.includes('anthropic') ? ['anthropic'] : 
@@ -300,7 +300,7 @@ This is the final leg of the relay - make it count!`;
       setResponses(synthesisResult.responses);
       
       toast({
-        title: "Relay Complete",
+        title: "Work Complete",
         description: "Final synthesis has been generated",
       });
     } catch (error: any) {
@@ -440,8 +440,8 @@ This is the final leg of the relay - make it count!`;
             </TabsList>
           </div>
 
-          {/* Freestyle Event - Main Competition Pool */}
-          <TabsContent value="freestyle" className="space-y-8">
+          {/* Dive Event - Main Competition Pool */}
+          <TabsContent value="dive" className="space-y-8">
             <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 border-blue-400 border-2 shadow-2xl">
               <CardHeader className="text-center pb-6 bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-t-lg relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent animate-pulse"></div>
@@ -453,7 +453,7 @@ This is the final leg of the relay - make it count!`;
                     <path d="M15 12l6 2-6 2v-4z"/>
                     <path d="M9 14h4v2H9v-2z"/>
                   </svg>
-                  <span className="text-white">Freestyle Analysis</span>
+                  <span className="text-white">Dive Analysis</span>
                 </CardTitle>
                 <CardDescription className="text-blue-200 text-lg relative z-10">
                   Submit queries for comprehensive multi-model analysis and comparison
@@ -495,8 +495,8 @@ This is the final leg of the relay - make it count!`;
             )}
           </TabsContent>
 
-          {/* Backstroke Event - AI-to-AI Verification Pool */}
-          <TabsContent value="backstroke" className="space-y-8">
+          {/* Turn Event - AI-to-AI Verification Pool */}
+          <TabsContent value="turn" className="space-y-8">
             <Card className="bg-gradient-to-r from-green-50 to-emerald-100 border-green-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
@@ -507,7 +507,7 @@ This is the final leg of the relay - make it count!`;
                     <path d="M14 6l2 2 4-4"/>
                     <path d="M14 14l2 2 4-4"/>
                   </svg>
-                  <span>Backstroke Verification</span>
+                  <span>Turn Verification</span>
                 </CardTitle>
                 <CardDescription className="text-green-100 text-lg">
                   AI agents fact-check each other's responses - looking back for accuracy and reliability
@@ -521,7 +521,7 @@ This is the final leg of the relay - make it count!`;
                     </div>
                     <h3 className="text-2xl font-varsity text-green-800 mb-4">Verification Lanes Ready</h3>
                     <p className="text-green-600 max-w-lg mx-auto text-lg leading-relaxed">
-                      Submit a query in Freestyle first, then return here to have other AI agents fact-check and verify the responses.
+                      Submit a query in Dive first, then return here to have other AI agents fact-check and verify the responses.
                     </p>
                   </div>
                 ) : (
@@ -534,7 +534,7 @@ This is the final leg of the relay - make it count!`;
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {responses.filter(r => r.status === 'complete').map((response) => (
                         <Card key={response.id} className="border-green-200 hover:shadow-md transition-shadow cursor-pointer" 
-                              onClick={() => handleBackstrokeVerification(response)}>
+                              onClick={() => handleTurnVerification(response)}>
                           <div className="border-b border-green-200 p-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-3">
@@ -549,7 +549,7 @@ This is the final leg of the relay - make it count!`;
                               <Button 
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleBackstrokeVerification(response);
+                                  handleTurnVerification(response);
                                 }}
                                 className="bg-green-600 hover:bg-green-700 text-white"
                                 size="sm"
@@ -572,8 +572,8 @@ This is the final leg of the relay - make it count!`;
             </Card>
           </TabsContent>
 
-          {/* Relay Event - Collaboration Pool */}
-          <TabsContent value="relay" className="space-y-8">
+          {/* Work Event - Collaboration Pool */}
+          <TabsContent value="work" className="space-y-8">
             <Card className="bg-gradient-to-r from-purple-50 to-pink-100 border-purple-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
@@ -589,7 +589,7 @@ This is the final leg of the relay - make it count!`;
                     <path d="M14 10l4 0-1-1"/>
                     <path d="M14 11l4 0-1 1"/>
                   </svg>
-                  <span>AI Relay Team</span>
+                  <span>AI Work Team</span>
                 </CardTitle>
                 <CardDescription className="text-purple-100 text-lg">
                   Multiple AI agents collaborate, build on each other's ideas, and refine solutions together
@@ -600,10 +600,10 @@ This is the final leg of the relay - make it count!`;
                   <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
                     <h3 className="text-xl font-varsity text-purple-800 mb-4 flex items-center">
                       <span className="text-2xl mr-2">🏊‍♂️</span>
-                      Relay Query Input
+                      Work Query Input
                     </h3>
                     <QueryInput
-                      onSubmit={handleRelaySubmit}
+                      onSubmit={handleWorkSubmit}
                       selectedAIs={selectedAIs}
                       onSelectionChange={setSelectedAIs}
                       isLoading={isSubmitting}
@@ -615,18 +615,18 @@ This is the final leg of the relay - make it count!`;
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-varsity text-purple-800 flex items-center">
                           <span className="text-2xl mr-2">🔄</span>
-                          Relay Progress
+                          Work Progress
                         </h3>
                         <div className="flex space-x-2">
                           <Button
-                            onClick={handleRelayRefinement}
+                            onClick={handleWorkRefinement}
                             disabled={isSubmitting || responses.filter(r => r.status === 'complete').length === 0}
                             className="bg-purple-600 hover:bg-purple-700"
                           >
-                            Continue Relay
+                            Continue Work
                           </Button>
                           <Button
-                            onClick={handleRelaySynthesis}
+                            onClick={handleWorkSynthesis}
                             disabled={isSubmitting || responses.filter(r => r.status === 'complete').length < 2}
                             className="bg-pink-600 hover:bg-pink-700"
                           >
@@ -655,7 +655,7 @@ This is the final leg of the relay - make it count!`;
                       <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <span className="text-5xl">🏊‍♂️</span>
                       </div>
-                      <h3 className="text-2xl font-varsity text-purple-800 mb-4">Relay Team Ready</h3>
+                      <h3 className="text-2xl font-varsity text-purple-800 mb-4">Work Team Ready</h3>
                       <p className="text-purple-600 max-w-lg mx-auto text-lg leading-relaxed">
                         Start a collaborative session where AI agents build on each other's responses,
                         refine ideas, and work together toward the best solution.
