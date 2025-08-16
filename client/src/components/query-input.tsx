@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NotebookPen, Shield, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { getProviders } from "@/lib/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getProviders, testProviderConnection } from "@/lib/api";
 import { AIProviderIcon, getProviderDisplayName } from "@/components/ai-provider-icons";
 import type { AIProvider } from "@shared/schema";
 
@@ -19,12 +19,45 @@ interface QueryInputProps {
 
 export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, isLoading = false }: QueryInputProps) {
   const [query, setQuery] = useState("");
+  const [providerStatuses, setProviderStatuses] = useState<Record<string, 'connected' | 'setup_required' | 'error'>>({});
   const { toast } = useToast();
 
   const { data: providers = [] } = useQuery({
     queryKey: ['/api/providers'],
     queryFn: () => getProviders(),
   });
+
+  const testConnectionMutation = useMutation({
+    mutationFn: (providerId: string) => testProviderConnection(providerId),
+    onSuccess: (data, providerId) => {
+      setProviderStatuses(prev => ({
+        ...prev,
+        [providerId]: data.success ? 'connected' : 'error'
+      }));
+    },
+    onError: (error, providerId) => {
+      setProviderStatuses(prev => ({
+        ...prev,
+        [providerId]: 'error'
+      }));
+    },
+  });
+
+  // Test connections when providers load
+  useEffect(() => {
+    if (providers.length > 0) {
+      providers.forEach(provider => {
+        if (provider.status === 'connected') {
+          testConnectionMutation.mutate(provider.id);
+        } else {
+          setProviderStatuses(prev => ({
+            ...prev,
+            [provider.id]: provider.status
+          }));
+        }
+      });
+    }
+  }, [providers]);
 
   const handleSubmit = () => {
     if (!query.trim()) {
@@ -110,10 +143,11 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
                   disabled={provider.status === 'error'}
                   data-testid={`checkbox-${provider.id}`}
                 />
-                <AIProviderIcon provider={provider.id} className="w-6 h-6" status={provider.status} />
+                <AIProviderIcon provider={provider.id} className="w-6 h-6" status={providerStatuses[provider.id] || provider.status} />
                 <span className="text-sm font-medium">{getProviderDisplayName(provider.id)}</span>
                 <div className={`w-2 h-2 rounded-full ${
-                  provider.status === 'connected' ? 'bg-emerald-500' : 'bg-slate-400'
+                  (providerStatuses[provider.id] || provider.status) === 'connected' ? 'bg-emerald-500' : 
+                  (providerStatuses[provider.id] || provider.status) === 'error' ? 'bg-red-500' : 'bg-yellow-500'
                 }`} />
               </label>
             ))}

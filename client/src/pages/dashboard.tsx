@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getConversationResponses, submitQuery } from "@/lib/api";
+import { getProviderDisplayName, AIProviderIcon } from "@/components/ai-provider-icons";
 import QueryInput from "@/components/query-input";
 import ResponseGrid from "@/components/response-grid";
 import BulkActions from "@/components/bulk-actions";
@@ -124,6 +125,206 @@ export default function Dashboard() {
   const handleOpenConversation = (conversationId: string) => {
     setCurrentConversationId(conversationId);
     // This will trigger the query to fetch responses for this conversation
+  };
+
+  const handleBackstrokeVerification = async (responseToVerify: AIResponse) => {
+    if (!currentQuery || !responseToVerify.content) {
+      toast({
+        title: "Cannot Verify",
+        description: "Original query or response content not available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get other connected AI providers to do the verification
+    const availableVerifiers = selectedAIs.filter(ai => ai !== responseToVerify.aiProvider);
+    
+    if (availableVerifiers.length === 0) {
+      toast({
+        title: "No Verifiers Available", 
+        description: "Select other AI models to perform verification",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const verificationPrompt = `FACT-CHECK TASK: Please analyze and fact-check the following AI response to the query "${currentQuery}".
+
+Original Query: "${currentQuery}"
+
+AI Response to Verify (from ${getProviderDisplayName(responseToVerify.aiProvider)}):
+"${responseToVerify.content}"
+
+Please provide:
+1. ACCURACY ASSESSMENT: Overall accuracy rating (1-10)
+2. FACTUAL ERRORS: Any specific incorrect statements
+3. MISSING INFORMATION: Important points that should be included
+4. SOURCES: What sources would support or contradict these claims
+5. CONFIDENCE: Your confidence level in this assessment
+
+Be thorough and objective in your verification.`;
+
+    setIsSubmitting(true);
+    try {
+      const verificationResult = await submitQuery(verificationPrompt, availableVerifiers);
+      setCurrentConversationId(verificationResult.conversationId);
+      setResponses(verificationResult.responses);
+      setActiveTab("freestyle"); // Switch to show verification results
+      
+      toast({
+        title: "Verification Started",
+        description: `${availableVerifiers.length} AI agents are fact-checking the response`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to start verification",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRelaySubmit = async (query: string) => {
+    if (selectedAIs.length < 2) {
+      toast({
+        title: "Need Multiple AIs",
+        description: "Select at least 2 AI models for relay collaboration",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCurrentQuery(query);
+    await handleQuerySubmit(query);
+  };
+
+  const handleRelayRefinement = async () => {
+    if (!currentQuery || responses.length === 0) {
+      toast({
+        title: "Cannot Continue Relay",
+        description: "No previous responses to build upon",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const completeResponses = responses.filter(r => r.status === 'complete');
+    if (completeResponses.length === 0) {
+      toast({
+        title: "Wait for Responses",
+        description: "Wait for initial responses before continuing the relay",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const previousResponsesSummary = completeResponses.map(r => 
+      `${getProviderDisplayName(r.aiProvider)}: ${r.content?.substring(0, 300)}...`
+    ).join('\n\n');
+
+    const refinementPrompt = `RELAY REFINEMENT TASK: Building on previous AI responses to improve the answer to "${currentQuery}".
+
+Original Query: "${currentQuery}"
+
+Previous Team Responses:
+${previousResponsesSummary}
+
+Your task: Review the above responses and provide an improved, refined answer that:
+1. Builds upon the best ideas from previous responses
+2. Addresses any gaps or weaknesses you notice
+3. Adds new insights or perspectives
+4. Provides a more comprehensive solution
+
+Please synthesize and improve upon what has been shared so far.`;
+
+    setIsSubmitting(true);
+    try {
+      const refinementResult = await submitQuery(refinementPrompt, selectedAIs);
+      setCurrentConversationId(refinementResult.conversationId);
+      setResponses(refinementResult.responses);
+      
+      toast({
+        title: "Relay Continued",
+        description: "AI agents are building on previous responses",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Refinement Failed",
+        description: error.message || "Failed to continue relay",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRelaySynthesis = async () => {
+    if (!currentQuery || responses.length < 2) {
+      toast({
+        title: "Need More Responses",
+        description: "Need at least 2 responses to synthesize",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const completeResponses = responses.filter(r => r.status === 'complete');
+    if (completeResponses.length < 2) {
+      toast({
+        title: "Wait for More Responses",
+        description: "Wait for more responses before synthesizing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const allResponsesSummary = completeResponses.map(r => 
+      `${getProviderDisplayName(r.aiProvider)}: ${r.content}`
+    ).join('\n\n---\n\n');
+
+    const synthesisPrompt = `RELAY SYNTHESIS TASK: Create the final, best possible answer by synthesizing all team responses to "${currentQuery}".
+
+Original Query: "${currentQuery}"
+
+All Team Responses:
+${allResponsesSummary}
+
+Your task: Provide the ultimate synthesized answer that:
+1. Combines the best elements from all responses
+2. Resolves any contradictions between responses
+3. Fills in any remaining gaps
+4. Presents a clear, comprehensive, and authoritative final answer
+5. Acknowledges the collaborative process
+
+This is the final leg of the relay - make it count!`;
+
+    // Use just one AI (preferably Anthropic or OpenAI) for synthesis to avoid confusion
+    const synthesisAI = selectedAIs.includes('anthropic') ? ['anthropic'] : 
+                       selectedAIs.includes('openai') ? ['openai'] : 
+                       [selectedAIs[0]];
+
+    setIsSubmitting(true);
+    try {
+      const synthesisResult = await submitQuery(synthesisPrompt, synthesisAI);
+      setCurrentConversationId(synthesisResult.conversationId);
+      setResponses(synthesisResult.responses);
+      
+      toast({
+        title: "Relay Complete",
+        description: "Final synthesis has been generated",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Synthesis Failed",
+        description: error.message || "Failed to synthesize final answer",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -279,35 +480,73 @@ export default function Dashboard() {
             )}
           </TabsContent>
 
-          {/* Backstroke Event - Verification Pool */}
+          {/* Backstroke Event - AI-to-AI Verification Pool */}
           <TabsContent value="backstroke" className="space-y-8">
             <Card className="bg-gradient-to-r from-green-50 to-emerald-100 border-green-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
-                <CardTitle className="text-3xl font-bold flex items-center justify-center space-x-3">
-                  <span className="text-4xl">🤾‍♂️</span>
+                <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
+                  <EventIcon event="backstroke" className="w-10 h-10 text-green-300" />
                   <span>Backstroke Verification</span>
                 </CardTitle>
                 <CardDescription className="text-green-100 text-lg">
-                  Look back and verify accuracy - check facts, cross-reference sources, and ensure reliability
+                  AI agents fact-check each other's responses - looking back for accuracy and reliability
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center py-16">
-                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-5xl">🔍</span>
-                </div>
-                <h3 className="text-2xl font-bold text-green-800 mb-4">Starting Blocks Ready</h3>
-                <p className="text-green-600 max-w-lg mx-auto text-lg leading-relaxed">
-                  Advanced fact-checking lanes are being prepared. Soon you'll be able to verify AI responses 
-                  against multiple sources, check citations, and identify potential inaccuracies.
-                </p>
-                <div className="mt-8 flex justify-center space-x-4">
-                  <div className="bg-green-200 px-4 py-2 rounded-full">
-                    <span className="text-green-800 font-semibold">🚧 Lane 1: Source Verification</span>
+              <CardContent className="p-8">
+                {responses.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <span className="text-5xl">🔍</span>
+                    </div>
+                    <h3 className="text-2xl font-varsity text-green-800 mb-4">Verification Lanes Ready</h3>
+                    <p className="text-green-600 max-w-lg mx-auto text-lg leading-relaxed">
+                      Submit a query in Freestyle first, then return here to have other AI agents fact-check and verify the responses.
+                    </p>
                   </div>
-                  <div className="bg-green-200 px-4 py-2 rounded-full">
-                    <span className="text-green-800 font-semibold">🚧 Lane 2: Cross-Reference Check</span>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="text-center mb-8">
+                      <h3 className="text-xl font-varsity text-green-800 mb-2">Select Response to Verify</h3>
+                      <p className="text-green-600">Choose an AI response below to have other agents fact-check it</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {responses.filter(r => r.status === 'complete').map((response) => (
+                        <Card key={response.id} className="border-green-200 hover:shadow-md transition-shadow cursor-pointer" 
+                              onClick={() => handleBackstrokeVerification(response)}>
+                          <div className="border-b border-green-200 p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                <AIProviderIcon provider={response.aiProvider} className="w-8 h-8" status="connected" />
+                                <div>
+                                  <h4 className="font-semibold text-green-900">
+                                    {getProviderDisplayName(response.aiProvider)}
+                                  </h4>
+                                  <p className="text-sm text-green-600">Original Response</p>
+                                </div>
+                              </div>
+                              <Button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleBackstrokeVerification(response);
+                                }}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                size="sm"
+                              >
+                                Verify
+                              </Button>
+                            </div>
+                          </div>
+                          <CardContent className="p-4">
+                            <p className="text-green-800 text-sm line-clamp-3">
+                              {response.content?.substring(0, 200)}...
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -316,14 +555,94 @@ export default function Dashboard() {
           <TabsContent value="relay" className="space-y-8">
             <Card className="bg-gradient-to-r from-purple-50 to-pink-100 border-purple-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
-                <CardTitle className="text-3xl font-bold flex items-center justify-center space-x-3">
-                  <span className="text-4xl">🏃‍♂️🏃‍♀️</span>
+                <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
+                  <EventIcon event="relay" className="w-10 h-10 text-purple-300" />
                   <span>AI Relay Team</span>
                 </CardTitle>
                 <CardDescription className="text-purple-100 text-lg">
-                  Team up multiple AI swimmers for collaborative problem-solving and iterative refinement
+                  Multiple AI agents collaborate, build on each other's ideas, and refine solutions together
                 </CardDescription>
               </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                    <h3 className="text-xl font-varsity text-purple-800 mb-4 flex items-center">
+                      <span className="text-2xl mr-2">🏊‍♂️</span>
+                      Relay Query Input
+                    </h3>
+                    <QueryInput
+                      onSubmit={handleRelaySubmit}
+                      selectedAIs={selectedAIs}
+                      onSelectionChange={setSelectedAIs}
+                      isLoading={isSubmitting}
+                    />
+                  </div>
+                  
+                  {responses.length > 0 && (
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-varsity text-purple-800 flex items-center">
+                          <span className="text-2xl mr-2">🔄</span>
+                          Relay Progress
+                        </h3>
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={handleRelayRefinement}
+                            disabled={isSubmitting || responses.filter(r => r.status === 'complete').length === 0}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            Continue Relay
+                          </Button>
+                          <Button
+                            onClick={handleRelaySynthesis}
+                            disabled={isSubmitting || responses.filter(r => r.status === 'complete').length < 2}
+                            className="bg-pink-600 hover:bg-pink-700"
+                          >
+                            Synthesize Final
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center mb-4">
+                        <p className="text-purple-600">
+                          {responses.filter(r => r.status === 'complete').length} of {responses.length} swimmers completed their leg
+                        </p>
+                      </div>
+                      
+                      <ResponseGrid
+                        responses={responses}
+                        originalQuery={currentQuery}
+                        onFactCheck={handleFactCheck}
+                        onReply={handleReply}
+                      />
+                    </div>
+                  )}
+                  
+                  {responses.length === 0 && (
+                    <div className="text-center py-16">
+                      <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span className="text-5xl">🏊‍♂️</span>
+                      </div>
+                      <h3 className="text-2xl font-varsity text-purple-800 mb-4">Relay Team Ready</h3>
+                      <p className="text-purple-600 max-w-lg mx-auto text-lg leading-relaxed">
+                        Start a collaborative session where AI agents build on each other's responses,
+                        refine ideas, and work together toward the best solution.
+                      </p>
+                      <div className="mt-8 flex justify-center space-x-4">
+                        <div className="bg-purple-200 px-4 py-2 rounded-full">
+                          <span className="text-purple-800 font-semibold">🏊‍♀️ Initial Response</span>
+                        </div>
+                        <div className="bg-purple-200 px-4 py-2 rounded-full">
+                          <span className="text-purple-800 font-semibold">🔄 Refinement</span>
+                        </div>
+                        <div className="bg-purple-200 px-4 py-2 rounded-full">
+                          <span className="text-purple-800 font-semibold">🏆 Synthesis</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
               <CardContent className="text-center py-16">
                 <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-5xl">🤝</span>
