@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Settings, History, MessageSquare, Search, Users, HelpCircle, Play, BookOpen, Waves } from "lucide-react";
 import type { AIResponse } from "@shared/schema";
+import { DebugTest } from "@/components/debug-test";
 
 export default function Dashboard() {
   const [selectedAIs, setSelectedAIs] = useState<string[]>([]);
@@ -316,6 +317,7 @@ This is the final stage of the work - make it count!`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
+      <DebugTest />
       {/* Underwater effect with floating particles */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-10 w-2 h-2 bg-cyan-300 rounded-full animate-bounce"></div>
