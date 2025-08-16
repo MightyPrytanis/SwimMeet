@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Saira+Stencil+One&family=Ultra&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Bowlby+One&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -165,30 +165,24 @@
 
 @layer components {
   .font-varsity {
-    font-family: 'Ultra', serif;
+    font-family: 'Bowlby One', serif;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--deep-ocean);
+    -webkit-text-stroke: 2px white;
+    text-stroke: 2px white;
+    paint-order: stroke fill;
+  }
+  
+  .font-varsity-bold {
+    font-family: 'Bowlby One', serif;
     font-weight: 400;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--deep-ocean);
-    text-shadow: 
-      -2px -2px 0 white,  
-      2px -2px 0 white,
-      -2px 2px 0 white,
-      2px 2px 0 white,
-      0px 0px 8px rgba(0,100,200,0.3);
-  }
-  
-  .font-varsity-bold {
-    font-family: 'Ultra', serif;
-    font-weight: 400;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--deep-ocean);
-    text-shadow: 
-      -3px -3px 0 white,  
-      3px -3px 0 white,
-      -3px 3px 0 white,
-      3px 3px 0 white,
-      0px 0px 12px rgba(0,100,200,0.4);
+    -webkit-text-stroke: 3px white;
+    text-stroke: 3px white;
+    paint-order: stroke fill;
   }
 }

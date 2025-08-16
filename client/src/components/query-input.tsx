@@ -67,7 +67,7 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
   const availableProviders = providers; // Show all providers
 
   return (
-    <div className="bg-white border-2 border-blue-200 rounded-xl shadow-lg">
+    <div className="bg-gradient-to-br from-blue-100 to-cyan-50 border-2 border-blue-300 rounded-xl shadow-xl backdrop-blur-sm">
       <div className="p-8">
         {/* Header with emphasis on accuracy */}
         <div className="flex items-center justify-between mb-6">

@@ -125,9 +125,20 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
+      {/* Underwater effect with floating particles */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-cyan-300 rounded-full animate-bounce"></div>
+        <div className="absolute top-40 right-20 w-1 h-1 bg-blue-200 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-32 left-1/4 w-3 h-3 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-60 right-1/3 w-1 h-1 bg-blue-300 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      {/* Water surface shimmer effect */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-cyan-400/10 to-transparent"></div>
+      
       {/* Swimming Pool Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-800 border-b-4 border-yellow-400 sticky top-0 z-50 shadow-lg">
+      <header className="bg-gradient-to-r from-blue-800 to-blue-900 border-b-4 border-cyan-400 sticky top-0 z-50 shadow-2xl relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
@@ -218,17 +229,19 @@ export default function Dashboard() {
 
           {/* Freestyle Event - Main Competition Pool */}
           <TabsContent value="freestyle" className="space-y-8">
-            <Card className="bg-gradient-to-r from-blue-50 to-cyan-100 border-blue-300 border-2">
-              <CardHeader className="text-center pb-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
-                <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
-                  <EventIcon event="freestyle" className="w-10 h-10" />
-                  <span>Freestyle Analysis</span>
+            <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 border-blue-400 border-2 shadow-2xl">
+              <CardHeader className="text-center pb-6 bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-t-lg relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent animate-pulse"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-300 to-cyan-400"></div>
+                <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3 relative z-10">
+                  <EventIcon event="freestyle" className="w-10 h-10 text-cyan-300" />
+                  <span className="text-white">Freestyle Analysis</span>
                 </CardTitle>
-                <CardDescription className="text-blue-100 text-lg">
+                <CardDescription className="text-blue-200 text-lg relative z-10">
                   Submit queries for comprehensive multi-model analysis and comparison
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-8">
+              <CardContent className="p-8 bg-gradient-to-b from-blue-800 to-blue-900">
                 <QueryInput
                   onSubmit={handleQuerySubmit}
                   selectedAIs={selectedAIs}
