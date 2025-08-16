@@ -114,6 +114,29 @@ export class AIService {
     }
   }
 
+  async queryMicrosoft(prompt: string): Promise<AIServiceResponse> {
+    // Microsoft Copilot doesn't have a direct API - return a placeholder
+    return { success: false, error: "Microsoft Copilot API not available" };
+  }
+
+  async queryPerplexity(prompt: string): Promise<AIServiceResponse> {
+    // For now, return placeholder - Perplexity API would need separate implementation
+    return { success: false, error: "Perplexity API not configured" };
+  }
+
+  async queryGrok(prompt: string): Promise<AIServiceResponse> {
+    // Grok would use xAI API (similar to OpenAI)
+    return { success: false, error: "Grok API not configured" };
+  }
+
+  async queryDeepSeek(prompt: string): Promise<AIServiceResponse> {
+    return { success: false, error: "DeepSeek API not configured" };
+  }
+
+  async queryLlama(prompt: string): Promise<AIServiceResponse> {
+    return { success: false, error: "Llama API not configured" };
+  }
+
   async queryMultiple(prompt: string, providers: string[]): Promise<Record<string, AIServiceResponse>> {
     const results: Record<string, AIServiceResponse> = {};
     
@@ -129,6 +152,21 @@ export class AIService {
           break;
         case 'google':
           result = await this.queryGemini(prompt);
+          break;
+        case 'microsoft':
+          result = await this.queryMicrosoft(prompt);
+          break;
+        case 'perplexity':
+          result = await this.queryPerplexity(prompt);
+          break;
+        case 'grok':
+          result = await this.queryGrok(prompt);
+          break;
+        case 'deepseek':
+          result = await this.queryDeepSeek(prompt);
+          break;
+        case 'llama':
+          result = await this.queryLlama(prompt);
           break;
         default:
           result = { success: false, error: `Unsupported provider: ${provider}` };
