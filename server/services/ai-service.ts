@@ -25,16 +25,21 @@ export class AIService {
   }
 
   private initializeClients(credentials: Record<string, string>) {
-    if (credentials.openai) {
-      this.openai = new OpenAI({ apiKey: credentials.openai });
+    // Use stored credentials or fallback to environment variables
+    const openaiKey = credentials.openai || process.env.OPENAI_API_KEY;
+    const anthropicKey = credentials.anthropic || process.env.ANTHROPIC_API_KEY;
+    const geminiKey = credentials.google || process.env.GEMINI_API_KEY;
+
+    if (openaiKey) {
+      this.openai = new OpenAI({ apiKey: openaiKey });
     }
 
-    if (credentials.anthropic) {
-      this.anthropic = new Anthropic({ apiKey: credentials.anthropic });
+    if (anthropicKey) {
+      this.anthropic = new Anthropic({ apiKey: anthropicKey });
     }
 
-    if (credentials.google) {
-      this.gemini = new GoogleGenAI({ apiKey: credentials.google });
+    if (geminiKey) {
+      this.gemini = new GoogleGenAI({ apiKey: geminiKey });
     }
   }
 
