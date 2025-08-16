@@ -60,6 +60,9 @@ export function HelpContent() {
             <div className="text-xs text-slate-600">
               Ideal for complex problems requiring multiple perspectives and iterative improvement.
             </div>
+            <div className="mt-3 p-2 bg-blue-50 rounded text-xs">
+              <strong>Integration Request:</strong> Need additional AI models? Submit requests for new provider integrations via the Support section.
+            </div>
           </CardContent>
         </Card>
 
@@ -87,8 +90,8 @@ export function HelpContent() {
               <div><strong>Silver Medal:</strong> High quality</div>
               <div><strong>Bronze Medal:</strong> Good quality</div>
               <div><strong>Finished:</strong> Adequate completion</div>
-              <div><strong>Sank:</strong> Poor quality</div>
-              <div><strong>Titanic:</strong> Failed completely</div>
+              <div><strong>Quit:</strong> Gave up or stopped trying</div>
+              <div><strong>Titanic:</strong> Complete disaster</div>
             </div>
           </CardContent>
         </Card>

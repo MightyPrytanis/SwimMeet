@@ -316,7 +316,28 @@ export class AIService {
   }
 
   async humanizeResponse(response: string): Promise<string> {
-    // Remove AI-specific language and replace with human-like alternatives
+    // Use Anthropic/Claude to humanize the response naturally
+    if (this.anthropic) {
+      try {
+        const humanizePrompt = `Please rewrite the following response to sound more natural and human-like while preserving all the factual content and meaning. Remove any AI-specific language, make it conversational, and ensure it flows naturally:
+
+"${response}"
+
+Provide only the humanized version, no explanations.`;
+
+        const result = await this.anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 2000,
+          messages: [{ role: "user", content: humanizePrompt }]
+        });
+
+        return result.content[0].type === 'text' ? result.content[0].text : response;
+      } catch (error) {
+        console.error('Humanization failed, using fallback:', error);
+      }
+    }
+
+    // Fallback method if Anthropic is not available
     const humanizedNames = ['Linda', 'Marcus', 'Sarah', 'David', 'Emma', 'James', 'Maria', 'Alex'];
     const randomName = humanizedNames[Math.floor(Math.random() * humanizedNames.length)];
     

@@ -258,15 +258,33 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleFactCheck(response)}>
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleFactCheck(response);
+                        }}
+                      >
                         <Search className="h-4 w-4 mr-2" />
                         Fact Check
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleHumanizeAndSubmit(response)}>
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleHumanizeAndSubmit(response);
+                        }}
+                      >
                         <UserCog className="h-4 w-4 mr-2" />
                         Humanize
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleReply(response)}>
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleReply(response);
+                        }}
+                      >
                         <Reply className="h-4 w-4 mr-2" />
                         Reply
                       </DropdownMenuItem>
