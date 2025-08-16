@@ -147,7 +147,7 @@ export default function Dashboard() {
                   <Waves className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-varsity-bold text-white tracking-wide">Swim Meet</h1>
+                  <h1 className="text-3xl font-varsity text-white tracking-wide">Swim Meet</h1>
                   <p className="text-blue-100 text-sm">AI Analysis Platform • Compare • Verify • Collaborate</p>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export default function Dashboard() {
       {/* Swimming Lane Divider */}
       <div className="h-2 lane-divider"></div>
 
-      {/* Olympic Swimming Events */}
+      {/* Swimming Events */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           {/* Event Selection Podium */}
