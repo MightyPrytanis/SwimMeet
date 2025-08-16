@@ -110,7 +110,7 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
                   disabled={provider.status === 'error'}
                   data-testid={`checkbox-${provider.id}`}
                 />
-                <AIProviderIcon provider={provider.id} className="w-6 h-6" />
+                <AIProviderIcon provider={provider.id} className="w-6 h-6" status={provider.status} />
                 <span className="text-sm font-medium">{getProviderDisplayName(provider.id)}</span>
                 <div className={`w-2 h-2 rounded-full ${
                   provider.status === 'connected' ? 'bg-emerald-500' : 'bg-slate-400'

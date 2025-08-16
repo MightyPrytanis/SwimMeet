@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("freestyle");
+  const [currentQuery, setCurrentQuery] = useState<string>("");
   const { toast } = useToast();
 
   // Poll for response updates when we have a conversation
@@ -51,6 +52,7 @@ export default function Dashboard() {
     }
 
     setIsSubmitting(true);
+    setCurrentQuery(query); // Store the current query for fact-checking and replies
     try {
       const result = await submitQuery(query, selectedAIs);
       setCurrentConversationId(result.conversationId);
@@ -253,6 +255,7 @@ export default function Dashboard() {
 
             <ResponseGrid
               responses={responses}
+              originalQuery={currentQuery}
               onFactCheck={handleFactCheck}
               onReply={handleReply}
             />

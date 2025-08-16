@@ -48,3 +48,30 @@ export async function humanizeResponse(responseText: string, userId?: string): P
   });
   return response.json();
 }
+
+export async function factCheckResponse(responseText: string, originalQuery: string, userId?: string): Promise<{ factCheck: string }> {
+  const response = await apiRequest('POST', '/api/fact-check', {
+    response: responseText,
+    query: originalQuery,
+    userId: userId || 'default-user'
+  });
+  return response.json();
+}
+
+export async function generateReply(responseText: string, originalQuery: string, context?: string, userId?: string): Promise<{ reply: string }> {
+  const response = await apiRequest('POST', '/api/reply', {
+    response: responseText,
+    originalQuery,
+    context,
+    userId: userId || 'default-user'
+  });
+  return response.json();
+}
+
+export async function testProviderConnection(providerId: string, userId?: string): Promise<{ success: boolean; error?: string }> {
+  const response = await apiRequest('POST', '/api/providers/test', {
+    providerId,
+    userId: userId || 'default-user'
+  });
+  return response.json();
+}

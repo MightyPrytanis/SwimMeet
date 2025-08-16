@@ -2,38 +2,85 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Copy, MoreVertical, Search, UserCog, Reply } from "lucide-react";
+import { Copy, MoreVertical, Search, UserCog, Reply, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { humanizeResponse } from "@/lib/api";
+import { humanizeResponse, factCheckResponse, generateReply } from "@/lib/api";
 import { AIProviderIcon, getProviderDisplayName } from "@/components/ai-provider-icons";
 import type { AIResponse } from "@shared/schema";
 
 interface ResponseGridProps {
   responses: AIResponse[];
+  originalQuery?: string;
   onFactCheck?: (response: AIResponse) => void;
   onReply?: (response: AIResponse) => void;
 }
 
-export default function ResponseGrid({ responses, onFactCheck, onReply }: ResponseGridProps) {
+export default function ResponseGrid({ responses, originalQuery, onFactCheck, onReply }: ResponseGridProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [factCheckModalOpen, setFactCheckModalOpen] = useState(false);
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [humanizeModalOpen, setHumanizeModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState("");
+  const [selectedResponse, setSelectedResponse] = useState<AIResponse | null>(null);
 
   const humanizeMutation = useMutation({
     mutationFn: (responseText: string) => humanizeResponse(responseText),
     onSuccess: (data, variables) => {
+      setModalContent(data.humanizedResponse);
+      setHumanizeModalOpen(true);
       toast({
         title: "Response Humanized",
-        description: "The response has been humanized and is ready to submit.",
+        description: "The response has been humanized successfully.",
       });
-      // You could open a modal here with the humanized response
-      console.log("Humanized response:", data.humanizedResponse);
     },
     onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to humanize response",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const factCheckMutation = useMutation({
+    mutationFn: ({ responseText, query }: { responseText: string; query: string }) => 
+      factCheckResponse(responseText, query),
+    onSuccess: (data, variables) => {
+      setModalContent(data.factCheck);
+      setFactCheckModalOpen(true);
+      toast({
+        title: "Fact Check Complete",
+        description: "The response has been fact-checked successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fact-check response",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const replyMutation = useMutation({
+    mutationFn: ({ responseText, query }: { responseText: string; query: string }) => 
+      generateReply(responseText, query),
+    onSuccess: (data, variables) => {
+      setModalContent(data.reply);
+      setReplyModalOpen(true);
+      toast({
+        title: "Reply Generated",
+        description: "A thoughtful reply has been generated.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate reply",
         variant: "destructive",
       });
     },
@@ -87,7 +134,34 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
 
   const handleHumanizeAndSubmit = (response: AIResponse) => {
     if (response.content) {
+      setSelectedResponse(response);
       humanizeMutation.mutate(response.content);
+    }
+  };
+
+  const handleFactCheck = (response: AIResponse) => {
+    if (response.content && originalQuery) {
+      setSelectedResponse(response);
+      factCheckMutation.mutate({ responseText: response.content, query: originalQuery });
+    } else {
+      toast({
+        title: "Cannot Fact Check",
+        description: "Original query not available for fact checking",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReply = (response: AIResponse) => {
+    if (response.content && originalQuery) {
+      setSelectedResponse(response);
+      replyMutation.mutate({ responseText: response.content, query: originalQuery });
+    } else {
+      toast({
+        title: "Cannot Generate Reply",
+        description: "Original query not available for reply generation",
+        variant: "destructive",
+      });
     }
   };
 
@@ -133,7 +207,7 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
             <div className="border-b border-slate-200 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <AIProviderIcon provider={response.aiProvider} className="w-10 h-10" />
+                  <AIProviderIcon provider={response.aiProvider} className="w-10 h-10" status="connected" />
                   <div>
                     <h3 className="font-semibold text-slate-900" data-testid={`text-provider-name-${response.id}`}>
                       {getProviderDisplayName(response.aiProvider)}
@@ -182,7 +256,7 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
                         <Copy className="h-4 w-4 mr-2" />
                         Copy Response
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onFactCheck?.(response)}>
+                      <DropdownMenuItem onClick={() => handleFactCheck(response)}>
                         <Search className="h-4 w-4 mr-2" />
                         Fact Check
                       </DropdownMenuItem>
@@ -190,7 +264,7 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
                         <UserCog className="h-4 w-4 mr-2" />
                         Humanize & Submit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onReply?.(response)}>
+                      <DropdownMenuItem onClick={() => handleReply(response)}>
                         <Reply className="h-4 w-4 mr-2" />
                         Reply
                       </DropdownMenuItem>
@@ -233,12 +307,13 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onFactCheck?.(response)}
+                      onClick={() => handleFactCheck(response)}
+                      disabled={factCheckMutation.isPending}
                       className="text-blue-600 hover:text-blue-700"
                       data-testid={`button-fact-check-${response.id}`}
                     >
                       <Search className="h-4 w-4 mr-2" />
-                      Fact Check
+                      {factCheckMutation.isPending ? 'Checking...' : 'Fact Check'}
                     </Button>
                     <Button
                       variant="ghost"
@@ -255,12 +330,13 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onReply?.(response)}
+                    onClick={() => handleReply(response)}
+                    disabled={replyMutation.isPending}
                     className="text-slate-600 hover:text-slate-900"
                     data-testid={`button-reply-${response.id}`}
                   >
                     <Reply className="h-4 w-4 mr-2" />
-                    Reply
+                    {replyMutation.isPending ? 'Generating...' : 'Reply'}
                   </Button>
                 </div>
               </div>
@@ -269,6 +345,81 @@ export default function ResponseGrid({ responses, onFactCheck, onReply }: Respon
         </Card>
       ))}
       </div>
+
+      {/* Fact Check Modal */}
+      <Dialog open={factCheckModalOpen} onOpenChange={setFactCheckModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              Fact Check Results
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <h4 className="font-semibold text-blue-900 mb-2">Original Response from {selectedResponse ? getProviderDisplayName(selectedResponse.aiProvider) : 'AI'}:</h4>
+              <p className="text-blue-800">{selectedResponse?.content}</p>
+            </div>
+            <div className="prose prose-sm max-w-none">
+              {modalContent.split('\n').map((paragraph, index) => (
+                <p key={index} className="mb-3 last:mb-0">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reply Modal */}
+      <Dialog open={replyModalOpen} onOpenChange={setReplyModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Reply className="h-5 w-5 text-blue-600" />
+              Suggested Reply
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+              <h4 className="font-semibold text-gray-900 mb-2">Response from {selectedResponse ? getProviderDisplayName(selectedResponse.aiProvider) : 'AI'}:</h4>
+              <p className="text-gray-800 text-sm">{selectedResponse?.content?.substring(0, 200)}...</p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">Suggested Follow-up:</h4>
+              <p className="text-blue-800">{modalContent}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Humanize Modal */}
+      <Dialog open={humanizeModalOpen} onOpenChange={setHumanizeModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserCog className="h-5 w-5 text-purple-600" />
+              Humanized Response
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+              <h4 className="font-semibold text-purple-900 mb-2">Original Response:</h4>
+              <p className="text-purple-800 text-sm">{selectedResponse?.content?.substring(0, 300)}...</p>
+            </div>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-semibold text-green-900 mb-2">Humanized Version:</h4>
+              <div className="prose prose-sm max-w-none">
+                {modalContent.split('\n').map((paragraph, index) => (
+                  <p key={index} className="mb-3 last:mb-0 text-green-800">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

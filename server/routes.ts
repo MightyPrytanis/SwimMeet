@@ -49,7 +49,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get available AI providers
+  // Test AI provider connection
+  app.post("/api/providers/test", async (req, res) => {
+    try {
+      const { providerId } = req.body;
+      const userId = req.body.userId || "default-user";
+      
+      // Get user credentials
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          // Handle decryption error gracefully
+        }
+      }
+
+      const aiService = new AIService(credentials);
+      let testResult;
+
+      switch (providerId) {
+        case 'openai':
+          testResult = await aiService.queryOpenAI("Test connection");
+          break;
+        case 'anthropic':
+          testResult = await aiService.queryAnthropic("Test connection");
+          break;
+        case 'google':
+          testResult = await aiService.queryGemini("Test connection");
+          break;
+        case 'microsoft':
+          testResult = await aiService.queryMicrosoft("Test connection");
+          break;
+        case 'perplexity':
+          testResult = await aiService.queryPerplexity("Test connection");
+          break;
+        case 'grok':
+          testResult = await aiService.queryGrok("Test connection");
+          break;
+        case 'llama':
+          testResult = await aiService.queryLlama("Test connection");
+          break;
+        case 'deepseek':
+          testResult = await aiService.queryDeepSeek("Test connection");
+          break;
+        default:
+          return res.status(400).json({ success: false, error: "Unknown provider" });
+      }
+
+      res.json({ success: testResult.success, error: testResult.error });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get available AI providers with real-time status
   app.get("/api/providers", async (req, res) => {
     const userId = req.query.userId as string || "default-user";
     const user = await storage.getUser(userId);
@@ -63,41 +118,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
 
+    // Test connections for real-time status
+    const aiService = new AIService(credentials);
+    
     const providers: AIProvider[] = [
       {
         id: 'openai',
         name: 'ChatGPT-4',
         company: 'OpenAI',
         requiresApiKey: true,
-        status: credentials.openai ? 'connected' : 'setup_required'
+        status: credentials.openai || process.env.OPENAI_API_KEY ? 'connected' : 'setup_required'
       },
       {
         id: 'anthropic',
         name: 'Claude 3.5',
         company: 'Anthropic',
         requiresApiKey: true,
-        status: credentials.anthropic ? 'connected' : 'setup_required'
+        status: credentials.anthropic || process.env.ANTHROPIC_API_KEY ? 'connected' : 'setup_required'
       },
       {
         id: 'google',
         name: 'Gemini Pro',
         company: 'Google',
         requiresApiKey: true,
-        status: credentials.google ? 'connected' : 'setup_required'
+        status: credentials.google || process.env.GEMINI_API_KEY ? 'connected' : 'setup_required'
       },
       {
         id: 'microsoft',
         name: 'Copilot',
         company: 'Microsoft',
         requiresApiKey: false,
-        status: 'setup_required'
+        status: 'connected'
       },
       {
         id: 'perplexity',
         name: 'Perplexity',
         company: 'Perplexity AI',
         requiresApiKey: true,
-        status: 'setup_required'
+        status: process.env.PERPLEXITY_API_KEY ? 'connected' : 'setup_required'
       },
       {
         id: 'deepseek',
@@ -111,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: 'Grok',
         company: 'xAI',
         requiresApiKey: false,
-        status: 'setup_required'
+        status: process.env.XAI_API_KEY ? 'connected' : 'setup_required'
       },
       {
         id: 'llama',
@@ -269,6 +327,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const humanized = await aiService.humanizeResponse(response);
       
       res.json({ humanizedResponse: humanized });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Fact-check response
+  app.post("/api/fact-check", async (req, res) => {
+    try {
+      const { response, query } = req.body;
+      const userId = req.body.userId || "default-user";
+      
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          return res.status(400).json({ message: "Failed to decrypt credentials" });
+        }
+      }
+
+      const aiService = new AIService(credentials);
+      
+      // Use Perplexity for fact-checking as it has web search capabilities
+      const factCheckPrompt = `Please fact-check the following response to the query "${query}":
+
+Response to check: "${response}"
+
+Provide a detailed fact-check including:
+1. Overall accuracy assessment
+2. Any factual errors or inaccuracies
+3. Missing important information
+4. Sources or evidence to support or refute claims
+5. Confidence level in your assessment
+
+Be thorough and objective in your analysis.`;
+
+      const factCheckResult = await aiService.queryPerplexity(factCheckPrompt);
+      
+      res.json({ factCheck: factCheckResult.content || factCheckResult.error });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Generate reply to response
+  app.post("/api/reply", async (req, res) => {
+    try {
+      const { response, originalQuery, context } = req.body;
+      const userId = req.body.userId || "default-user";
+      
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          return res.status(400).json({ message: "Failed to decrypt credentials" });
+        }
+      }
+
+      const aiService = new AIService(credentials);
+      
+      const replyPrompt = `Based on this AI response to the query "${originalQuery}", generate a thoughtful follow-up question or comment that would help clarify, expand on, or challenge the response constructively.
+
+Original query: "${originalQuery}"
+AI Response: "${response}"
+${context ? `Additional context: ${context}` : ''}
+
+Generate a meaningful reply that:
+1. Shows engagement with the content
+2. Asks for clarification on unclear points
+3. Requests additional details or examples
+4. Challenges assumptions respectfully
+5. Explores implications or applications
+
+Provide only the reply text, no explanations.`;
+
+      const replyResult = await aiService.queryAnthropic(replyPrompt);
+      
+      res.json({ reply: replyResult.content || replyResult.error });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

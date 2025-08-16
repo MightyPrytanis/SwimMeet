@@ -3,10 +3,11 @@ import React from "react";
 interface AIProviderIconProps {
   provider: string;
   className?: string;
+  status?: 'connected' | 'setup_required' | 'error';
 }
 
-export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProviderIconProps) {
-  const baseClasses = "rounded-full flex items-center justify-center border-2 border-white shadow-lg font-bold text-lg";
+export function AIProviderIcon({ provider, className = "w-10 h-10", status = 'setup_required' }: AIProviderIconProps) {
+  const baseClasses = "rounded-full flex items-center justify-center border-2 border-white shadow-lg font-bold text-lg relative";
   
   // Use first initials for all providers
   const getInitialAndColor = (provider: string) => {
@@ -32,11 +33,26 @@ export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProvider
     }
   };
   
+  const getStatusIndicator = (status: string) => {
+    switch (status) {
+      case 'connected':
+        return 'bg-green-500';
+      case 'error':
+        return 'bg-red-500';
+      case 'setup_required':
+      default:
+        return 'bg-yellow-500';
+    }
+  };
+  
   const { initial, color } = getInitialAndColor(provider);
+  const statusColor = getStatusIndicator(status);
   
   return (
     <div className={`${baseClasses} ${className} ${color} text-white`}>
       {initial}
+      {/* Status indicator light */}
+      <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white ${statusColor}`}></div>
     </div>
   );
 }
