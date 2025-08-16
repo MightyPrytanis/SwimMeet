@@ -22,6 +22,7 @@ export class AIService {
   private perplexity: OpenAI | null = null;
   private grok: OpenAI | null = null;
   private copilotApiKey: string | null = null;
+  private llamaApiKey: string | null = null;
 
   constructor(credentials: Record<string, string>) {
     this.initializeClients(credentials);
@@ -35,6 +36,7 @@ export class AIService {
     const perplexityKey = credentials.perplexity || process.env.PERPLEXITY_API_KEY;
     const xaiKey = credentials.grok || process.env.XAI_API_KEY;
     const copilotKey = credentials.microsoft || process.env.COPILOT_API_KEY || "dfa5965f91msh742cae2064e8d2bp13f2a9jsn65b7d5c83e6b";
+    const llamaKey = credentials.llama || process.env.LLAMA_API_KEY || "dfa5965f91msh742cae2064e8d2bp13f2a9jsn65b7d5c83e6b";
 
     if (openaiKey) {
       this.openai = new OpenAI({ apiKey: openaiKey });
@@ -64,6 +66,10 @@ export class AIService {
 
     if (copilotKey) {
       this.copilotApiKey = copilotKey;
+    }
+
+    if (llamaKey) {
+      this.llamaApiKey = llamaKey;
     }
   }
 
@@ -231,7 +237,40 @@ export class AIService {
   }
 
   async queryLlama(prompt: string): Promise<AIServiceResponse> {
-    return { success: false, error: "Llama API not configured" };
+    if (!this.llamaApiKey) {
+      return { success: false, error: "Llama API key not configured" };
+    }
+
+    try {
+      const response = await fetch("https://meta-llama-3-8b.p.rapidapi.com/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-rapidapi-host": "meta-llama-3-8b.p.rapidapi.com",
+          "x-rapidapi-key": this.llamaApiKey,
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8B-Instruct",
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        success: true,
+        content: data.choices?.[0]?.message?.content || data.data || data.message || "No response generated",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `Llama error: ${error.message}`,
+      };
+    }
   }
 
   async queryMultiple(prompt: string, providers: string[]): Promise<Record<string, AIServiceResponse>> {
