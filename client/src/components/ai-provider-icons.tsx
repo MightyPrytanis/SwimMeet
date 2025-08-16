@@ -10,60 +10,69 @@ export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProvider
   
   switch (provider) {
     case 'openai':
+      // ChatGPT favicon - green circle with white sparkle/star
       return (
-        <div className={`${baseClasses} ${className} bg-emerald-600 text-white`}>
-          <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/>
+        <div className={`${baseClasses} ${className} bg-green-600 text-white`}>
+          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
         </div>
       );
       
     case 'anthropic':
+      // Claude favicon - orange "A" symbol
       return (
-        <div className={`${baseClasses} ${className} bg-orange-500 text-white`}>
+        <div className={`${baseClasses} ${className} bg-orange-600 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12 2L14.09 8.26L20 6L18.74 12L24 12L18.74 12L20 18L14.09 15.74L12 22L9.91 15.74L4 18L5.26 12L0 12L5.26 12L4 6L9.91 8.26L12 2Z"/>
+            <path d="M12 2L8 22h2.5l1-4h5l1 4H20L16 2h-4zm-1 6l1.5 6h-3L10.5 8z"/>
           </svg>
         </div>
       );
       
     case 'google':
+      // Google Gemini favicon - blue diamond/gem shape
       return (
-        <div className={`${baseClasses} ${className} bg-blue-600 text-white`}>
+        <div className={`${baseClasses} ${className} bg-blue-500 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12.017 2.016c5.517 0 9.997 4.48 9.997 9.998s-4.48 9.998-9.997 9.998S2.02 17.532 2.02 12.014 6.5 2.016 12.017 2.016zm0 1.5c-4.69 0-8.497 3.807-8.497 8.498s3.807 8.498 8.497 8.498 8.497-3.807 8.497-8.498-3.807-8.498-8.497-8.498zm2.25 5.25h-4.5v1.5h2.734c-.234 1.266-1.266 2.25-2.734 2.25-1.518 0-2.75-1.232-2.75-2.75s1.232-2.75 2.75-2.75c.703 0 1.359.281 1.828.75l1.078-1.078C11.859 5.672 10.984 5.25 10.017 5.25c-2.344 0-4.25 1.906-4.25 4.25s1.906 4.25 4.25 4.25c2.344 0 4.25-1.906 4.25-4.25 0-.281-.031-.562-.094-.828h-2.156v-1.406z"/>
+            <path d="M12 2l6 6-6 6-6-6 6-6zm0 4L8 10l4 4 4-4-4-4z"/>
+            <path d="M12 10l6 6-6 6-6-6 6-6z" opacity="0.7"/>
           </svg>
         </div>
       );
       
     case 'microsoft':
+      // Microsoft Copilot favicon - blue with white Microsoft squares
       return (
-        <div className={`${baseClasses} ${className} bg-blue-700 text-white`}>
+        <div className={`${baseClasses} ${className} bg-blue-600 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12 2C13.1 2 14 2.9 14 4V10C14 11.1 13.1 12 12 12H6C4.9 12 4 11.1 4 10V4C4 2.9 4.9 2 6 2H12ZM12 14C13.1 14 14 14.9 14 16V20C14 21.1 13.1 22 12 22H6C4.9 22 4 21.1 4 20V16C4 14.9 4.9 14 6 14H12ZM18 2C19.1 2 20 2.9 20 4V10C20 11.1 19.1 12 18 12H16C14.9 12 14 11.1 14 10V4C14 2.9 14.9 2 16 2H18ZM18 14C19.1 14 20 14.9 20 16V20C20 21.1 19.1 22 18 22H16C14.9 22 14 21.1 14 20V16C14 14.9 14.9 14 16 14H18Z"/>
+            <path d="M11.4 11.4H2V2h9.4v9.4zM22 11.4h-9.4V2H22v9.4zM11.4 22H2v-9.4h9.4V22zM22 22h-9.4v-9.4H22V22z"/>
           </svg>
         </div>
       );
       
     case 'perplexity':
+      // Perplexity favicon - dark circle with stylized design
       return (
-        <div className={`${baseClasses} ${className} bg-purple-600 text-white`}>
+        <div className={`${baseClasses} ${className} bg-slate-700 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12 2L4 7.5L12 13L20 7.5L12 2ZM4 16.5L12 22L20 16.5L16 14L12 16.5L8 14L4 16.5ZM4 10.5L8 13L12 10.5L16 13L20 10.5V7.5L12 13L4 7.5V10.5Z"/>
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 10h8M8 14h8" stroke="white" strokeWidth="2" fill="none"/>
           </svg>
         </div>
       );
       
     case 'deepseek':
+      // DeepSeek favicon - simple geometric design
       return (
-        <div className={`${baseClasses} ${className} bg-gray-800 text-white`}>
+        <div className={`${baseClasses} ${className} bg-black text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 6L12 10.5 8.5 8 12 5.5 15.5 8zM8.5 16L12 13.5 15.5 16 12 18.5 8.5 16zm7-4L13 14.5 13 9.5 15.5 12zm-7 0L6.5 12 9 9.5 9 14.5 6.5 12z"/>
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
       );
       
     case 'grok':
+      // Grok/X favicon - black with white X (correct design)
       return (
         <div className={`${baseClasses} ${className} bg-black text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
@@ -73,10 +82,11 @@ export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProvider
       );
       
     case 'llama':
+      // Meta/Llama favicon - blue with simplified Meta symbol
       return (
         <div className={`${baseClasses} ${className} bg-blue-500 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12 2L9 5H7C5.9 5 5 5.9 5 7V17C5 18.1 5.9 19 7 19H17C18.1 19 19 18.1 19 17V7C19 5.9 18.1 5 17 5H15L12 2ZM12 4.4L13.6 6H10.4L12 4.4ZM7 7H17V17H7V7ZM12 9C10.3 9 9 10.3 9 12S10.3 15 12 15S15 13.7 15 12S13.7 9 12 9ZM12 11C12.6 11 13 11.4 13 12S12.6 13 12 13S11 12.6 11 12S11.4 11 12 11Z"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm3.5 6L12 10.5 8.5 8 12 5.5 15.5 8zM8.5 16L12 13.5 15.5 16 12 18.5 8.5 16z"/>
           </svg>
         </div>
       );
@@ -85,7 +95,9 @@ export function AIProviderIcon({ provider, className = "w-10 h-10" }: AIProvider
       return (
         <div className={`${baseClasses} ${className} bg-gray-500 text-white`}>
           <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M9 9h.01M15 9h.01" stroke="currentColor" strokeWidth="2" fill="none"/>
           </svg>
         </div>
       );

@@ -6,43 +6,67 @@ interface EventIconProps {
 }
 
 export function EventIcon({ event, className = "w-8 h-8" }: EventIconProps) {
-  const baseClasses = "rounded-lg flex items-center justify-center";
-  
   switch (event) {
     case 'freestyle':
+      // Olympic freestyle swimming - side view swimmer with freestyle stroke
       return (
-        <div className={`${baseClasses} ${className} bg-blue-600 text-white`}>
-          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-            <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"/>
-          </svg>
-        </div>
+        <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+          <g>
+            {/* Swimmer body in freestyle position */}
+            <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v1c0 1-1 2-2 2H5c-1 0-2-1-2-2v-1z"/>
+            {/* Extended arm reaching forward */}
+            <path d="M9 11h6c1 0 2 0 2 1s-1 1-2 1H9c0-1 0-2 0-2z"/>
+            {/* Head position */}
+            <circle cx="6" cy="9" r="1.5"/>
+            {/* Water lines indicating movement */}
+            <path d="M2 16h20M1 18h18M3 14h16" stroke="currentColor" strokeWidth="1" opacity="0.3"/>
+          </g>
+        </svg>
       );
-      
+
     case 'backstroke':
+      // Olympic backstroke - swimmer on back with arched position
       return (
-        <div className={`${baseClasses} ${className} bg-emerald-600 text-white`}>
-          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-            <path d="M12 2C17.52 2 22 6.48 22 12S17.52 22 12 22S2 17.52 2 12S6.48 2 12 2ZM12 4C7.59 4 4 7.59 4 12S7.59 20 12 20S20 16.41 20 12S16.41 4 12 4ZM12 6L16 10H13V18H11V10H8L12 6Z"/>
-          </svg>
-        </div>
+        <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+          <g>
+            {/* Swimmer on back with arched body */}
+            <path d="M5 8c2-1 4-1 6 0s4 1 6 0c1 0 2 1 2 2s-1 2-2 2c-2 1-4 1-6 0s-4-1-6 0c-1 0-2-1-2-2s1-2 2-2z"/>
+            {/* Head tilted back */}
+            <circle cx="6" cy="6" r="1.5"/>
+            {/* Arm extending backwards over head */}
+            <path d="M8 4c2-1 4-2 6-1s3 3 2 4-3 0-4-1-3-1-4-2z"/>
+            {/* Water surface lines */}
+            <path d="M2 16h20M1 18h18M3 14h16" stroke="currentColor" strokeWidth="1" opacity="0.3"/>
+          </g>
+        </svg>
       );
-      
+
     case 'relay':
+      // Olympic relay - multiple swimmers or starting block with handoff
       return (
-        <div className={`${baseClasses} ${className} bg-purple-600 text-white`}>
-          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22S22 17.52 22 12S17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12S16.41 20 12 20S4 16.41 4 12S7.59 4 12 4ZM8 8V16L16 12L8 8Z"/>
-          </svg>
-        </div>
+        <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+          <g>
+            {/* Starting block/platform */}
+            <rect x="2" y="14" width="20" height="2" rx="1"/>
+            {/* Swimmer diving off */}
+            <path d="M6 8c1-2 3-3 5-2s3 3 2 5-3 2-4 1-3-2-3-4z"/>
+            {/* Second swimmer ready position */}
+            <path d="M14 10c0-1 1-2 2-2s2 1 2 2v2c0 1-1 2-2 2s-2-1-2-2v-2z"/>
+            {/* Team connection/baton handoff visual */}
+            <path d="M10 12h4" stroke="currentColor" strokeWidth="2" opacity="0.7"/>
+            {/* Water splash effects */}
+            <circle cx="8" cy="16" r="1" opacity="0.3"/>
+            <circle cx="10" cy="17" r="0.5" opacity="0.3"/>
+          </g>
+        </svg>
       );
-      
+
     default:
+      // Default swimming icon
       return (
-        <div className={`${baseClasses} ${className} bg-gray-500 text-white`}>
-          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22S22 17.52 22 12S17.52 2 12 2ZM12 4C16.41 4 20 7.59 20 12S16.41 20 12 20S4 16.41 4 12S7.59 4 12 4ZM11 7V13H13V7H11ZM11 15V17H13V15H11Z"/>
-          </svg>
-        </div>
+        <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 6L12 10.5 8.5 8 12 5.5 15.5 8zM8.5 16L12 13.5 15.5 16 12 18.5 8.5 16z"/>
+        </svg>
       );
   }
 }
