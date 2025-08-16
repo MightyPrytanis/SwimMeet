@@ -1,28 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Swimming Pool Theme Variables */
+/* Natatorium Theme Variables - Immersive Aquatic Design */
 :root {
-  /* Pool blues and water tones */
-  --pool-blue: hsl(195, 100%, 45%);
-  --deep-water: hsl(195, 85%, 25%);
-  --pool-light: hsl(195, 100%, 85%);
+  /* Deep water blues - creating underwater feeling */
+  --deep-ocean: hsl(210, 85%, 15%);
+  --pool-blue: hsl(200, 90%, 35%);
+  --water-medium: hsl(205, 80%, 45%);
+  --pool-light: hsl(195, 75%, 65%);
+  --surface-shimmer: hsl(190, 60%, 85%);
   --chlorine-foam: hsl(195, 40%, 95%);
-  --lane-rope: hsl(45, 95%, 55%);
-  --starting-block: hsl(0, 0%, 15%);
-  --pool-deck: hsl(30, 15%, 85%);
   
-  /* Brand colors for AI providers */
-  --openai-green: hsl(150, 100%, 35%);
-  --anthropic-orange: hsl(25, 95%, 55%);
-  --google-blue: hsl(215, 100%, 55%);
-  --microsoft-blue: hsl(210, 100%, 45%);
-  --meta-blue: hsl(220, 100%, 50%);
-  --x-black: hsl(0, 0%, 5%);
-  --perplexity-purple: hsl(270, 75%, 45%);
+  /* Lane and facility colors */
+  --lane-rope: hsl(45, 95%, 55%);
+  --starting-block: hsl(220, 25%, 20%);
+  --pool-deck: hsl(200, 15%, 85%);
+  --tile-blue: hsl(205, 70%, 55%);
+  
+  /* Aquatic gradients */
+  --water-gradient: linear-gradient(135deg, var(--deep-ocean) 0%, var(--pool-blue) 50%, var(--water-medium) 100%);
+  --surface-gradient: linear-gradient(to bottom, var(--surface-shimmer) 0%, var(--pool-light) 100%);
 }
 
 /* Swimming theme animations */
@@ -165,16 +165,18 @@
 
 @layer components {
   .font-varsity {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-  
-  .font-varsity-bold {
-    font-family: 'Anton', sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
     font-weight: 400;
     letter-spacing: 0.2em;
     text-transform: uppercase;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+  }
+  
+  .font-varsity-bold {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
   }
 }
