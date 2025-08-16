@@ -264,6 +264,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                           e.stopPropagation();
                           handleFactCheck(response);
                         }}
+                        data-testid={`menu-fact-check-${response.id}`}
                       >
                         <Search className="h-4 w-4 mr-2" />
                         Fact Check
@@ -274,6 +275,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                           e.stopPropagation();
                           handleHumanizeAndSubmit(response);
                         }}
+                        data-testid={`menu-humanize-${response.id}`}
                       >
                         <UserCog className="h-4 w-4 mr-2" />
                         Humanize
@@ -284,6 +286,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                           e.stopPropagation();
                           handleReply(response);
                         }}
+                        data-testid={`menu-reply-${response.id}`}
                       >
                         <Reply className="h-4 w-4 mr-2" />
                         Reply

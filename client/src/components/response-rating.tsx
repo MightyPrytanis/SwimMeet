@@ -43,6 +43,7 @@ export function ResponseRating({ responseId, currentRating, onRatingChange }: Re
                 ? `${r.color} ${r.textColor} hover:opacity-80` 
                 : 'hover:bg-gray-100'
             }`}
+            data-testid={`button-rating-${r.id}`}
           >
             <IconComponent className="h-3 w-3 mr-1" />
             {r.label}
