@@ -17,7 +17,7 @@ export function ResponseRating({ responseId, currentRating, onRatingChange }: Re
     { id: 'silver', label: 'Silver Medal', icon: Award, color: 'bg-gray-400', textColor: 'text-gray-800' },
     { id: 'bronze', label: 'Bronze Medal', icon: Medal, color: 'bg-amber-600', textColor: 'text-amber-800' },
     { id: 'finished', label: 'Finished', icon: CheckCircle, color: 'bg-green-500', textColor: 'text-green-800' },
-    { id: 'sank', label: 'Sank', icon: XCircle, color: 'bg-red-500', textColor: 'text-red-800' },
+    { id: 'quit', label: 'Quit', icon: XCircle, color: 'bg-red-500', textColor: 'text-red-800' },
     { id: 'titanic', label: 'Titanic', icon: Anchor, color: 'bg-slate-800', textColor: 'text-slate-100' }
   ];
 

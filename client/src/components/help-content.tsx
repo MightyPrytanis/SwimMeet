@@ -8,6 +8,7 @@ export function HelpContent() {
       <div className="text-center mb-6">
         <h2 className="text-2xl font-varsity-bold mb-2">AI Analysis Platform Guide</h2>
         <p className="text-slate-600">Professional multi-model AI analysis and verification system</p>
+        <p className="text-sm text-orange-600 mt-2 font-medium">⚠️ This application is currently in development</p>
       </div>
 
       <div className="grid gap-4">
@@ -34,7 +35,7 @@ export function HelpContent() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p>Professional fact-checking using David Towne's 10-rule truthfulness protocol. AI models review and critique each other's responses for accuracy.</p>
+            <p>The AI Integrity Project's Human/AI Interaction Protocol, a straightforward set of 'Ten Rules' for ethical engagement that values truth, user sovereignty, and efficient task completion. Most AI models cannot be relied upon to consistently apply these best practices to themselves, because they are routinely overruled by internal imperatives, hidden from the user, that value factors like appearances, engagement, and revenue over honesty and real user value. Instead of fighting those tendencies, we have AI models apply the protocols not to themselves, but to their competition. As it turns out, they are only too happy to critique the output of other models.</p>
             <div className="bg-green-50 p-3 rounded text-sm">
               <strong>Process:</strong> Original response → Independent verification → Detailed accuracy assessment with citations and confidence scores
             </div>
