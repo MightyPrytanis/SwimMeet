@@ -348,12 +348,12 @@ export default function Dashboard() {
             </Card>
           </TabsContent>
 
-          {/* Olympic Records - Race History */}
+          {/* Performance Metrics - Race History */}
           <Card className="bg-gradient-to-r from-slate-50 to-gray-100 border-slate-300">
             <CardHeader>
               <CardTitle className="flex items-center space-x-3 text-slate-800">
                 <span className="text-2xl">📊</span>
-                <span>Olympic Records & History</span>
+                <span>Performance Metrics</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
