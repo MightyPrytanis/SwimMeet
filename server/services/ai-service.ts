@@ -19,6 +19,8 @@ export class AIService {
   private openai: OpenAI | null = null;
   private anthropic: Anthropic | null = null;
   private gemini: GoogleGenAI | null = null;
+  private perplexity: OpenAI | null = null;
+  private grok: OpenAI | null = null;
 
   constructor(credentials: Record<string, string>) {
     this.initializeClients(credentials);
@@ -29,6 +31,8 @@ export class AIService {
     const openaiKey = credentials.openai || process.env.OPENAI_API_KEY;
     const anthropicKey = credentials.anthropic || process.env.ANTHROPIC_API_KEY;
     const geminiKey = credentials.google || process.env.GEMINI_API_KEY;
+    const perplexityKey = credentials.perplexity || process.env.PERPLEXITY_API_KEY;
+    const xaiKey = credentials.grok || process.env.XAI_API_KEY;
 
     if (openaiKey) {
       this.openai = new OpenAI({ apiKey: openaiKey });
@@ -40,6 +44,20 @@ export class AIService {
 
     if (geminiKey) {
       this.gemini = new GoogleGenAI({ apiKey: geminiKey });
+    }
+
+    if (perplexityKey) {
+      this.perplexity = new OpenAI({ 
+        baseURL: "https://api.perplexity.ai", 
+        apiKey: perplexityKey 
+      });
+    }
+
+    if (xaiKey) {
+      this.grok = new OpenAI({ 
+        baseURL: "https://api.x.ai/v1", 
+        apiKey: xaiKey 
+      });
     }
   }
 
@@ -120,13 +138,52 @@ export class AIService {
   }
 
   async queryPerplexity(prompt: string): Promise<AIServiceResponse> {
-    // For now, return placeholder - Perplexity API would need separate implementation
-    return { success: false, error: "Perplexity API not configured" };
+    if (!this.perplexity) {
+      return { success: false, error: "Perplexity API key not configured" };
+    }
+
+    try {
+      const response = await this.perplexity.chat.completions.create({
+        model: "llama-3.1-sonar-small-128k-online",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2000,
+        temperature: 0.2,
+      });
+
+      return {
+        success: true,
+        content: response.choices[0].message.content || "No response generated",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `Perplexity error: ${error.message}`,
+      };
+    }
   }
 
   async queryGrok(prompt: string): Promise<AIServiceResponse> {
-    // Grok would use xAI API (similar to OpenAI)
-    return { success: false, error: "Grok API not configured" };
+    if (!this.grok) {
+      return { success: false, error: "Grok API key not configured" };
+    }
+
+    try {
+      const response = await this.grok.chat.completions.create({
+        model: "grok-2-1212",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2000,
+      });
+
+      return {
+        success: true,
+        content: response.choices[0].message.content || "No response generated",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `Grok error: ${error.message}`,
+      };
+    }
   }
 
   async queryDeepSeek(prompt: string): Promise<AIServiceResponse> {
