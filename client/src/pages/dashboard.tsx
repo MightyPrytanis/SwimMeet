@@ -4,13 +4,14 @@ import { useToast } from "@/hooks/use-toast";
 import { getConversationResponses, submitQuery } from "@/lib/api";
 import { getProviderDisplayName, AIProviderIcon } from "@/components/ai-provider-icons";
 import { createTruthfulnessPrompt } from "@/components/truthfulness-standards";
+import { HelpContent } from "@/components/help-content";
 import QueryInput from "@/components/query-input";
 import ResponseGrid from "@/components/response-grid";
 import BulkActions from "@/components/bulk-actions";
 import ConversationHistory from "@/components/conversation-history";
 import CredentialsModal from "@/components/credentials-modal";
-import HelpModal from "@/components/help-modal";
-import { EventIcon } from "@/components/event-icons";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import EventIcon from "@/components/event-icon";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -389,7 +390,12 @@ This is the final leg of the relay - make it count!`;
                 className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-freestyle"
               >
-                <EventIcon event="freestyle" className="w-8 h-8" />
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v4c0 1-1 2-2 2H5c-1 0-2-1-2-2v-4z"/>
+                  <path d="M10 8c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z"/>
+                  <path d="M15 12l6 2-6 2v-4z"/>
+                  <path d="M9 14h4v2H9v-2z"/>
+                </svg>
                 <div className="text-center">
                   <span className="font-varsity text-lg">Freestyle</span>
                   <p className="text-xs opacity-75">Direct Analysis</p>
@@ -400,7 +406,13 @@ This is the final leg of the relay - make it count!`;
                 className="data-[state=active]:bg-green-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-backstroke"
               >
-                <EventIcon event="backstroke" className="w-8 h-8" />
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 8c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z"/>
+                  <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v4c0 1-1 2-2 2H5c-1 0-2-1-2-2v-4z"/>
+                  <path d="M1 12l4-2v4l-4-2z"/>
+                  <path d="M14 6l2 2 4-4"/>
+                  <path d="M14 14l2 2 4-4"/>
+                </svg>
                 <div className="text-center">
                   <span className="font-varsity text-lg">Backstroke</span>
                   <p className="text-xs opacity-75">Verification</p>
@@ -411,7 +423,18 @@ This is the final leg of the relay - make it count!`;
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-relay"
               >
-                <EventIcon event="relay" className="w-8 h-8" />
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="4" cy="8" r="2"/>
+                  <circle cx="12" cy="8" r="2"/>
+                  <circle cx="20" cy="8" r="2"/>
+                  <path d="M2 12h4v2H2v-2z"/>
+                  <path d="M10 12h4v2h-4v-2z"/>
+                  <path d="M18 12h4v2h-4v-2z"/>
+                  <path d="M6 10l4 0-1-1"/>
+                  <path d="M6 11l4 0-1 1"/>
+                  <path d="M14 10l4 0-1-1"/>
+                  <path d="M14 11l4 0-1 1"/>
+                </svg>
                 <div className="text-center">
                   <span className="font-varsity text-lg">Relay</span>
                   <p className="text-xs opacity-75">Collaboration</p>
@@ -427,7 +450,12 @@ This is the final leg of the relay - make it count!`;
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent animate-pulse"></div>
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-300 to-cyan-400"></div>
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3 relative z-10">
-                  <EventIcon event="freestyle" className="w-10 h-10 text-cyan-300" />
+                  <svg className="w-10 h-10 text-cyan-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v4c0 1-1 2-2 2H5c-1 0-2-1-2-2v-4z"/>
+                    <path d="M10 8c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z"/>
+                    <path d="M15 12l6 2-6 2v-4z"/>
+                    <path d="M9 14h4v2H9v-2z"/>
+                  </svg>
                   <span className="text-white">Freestyle Analysis</span>
                 </CardTitle>
                 <CardDescription className="text-blue-200 text-lg relative z-10">
@@ -475,7 +503,13 @@ This is the final leg of the relay - make it count!`;
             <Card className="bg-gradient-to-r from-green-50 to-emerald-100 border-green-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
-                  <EventIcon event="backstroke" className="w-10 h-10 text-green-300" />
+                  <svg className="w-10 h-10 text-green-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 8c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z"/>
+                    <path d="M3 12c0-1 1-2 2-2h2c1 0 2 1 2 2v4c0 1-1 2-2 2H5c-1 0-2-1-2-2v-4z"/>
+                    <path d="M1 12l4-2v4l-4-2z"/>
+                    <path d="M14 6l2 2 4-4"/>
+                    <path d="M14 14l2 2 4-4"/>
+                  </svg>
                   <span>Backstroke Verification</span>
                 </CardTitle>
                 <CardDescription className="text-green-100 text-lg">
@@ -546,7 +580,18 @@ This is the final leg of the relay - make it count!`;
             <Card className="bg-gradient-to-r from-purple-50 to-pink-100 border-purple-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
-                  <EventIcon event="relay" className="w-10 h-10 text-purple-300" />
+                  <svg className="w-10 h-10 text-purple-300" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="4" cy="8" r="2"/>
+                    <circle cx="12" cy="8" r="2"/>
+                    <circle cx="20" cy="8" r="2"/>
+                    <path d="M2 12h4v2H2v-2z"/>
+                    <path d="M10 12h4v2h-4v-2z"/>
+                    <path d="M18 12h4v2h-4v-2z"/>
+                    <path d="M6 10l4 0-1-1"/>
+                    <path d="M6 11l4 0-1 1"/>
+                    <path d="M14 10l4 0-1-1"/>
+                    <path d="M14 11l4 0-1 1"/>
+                  </svg>
                   <span>AI Relay Team</span>
                 </CardTitle>
                 <CardDescription className="text-purple-100 text-lg">
@@ -682,10 +727,14 @@ This is the final leg of the relay - make it count!`;
         open={credentialsModalOpen}
         onClose={() => setCredentialsModalOpen(false)}
       />
-      <HelpModal 
-        open={helpModalOpen}
-        onOpenChange={setHelpModalOpen}
-      />
+      <Dialog open={helpModalOpen} onOpenChange={setHelpModalOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-varsity">Platform Guide</DialogTitle>
+          </DialogHeader>
+          <HelpContent />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

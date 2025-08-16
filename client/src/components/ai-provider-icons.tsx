@@ -48,25 +48,25 @@ export function AIProviderIcon({ provider, className = "w-10 h-10", status = 'se
   const statusColor = getStatusIndicator(status);
   
   return (
-    <div className={`${baseClasses} ${className}`}>
+    <div className={`${baseClasses} ${className} ${config.color}`}>
       <img 
         src={config.favicon} 
         alt={`${provider} favicon`}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover rounded-full"
+        style={{ backgroundColor: 'white' }}
         onError={(e) => {
+          // Fallback to initial if favicon fails
           const target = e.target as HTMLImageElement;
+          target.style.display = 'none';
           const parent = target.parentElement!;
-          parent.innerHTML = `<div class="${config.color} w-full h-full flex items-center justify-center text-white font-bold text-lg">${config.initial}</div><div class="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white ${statusColor}"></div>`;
-        }}
-        onLoad={(e) => {
-          const target = e.target as HTMLImageElement;
-          const parent = target.parentElement!;
-          // Add status indicator after image loads
-          const statusDiv = document.createElement('div');
-          statusDiv.className = `absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white ${statusColor}`;
-          parent.appendChild(statusDiv);
+          const fallbackDiv = document.createElement('div');
+          fallbackDiv.className = `${config.color} w-full h-full flex items-center justify-center text-white font-bold text-lg rounded-full`;
+          fallbackDiv.textContent = config.initial;
+          parent.appendChild(fallbackDiv);
         }}
       />
+      {/* Status indicator light */}
+      <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white ${statusColor}`}></div>
     </div>
   );
 }

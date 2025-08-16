@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { humanizeResponse, factCheckResponse, generateReply } from "@/lib/api";
 import { AIProviderIcon, getProviderDisplayName } from "@/components/ai-provider-icons";
+import { ResponseRating } from "@/components/response-rating";
 import type { AIResponse } from "@shared/schema";
 
 interface ResponseGridProps {
@@ -16,6 +17,10 @@ interface ResponseGridProps {
   originalQuery?: string;
   onFactCheck?: (response: AIResponse) => void;
   onReply?: (response: AIResponse) => void;
+}
+
+interface ResponseWithRating extends AIResponse {
+  userRating?: string;
 }
 
 export default function ResponseGrid({ responses, originalQuery, onFactCheck, onReply }: ResponseGridProps) {
@@ -26,6 +31,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
   const [humanizeModalOpen, setHumanizeModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [selectedResponse, setSelectedResponse] = useState<AIResponse | null>(null);
+  const [responseRatings, setResponseRatings] = useState<Record<string, string>>({});
 
   const humanizeMutation = useMutation({
     mutationFn: (responseText: string) => humanizeResponse(responseText),
@@ -234,7 +240,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCopyResponse(response.content)}
+                    onClick={() => handleCopyResponse(response.content || '')}
                     className="p-1 text-slate-400 hover:text-slate-600"
                     data-testid={`button-copy-${response.id}`}
                   >
@@ -252,17 +258,13 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleCopyResponse(response.content)}>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy Response
-                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleFactCheck(response)}>
                         <Search className="h-4 w-4 mr-2" />
                         Fact Check
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleHumanizeAndSubmit(response)}>
                         <UserCog className="h-4 w-4 mr-2" />
-                        Humanize & Submit
+                        Humanize
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleReply(response)}>
                         <Reply className="h-4 w-4 mr-2" />
@@ -291,13 +293,22 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
             )}
             
             {response.status === 'complete' && response.content && (
-              <div className="prose prose-sm max-w-none text-slate-700" data-testid={`text-content-${response.id}`}>
-                {response.content.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-3 last:mb-0">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+              <>
+                <div className="prose prose-sm max-w-none text-slate-700" data-testid={`text-content-${response.id}`}>
+                  {response.content.split('\n').map((paragraph, index) => (
+                    <p key={index} className="mb-3 last:mb-0">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+                <ResponseRating 
+                  responseId={response.id}
+                  currentRating={responseRatings[response.id]}
+                  onRatingChange={(id, rating) => 
+                    setResponseRatings(prev => ({ ...prev, [id]: rating }))
+                  }
+                />
+              </>
             )}
             
             {response.status === 'complete' && (
