@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SimpleDropdown, SimpleDropdownItem } from "@/components/simple-dropdown";
 import { Copy, MoreVertical, Search, UserCog, Reply, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -246,53 +246,26 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="p-1 text-slate-400 hover:text-slate-600"
-                        data-testid={`button-menu-${response.id}`}
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="z-50">
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleFactCheck(response);
-                        }}
-                        data-testid={`menu-fact-check-${response.id}`}
-                      >
-                        <Search className="h-4 w-4 mr-2" />
-                        Fact Check
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleHumanizeAndSubmit(response);
-                        }}
-                        data-testid={`menu-humanize-${response.id}`}
-                      >
-                        <UserCog className="h-4 w-4 mr-2" />
-                        Humanize
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleReply(response);
-                        }}
-                        data-testid={`menu-reply-${response.id}`}
-                      >
-                        <Reply className="h-4 w-4 mr-2" />
-                        Reply
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <SimpleDropdown>
+                    <SimpleDropdownItem 
+                      onClick={() => handleFactCheck(response)}
+                    >
+                      <Search className="h-4 w-4 mr-2" />
+                      Fact Check
+                    </SimpleDropdownItem>
+                    <SimpleDropdownItem 
+                      onClick={() => handleHumanizeAndSubmit(response)}
+                    >
+                      <UserCog className="h-4 w-4 mr-2" />
+                      Humanize
+                    </SimpleDropdownItem>
+                    <SimpleDropdownItem 
+                      onClick={() => handleReply(response)}
+                    >
+                      <Reply className="h-4 w-4 mr-2" />
+                      Reply
+                    </SimpleDropdownItem>
+                  </SimpleDropdown>
                 </div>
               </div>
             </div>

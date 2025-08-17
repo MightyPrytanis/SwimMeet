@@ -13,7 +13,7 @@ import CredentialsModal from "@/components/credentials-modal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 // Removed unused import
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SimpleTabs, SimpleTabsContent, SimpleTabsList, SimpleTabsTrigger } from "@/components/simple-tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Settings, History, MessageSquare, Search, Users, HelpCircle, Play, BookOpen, Waves } from "lucide-react";
 import type { AIResponse } from "@shared/schema";
@@ -317,7 +317,7 @@ This is the final stage of the work - make it count!`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
-      <DebugTest />
+
       {/* Underwater effect with floating particles */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-20 left-10 w-2 h-2 bg-cyan-300 rounded-full animate-bounce"></div>
@@ -379,11 +379,11 @@ This is the final stage of the work - make it count!`;
 
       {/* Swimming Events */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8" style={{ zIndex: 1, position: 'relative' }}>
+        <SimpleTabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           {/* Event Selection Podium */}
           <div className="bg-white rounded-xl shadow-lg border-4 border-yellow-400 p-4">
-            <TabsList className="grid w-full grid-cols-3 gap-4 bg-gradient-to-r from-blue-100 to-blue-50 p-2 rounded-lg">
-              <TabsTrigger 
+            <SimpleTabsList className="grid w-full grid-cols-3 gap-4 bg-gradient-to-r from-blue-100 to-blue-50 p-2 rounded-lg">
+              <SimpleTabsTrigger 
                 value="dive" 
                 className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-dive"
@@ -400,8 +400,8 @@ This is the final stage of the work - make it count!`;
                   <span className="font-varsity text-lg">Dive</span>
                   <p className="text-xs opacity-75">Direct Analysis</p>
                 </div>
-              </TabsTrigger>
-              <TabsTrigger 
+              </SimpleTabsTrigger>
+              <SimpleTabsTrigger 
                 value="turn" 
                 className="data-[state=active]:bg-green-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-turn"
@@ -418,8 +418,8 @@ This is the final stage of the work - make it count!`;
                   <span className="font-varsity text-lg">Turn</span>
                   <p className="text-xs opacity-75">Verification</p>
                 </div>
-              </TabsTrigger>
-              <TabsTrigger 
+              </SimpleTabsTrigger>
+              <SimpleTabsTrigger 
                 value="work" 
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
                 data-testid="tab-work"
@@ -438,12 +438,12 @@ This is the final stage of the work - make it count!`;
                   <span className="font-varsity text-lg">Work</span>
                   <p className="text-xs opacity-75">Collaboration</p>
                 </div>
-              </TabsTrigger>
-            </TabsList>
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
           </div>
 
           {/* Dive Event - Main Competition Pool */}
-          <TabsContent value="dive" className="space-y-8">
+          <SimpleTabsContent value="dive" className="space-y-8">
             <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 border-blue-400 border-2 shadow-2xl">
               <CardHeader className="text-center pb-6 bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-t-lg relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent animate-pulse"></div>
@@ -495,10 +495,10 @@ This is the final stage of the work - make it count!`;
                 </CardContent>
               </Card>
             )}
-          </TabsContent>
+          </SimpleTabsContent>
 
           {/* Turn Event - AI-to-AI Verification Pool */}
-          <TabsContent value="turn" className="space-y-8">
+          <SimpleTabsContent value="turn" className="space-y-8">
             <Card className="bg-gradient-to-r from-green-50 to-emerald-100 border-green-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
@@ -572,10 +572,10 @@ This is the final stage of the work - make it count!`;
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          </SimpleTabsContent>
 
           {/* Work Event - Collaboration Pool */}
-          <TabsContent value="work" className="space-y-8">
+          <SimpleTabsContent value="work" className="space-y-8">
             <Card className="bg-gradient-to-r from-purple-50 to-pink-100 border-purple-300 border-2">
               <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
                 <CardTitle className="text-3xl font-varsity-bold flex items-center justify-center space-x-3">
@@ -702,7 +702,7 @@ This is the final stage of the work - make it count!`;
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </SimpleTabsContent>
 
           {/* Performance Metrics - Race History */}
           <Card className="bg-gradient-to-r from-slate-50 to-gray-100 border-slate-300">
@@ -718,7 +718,7 @@ This is the final stage of the work - make it count!`;
               />
             </CardContent>
           </Card>
-        </Tabs>
+        </SimpleTabs>
       </div>
 
       {/* Modals */}
