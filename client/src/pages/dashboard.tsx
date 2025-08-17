@@ -379,7 +379,7 @@ This is the final stage of the work - make it count!`;
 
       {/* Swimming Events */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8" style={{ zIndex: 1, position: 'relative' }}>
           {/* Event Selection Podium */}
           <div className="bg-white rounded-xl shadow-lg border-4 border-yellow-400 p-4">
             <TabsList className="grid w-full grid-cols-3 gap-4 bg-gradient-to-r from-blue-100 to-blue-50 p-2 rounded-lg">

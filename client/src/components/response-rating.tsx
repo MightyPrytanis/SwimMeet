@@ -28,7 +28,7 @@ export function ResponseRating({ responseId, currentRating, onRatingChange }: Re
   };
 
   return (
-    <div className="flex flex-wrap gap-2 mt-2">
+    <div className="flex flex-wrap gap-2 mt-2" style={{ zIndex: 10, position: 'relative' }}>
       {ratings.map((r) => {
         const IconComponent = r.icon;
         const isSelected = rating === r.id;
@@ -37,13 +37,18 @@ export function ResponseRating({ responseId, currentRating, onRatingChange }: Re
             key={r.id}
             variant={isSelected ? "default" : "outline"}
             size="sm"
-            onClick={() => handleRatingClick(r.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleRatingClick(r.id);
+            }}
             className={`h-8 px-3 text-xs transition-all ${
               isSelected 
                 ? `${r.color} ${r.textColor} hover:opacity-80` 
                 : 'hover:bg-gray-100'
             }`}
             data-testid={`button-rating-${r.id}`}
+            style={{ pointerEvents: 'auto', zIndex: 20 }}
           >
             <IconComponent className="h-3 w-3 mr-1" />
             {r.label}

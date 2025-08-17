@@ -246,7 +246,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
@@ -257,7 +257,7 @@ export default function ResponseGrid({ responses, originalQuery, onFactCheck, on
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="z-50">
                       <DropdownMenuItem 
                         onClick={(e) => {
                           e.preventDefault();
