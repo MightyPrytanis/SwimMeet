@@ -104,7 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get available AI providers with real-time status
+  // Get available AI providers with REAL connection testing
   app.get("/api/providers", async (req, res) => {
     const userId = req.query.userId as string || "default-user";
     const user = await storage.getUser(userId);
@@ -118,67 +118,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
 
-    // Test connections for real-time status
+    // Test actual connections with real API calls
     const aiService = new AIService(credentials);
     
-    const providers: AIProvider[] = [
-      {
-        id: 'openai',
-        name: 'ChatGPT-4',
-        company: 'OpenAI',
-        requiresApiKey: true,
-        status: credentials.openai || process.env.OPENAI_API_KEY ? 'connected' : 'setup_required'
-      },
-      {
-        id: 'anthropic',
-        name: 'Claude 3.5',
-        company: 'Anthropic',
-        requiresApiKey: true,
-        status: credentials.anthropic || process.env.ANTHROPIC_API_KEY ? 'connected' : 'setup_required'
-      },
-      {
-        id: 'google',
-        name: 'Gemini Pro',
-        company: 'Google',
-        requiresApiKey: true,
-        status: credentials.google || process.env.GEMINI_API_KEY ? 'connected' : 'setup_required'
-      },
-      {
-        id: 'microsoft',
-        name: 'Copilot',
-        company: 'Microsoft',
-        requiresApiKey: false,
-        status: 'connected'
-      },
-      {
-        id: 'perplexity',
-        name: 'Perplexity',
-        company: 'Perplexity AI',
-        requiresApiKey: true,
-        status: process.env.PERPLEXITY_API_KEY ? 'connected' : 'setup_required'
-      },
-      {
-        id: 'deepseek',
-        name: 'DeepSeek',
-        company: 'DeepSeek AI',
-        requiresApiKey: true,
-        status: 'setup_required'
-      },
-      {
-        id: 'grok',
-        name: 'Grok',
-        company: 'xAI',
-        requiresApiKey: false,
-        status: process.env.XAI_API_KEY ? 'connected' : 'setup_required'
-      },
-      {
-        id: 'llama',
-        name: 'Llama 3.2',
-        company: 'Meta',
-        requiresApiKey: false,
-        status: 'connected'
-      }
+    const providerTests = [
+      { id: 'openai', name: 'ChatGPT-4', company: 'OpenAI', requiresApiKey: true },
+      { id: 'anthropic', name: 'Claude 4', company: 'Anthropic', requiresApiKey: true },
+      { id: 'google', name: 'Gemini Pro', company: 'Google', requiresApiKey: true },
+      { id: 'microsoft', name: 'Copilot', company: 'Microsoft', requiresApiKey: false },
+      { id: 'perplexity', name: 'Perplexity', company: 'Perplexity AI', requiresApiKey: true },
+      { id: 'deepseek', name: 'DeepSeek', company: 'DeepSeek AI', requiresApiKey: true },
+      { id: 'grok', name: 'Grok', company: 'xAI', requiresApiKey: true },
+      { id: 'llama', name: 'Llama 3.2', company: 'Meta', requiresApiKey: false }
     ];
+
+    // Test each provider with actual API calls
+    const providers: AIProvider[] = await Promise.all(
+      providerTests.map(async (provider) => {
+        let testResult;
+        
+        try {
+          switch (provider.id) {
+            case 'openai':
+              testResult = await aiService.queryOpenAI("Test");
+              break;
+            case 'anthropic':
+              testResult = await aiService.queryAnthropic("Test");
+              break;
+            case 'google':
+              testResult = await aiService.queryGemini("Test");
+              break;
+            case 'microsoft':
+              testResult = await aiService.queryMicrosoft("Test");
+              break;
+            case 'perplexity':
+              testResult = await aiService.queryPerplexity("Test");
+              break;
+            case 'grok':
+              testResult = await aiService.queryGrok("Test");
+              break;
+            case 'llama':
+              testResult = await aiService.queryLlama("Test");
+              break;
+            case 'deepseek':
+              testResult = await aiService.queryDeepSeek("Test");
+              break;
+            default:
+              testResult = { success: false, error: "Unknown provider" };
+          }
+        } catch (error: any) {
+          testResult = { success: false, error: error.message };
+        }
+
+        return {
+          ...provider,
+          status: (testResult.success ? 'connected' : 
+                 (testResult.error?.includes('not configured') || testResult.error?.includes('API key')) ? 'setup_required' : 'error') as 'connected' | 'setup_required' | 'error'
+        };
+      })
+    );
 
     res.json(providers);
   });
