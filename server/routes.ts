@@ -413,6 +413,29 @@ Provide only the reply text, no explanations.`;
     }
   });
 
+  // Award response
+  app.post("/api/responses/:id/award", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { award } = req.body;
+      
+      // Update response metadata with award
+      const response = await storage.updateResponseMetadata(id, { award });
+      
+      res.json({ 
+        success: true, 
+        message: `Response awarded ${award}`,
+        response: {
+          id: response.id,
+          aiProvider: response.aiProvider,
+          award: response.metadata?.award
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

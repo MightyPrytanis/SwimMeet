@@ -17,6 +17,7 @@ export interface IStorage {
   createResponse(response: InsertResponse): Promise<Response>;
   getConversationResponses(conversationId: string): Promise<Response[]>;
   updateResponseContent(id: string, content: string, status: string): Promise<void>;
+  updateResponseMetadata(id: string, metadata: Record<string, any>): Promise<Response>;
 }
 
 export class MemStorage implements IStorage {
@@ -108,6 +109,16 @@ export class MemStorage implements IStorage {
       response.status = status;
       this.responses.set(id, response);
     }
+  }
+
+  async updateResponseMetadata(id: string, metadata: Record<string, any>): Promise<Response> {
+    const response = this.responses.get(id);
+    if (response) {
+      response.metadata = { ...response.metadata, ...metadata };
+      this.responses.set(id, response);
+      return response;
+    }
+    throw new Error(`Response with id ${id} not found`);
   }
 }
 
