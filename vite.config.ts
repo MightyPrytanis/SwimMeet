@@ -1,15 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-// Minimal Vite config without Replit plugins to test if they're causing the issue
 export default defineConfig({
   plugins: [
-    react({
-      // Explicit React plugin configuration
-      jsxImportSource: undefined,
-      babel: undefined,
-    }),
+    react(),
+    runtimeErrorOverlay(),
+    ...(process.env.NODE_ENV !== "production" &&
+    process.env.REPL_ID !== undefined
+      ? [
+          await import("@replit/vite-plugin-cartographer").then((m) =>
+            m.cartographer(),
+          ),
+        ]
+      : []),
   ],
   resolve: {
     alias: {
@@ -22,14 +27,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    sourcemap: true, // Enable source maps for debugging
-  },
-  esbuild: {
-    jsx: 'automatic', // Ensure proper JSX transformation
   },
   server: {
     fs: {
-      strict: false, // Less restrictive file system access
+      strict: true,
+      deny: ["**/.*"],
     },
   },
 });
