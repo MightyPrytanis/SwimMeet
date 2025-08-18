@@ -160,7 +160,7 @@ export default function SwimMeet() {
   });
 
   const handleTurnVerification = async (response: AIResponse) => {
-    if (verifyingStates[response.id] || response.verificationStatus === 'pending') return;
+    if (verifyingStates[response.id] || response.metadata?.verificationStatus === 'pending') return;
     
     setVerifyingStates(prev => ({
       ...prev,
@@ -586,7 +586,7 @@ export default function SwimMeet() {
                     disabled={verifyingStates[response.id]}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: response.verificationStatus === 'complete' ? '#16a34a' : 
+                      backgroundColor: response.metadata?.verificationStatus === 'complete' ? '#16a34a' : 
                                      verifyingStates[response.id] ? '#fbbf24' : '#0ea5e9',
                       color: 'white',
                       border: 'none',
@@ -597,10 +597,10 @@ export default function SwimMeet() {
                     }}
                   >
                     {verifyingStates[response.id] ? '⏳ Analyzing...' : 
-                     response.verificationStatus === 'complete' ? '✓ TURN Verified' : '🔍 TURN Analysis'}
+                     response.metadata?.verificationStatus === 'complete' ? '✓ TURN Verified' : '🔍 TURN Analysis'}
                   </button>
 
-                  {response.verificationStatus === 'complete' && (
+                  {response.metadata?.verificationStatus === 'complete' && (
                     <button
                       onClick={() => handleShareCritique(response)}
                       style={{
@@ -638,7 +638,7 @@ export default function SwimMeet() {
                 </div>
 
                 {/* Display Verification Results */}
-                {response.verificationResults && response.verificationResults.length > 0 && (
+                {response.metadata?.verificationResults && response.metadata.verificationResults.length > 0 && (
                   <div style={{
                     marginTop: '10px',
                     padding: '10px',
@@ -647,17 +647,20 @@ export default function SwimMeet() {
                     border: '1px solid #0ea5e9'
                   }}>
                     <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#0c4a6e', marginBottom: '5px' }}>
-                      TURN Analysis by {response.verificationResults[0].verifiedBy}
+                      TURN Analysis by {response.metadata.verificationResults[0].verifiedBy}
                     </div>
                     <div style={{ fontSize: '11px', color: '#374151' }}>
-                      <div>🎯 Accuracy: {response.verificationResults[0].accuracyScore}/10</div>
-                      {response.verificationResults[0].factualErrors.length > 0 && (
-                        <div style={{ color: '#dc2626' }}>❌ Errors: {response.verificationResults[0].factualErrors.join(', ')}</div>
+                      <div>🎯 Accuracy: {response.metadata.verificationResults[0].accuracyScore}/10</div>
+                      {response.metadata.verificationResults[0].factualErrors && response.metadata.verificationResults[0].factualErrors.length > 0 && (
+                        <div style={{ color: '#dc2626' }}>❌ Errors: {response.metadata.verificationResults[0].factualErrors.join(', ')}</div>
                       )}
-                      <div>✅ Strengths: {response.verificationResults[0].strengths.join(', ')}</div>
-                      {response.verificationResults[0].weaknesses.length > 0 && (
-                        <div>⚠️ Areas to improve: {response.verificationResults[0].weaknesses.join(', ')}</div>
+                      <div>✅ Strengths: {response.metadata.verificationResults[0].strengths.join(', ')}</div>
+                      {response.metadata.verificationResults[0].weaknesses && response.metadata.verificationResults[0].weaknesses.length > 0 && (
+                        <div>⚠️ Areas to improve: {response.metadata.verificationResults[0].weaknesses.join(', ')}</div>
                       )}
+                      <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
+                        📋 Assessment: {response.metadata.verificationResults[0].overallAssessment}
+                      </div>
                     </div>
                   </div>
                 )}

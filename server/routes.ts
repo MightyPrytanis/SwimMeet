@@ -545,12 +545,17 @@ Respond in JSON format with:
         verifiedAt: new Date().toISOString()
       };
 
-      const currentResults = response.verificationResults || [];
+      // Store verification data in metadata
+      const currentMetadata = response.metadata || {};
+      const currentResults = currentMetadata.verificationResults || [];
       const updatedResults = [...currentResults, verificationData];
 
       await storage.updateResponse(id, { 
-        verificationStatus: "complete",
-        verificationResults: updatedResults
+        metadata: {
+          ...currentMetadata,
+          verificationStatus: "complete",
+          verificationResults: updatedResults
+        }
       });
 
       res.json({
@@ -575,7 +580,8 @@ Respond in JSON format with:
         return res.status(404).json({ message: "Response not found" });
       }
 
-      if (!response.verificationResults || response.verificationResults.length === 0) {
+      const verificationResults = response.metadata?.verificationResults;
+      if (!verificationResults || verificationResults.length === 0) {
         return res.status(400).json({ message: "No verification results to share" });
       }
 
@@ -595,7 +601,7 @@ Respond in JSON format with:
       }
 
       const aiService = new AIService(credentials);
-      const latestVerification = response.verificationResults[response.verificationResults.length - 1];
+      const latestVerification = verificationResults[verificationResults.length - 1];
       
       const sharePrompt = `TURN MODE CRITIQUE SHARING
 
