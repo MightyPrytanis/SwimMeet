@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 export function EventDiagnostic() {
   const [testCount, setTestCount] = useState(0);
   const [buttonStates, setButtonStates] = useState<Record<string, number>>({});
   
-  const testClick = (buttonName: string) => {
+  const testClick = useCallback((buttonName: string) => {
     console.log(`${buttonName} clicked!`);
     console.log('Current testCount:', testCount);
     console.log('Current buttonStates:', buttonStates);
@@ -22,22 +22,36 @@ export function EventDiagnostic() {
       console.log('setButtonStates prev:', prev, 'new:', newStates);
       return newStates;
     });
-  };
+  }, [testCount, buttonStates]);
+
+  const handleGoldClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Gold button clicked - raw event');
+    testClick('gold');
+  }, [testClick]);
+
+  const handleDropdownClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Dropdown button clicked - raw event');
+    testClick('dropdown');
+  }, [testClick]);
+
+  const handleTabClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Tab button clicked - raw event');
+    testClick('tab');
+  }, [testClick]);
   
   return (
     <div style={{border: '2px solid red', padding: '10px', margin: '10px', backgroundColor: 'white'}}>
       <h3 style={{margin: '0 0 10px 0'}}>EVENT HANDLER TEST - Total Clicks: {testCount}</h3>
       <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Gold button clicked - raw event');
-            testClick('gold');
-          }}
-          onMouseDown={(e) => {
-            console.log('Gold button mousedown');
-          }}
+          onClick={handleGoldClick}
+          onMouseDown={() => console.log('Gold button mousedown')}
           style={{
             margin: '0',
             padding: '10px 15px',
@@ -53,15 +67,8 @@ export function EventDiagnostic() {
           Gold Test ({buttonStates.gold || 0})
         </button>
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Dropdown button clicked - raw event');
-            testClick('dropdown');
-          }}
-          onMouseDown={(e) => {
-            console.log('Dropdown button mousedown');
-          }}
+          onClick={handleDropdownClick}
+          onMouseDown={() => console.log('Dropdown button mousedown')}
           style={{
             margin: '0',
             padding: '10px 15px',
@@ -77,15 +84,8 @@ export function EventDiagnostic() {
           Dropdown Test ({buttonStates.dropdown || 0})
         </button>
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Tab button clicked - raw event');
-            testClick('tab');
-          }}
-          onMouseDown={(e) => {
-            console.log('Tab button mousedown');
-          }}
+          onClick={handleTabClick}
+          onMouseDown={() => console.log('Tab button mousedown')}
           style={{
             margin: '0',
             padding: '10px 15px',
