@@ -34,6 +34,7 @@ export default function SwimMeet() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showStats, setShowStats] = useState(false);
   const [verifyingStates, setVerifyingStates] = useState<Record<string, boolean>>({});
+  const [sharingStates, setSharingStates] = useState<Record<string, boolean>>({});
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
 
   // Fetch available AI providers - MINIMAL API CALLS
@@ -163,12 +164,37 @@ export default function SwimMeet() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to share critique');
+      }
       return response.json();
     },
-    onSuccess: () => {
-      if (conversationId) {
-        queryClient.invalidateQueries({ queryKey: [`/api/conversations/${conversationId}/responses`] });
+    onSuccess: (data, variables) => {
+      console.log('✅ Critique shared successfully:', data);
+      
+      // Update local state to show the AI's response to the critique
+      if (data.aiResponse) {
+        setResponses(prev => prev.map(r => 
+          r.id === variables.responseId 
+            ? { 
+                ...r, 
+                metadata: {
+                  ...r.metadata,
+                  critiqueResponse: data.aiResponse
+                }
+              }
+            : r
+        ));
       }
+      
+      if (conversationId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/conversations', conversationId, 'responses'] });
+        queryClient.refetchQueries({ queryKey: ['/api/conversations', conversationId, 'responses'] });
+      }
+    },
+    onError: (error) => {
+      console.error('Failed to share critique:', error);
     }
   });
 
@@ -194,10 +220,20 @@ export default function SwimMeet() {
   };
 
   const handleShareCritique = async (response: AIResponse) => {
+    if (sharingStates[response.id]) return;
+    
+    setSharingStates(prev => ({ ...prev, [response.id]: true }));
+    
     try {
       await shareCritiqueMutation.mutateAsync({ responseId: response.id });
     } catch (error) {
       console.error('Failed to share critique:', error);
+    } finally {
+      setSharingStates(prev => {
+        const newState = { ...prev };
+        delete newState[response.id];
+        return newState;
+      });
     }
   };
 
@@ -616,18 +652,22 @@ export default function SwimMeet() {
                   {response.metadata?.verificationStatus === 'complete' && (
                     <button
                       onClick={() => handleShareCritique(response)}
+                      disabled={sharingStates[response.id]}
                       style={{
                         padding: '6px 12px',
-                        backgroundColor: response.metadata?.critiqueResponse ? '#16a34a' : '#7c3aed',
+                        backgroundColor: sharingStates[response.id] ? '#94a3b8' : 
+                                       response.metadata?.critiqueResponse ? '#16a34a' : '#7c3aed',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        cursor: 'pointer',
+                        cursor: sharingStates[response.id] ? 'not-allowed' : 'pointer',
                         fontSize: '12px',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        opacity: sharingStates[response.id] ? 0.7 : 1
                       }}
                     >
-                      {response.metadata?.critiqueResponse ? '✓ Shared with AI' : '📤 Share Critique'}
+                      {sharingStates[response.id] ? '📨 Sharing...' :
+                       response.metadata?.critiqueResponse ? '✓ Shared with AI' : '📤 Share Critique'}
                     </button>
                   )}
 
@@ -711,11 +751,28 @@ export default function SwimMeet() {
                     borderRadius: '6px',
                     border: '1px solid #7c3aed'
                   }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#7c3aed', marginBottom: '5px' }}>
-                      {response.aiProvider}'s Response to Critique:
+                    <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#7c3aed', marginBottom: '8px' }}>
+                      🔄 {response.aiProvider.toUpperCase()}'s Response to TURN Critique:
                     </div>
-                    <div style={{ fontSize: '11px', color: '#374151', whiteSpace: 'pre-wrap' }}>
-                      {response.metadata.critiqueResponse.aiResponse}
+                    <div style={{ 
+                      fontSize: '11px', 
+                      color: '#374151', 
+                      whiteSpace: 'pre-wrap',
+                      lineHeight: '1.4',
+                      backgroundColor: '#ffffff',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      {response.metadata.critiqueResponse.aiResponse || response.metadata.critiqueResponse}
+                    </div>
+                    <div style={{ 
+                      fontSize: '10px', 
+                      color: '#9ca3af', 
+                      marginTop: '5px',
+                      fontStyle: 'italic'
+                    }}>
+                      Shared at {new Date(response.metadata.critiqueResponse.sharedAt || Date.now()).toLocaleTimeString()}
                     </div>
                   </div>
                 )}
