@@ -33,17 +33,18 @@ export default function SwimMeet() {
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
 
-  // Fetch available AI providers
+  // Fetch available AI providers - MINIMAL API CALLS
   const { data: providers = [] } = useQuery<AIProvider[]>({
     queryKey: ['/api/providers'],
-    refetchInterval: 30000, // Refresh status every 30 seconds (reduced from 5 seconds)
+    refetchInterval: 300000, // Refresh status every 5 minutes to minimize API costs
+    staleTime: 240000, // Cache for 4 minutes
   });
 
-  // Poll for response updates when we have an active conversation
+  // Poll for response updates when we have an active conversation - MINIMAL COST
   const { data: updatedResponses } = useQuery<AIResponse[]>({
     queryKey: ['/api/conversations', conversationId, 'responses'],
-    enabled: !!conversationId,
-    refetchInterval: 2000, // Poll every 2 seconds for response updates
+    enabled: !!conversationId && responses.some(r => r.status === 'pending'),
+    refetchInterval: 5000, // Poll every 5 seconds, only when responses are pending
   });
 
   // Update responses when polling returns new data
