@@ -27,6 +27,16 @@ export const responses = pgTable("responses", {
   status: text("status").notNull().default("pending"), // pending, complete, error
   award: text("award"), // gold, silver, bronze, finished, quit, titanic
   responseTimeMs: varchar("response_time_ms"), // time taken to generate response
+  verificationStatus: text("verification_status").default("none"), // none, pending, complete, failed
+  verificationResults: json("verification_results").$type<{
+    verifiedBy: string;
+    accuracyScore: number;
+    factualErrors: string[];
+    strengths: string[];
+    weaknesses: string[];
+    overallAssessment: string;
+    recommendations: string[];
+  }[]>().default([]),
   metadata: json("metadata").$type<Record<string, any>>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });

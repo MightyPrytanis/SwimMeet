@@ -131,6 +131,10 @@ export class MemStorage implements IStorage {
     throw new Error(`Response with id ${id} not found`);
   }
 
+  async getResponse(id: string): Promise<Response | undefined> {
+    return this.responses.get(id);
+  }
+
   async getProviderStats(): Promise<Record<string, any>> {
     const allResponses = Array.from(this.responses.values());
     const stats: Record<string, any> = {};
@@ -147,10 +151,13 @@ export class MemStorage implements IStorage {
     // Calculate stats for each provider
     Object.entries(responsesByProvider).forEach(([provider, responses]) => {
       const completeResponses = responses.filter(r => r.status === 'complete');
+      const verifiedResponses = responses.filter(r => r.verificationStatus === 'complete');
       const awardCounts = { gold: 0, silver: 0, bronze: 0, finished: 0, quit: 0, titanic: 0 };
       
       let totalResponseTime = 0;
       let responseTimeCount = 0;
+      let totalAccuracyScore = 0;
+      let accuracyCount = 0;
 
       completeResponses.forEach(response => {
         // Count awards
@@ -163,14 +170,25 @@ export class MemStorage implements IStorage {
           totalResponseTime += parseInt(response.responseTimeMs);
           responseTimeCount++;
         }
+
+        // Calculate verification scores
+        if (response.verificationResults && response.verificationResults.length > 0) {
+          response.verificationResults.forEach(verification => {
+            totalAccuracyScore += verification.accuracyScore;
+            accuracyCount++;
+          });
+        }
       });
 
       stats[provider] = {
         totalResponses: responses.length,
         completeResponses: completeResponses.length,
+        verifiedResponses: verifiedResponses.length,
         awards: awardCounts,
         avgResponseTimeMs: responseTimeCount > 0 ? Math.round(totalResponseTime / responseTimeCount) : null,
-        successRate: responses.length > 0 ? Math.round((completeResponses.length / responses.length) * 100) : 0
+        avgAccuracyScore: accuracyCount > 0 ? Math.round((totalAccuracyScore / accuracyCount) * 10) / 10 : null,
+        successRate: responses.length > 0 ? Math.round((completeResponses.length / responses.length) * 100) : 0,
+        verificationRate: completeResponses.length > 0 ? Math.round((verifiedResponses.length / completeResponses.length) * 100) : 0
       };
     });
 

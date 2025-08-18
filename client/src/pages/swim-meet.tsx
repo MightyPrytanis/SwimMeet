@@ -33,6 +33,8 @@ export default function SwimMeet() {
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showStats, setShowStats] = useState(false);
+  const [verifyingStates, setVerifyingStates] = useState<Record<string, boolean>>({});
+  const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
 
   // Fetch available AI providers - MINIMAL API CALLS
   const { data: providers = [] } = useQuery<AIProvider[]>({
@@ -268,6 +270,20 @@ export default function SwimMeet() {
                         </span>
                       </div>
                     )}
+                    {stats.avgAccuracyScore && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#6b7280' }}>Avg Accuracy:</span>
+                        <span style={{ fontWeight: 'bold', color: stats.avgAccuracyScore >= 8 ? '#16a34a' : stats.avgAccuracyScore >= 6 ? '#eab308' : '#dc2626' }}>
+                          {stats.avgAccuracyScore}/10
+                        </span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#6b7280' }}>Verified:</span>
+                      <span style={{ fontWeight: 'bold', color: '#374151' }}>
+                        {stats.verificationRate}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
@@ -364,6 +380,7 @@ export default function SwimMeet() {
                   <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>
                     🏆 {providerStats[provider.id].awards.gold}G {providerStats[provider.id].awards.silver}S {providerStats[provider.id].awards.bronze}B
                     {providerStats[provider.id].avgResponseTimeMs && ` • ⏱️ ${(providerStats[provider.id].avgResponseTimeMs / 1000).toFixed(1)}s`}
+                    {providerStats[provider.id].avgAccuracyScore && ` • 🎯 ${providerStats[provider.id].avgAccuracyScore}/10`}
                   </div>
                 )}
               </div>

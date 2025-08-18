@@ -444,6 +444,126 @@ Provide only the reply text, no explanations.`;
     res.json(stats);
   });
 
+  // Backstroke verification - AI-to-AI fact-checking
+  app.post("/api/responses/:id/verify", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { verifierAI } = req.body;
+      const userId = req.body.userId || "default-user";
+      
+      const response = await storage.getResponse(id);
+      if (!response) {
+        return res.status(404).json({ message: "Response not found" });
+      }
+
+      const conversation = await storage.getConversation(response.conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          return res.status(400).json({ message: "Failed to decrypt credentials" });
+        }
+      }
+
+      // Update verification status to pending
+      await storage.updateResponse(id, { verificationStatus: "pending" });
+
+      const aiService = new AIService(credentials);
+      
+      const verificationPrompt = `BACKSTROKE VERIFICATION TASK
+      
+You are performing AI-to-AI verification. Carefully analyze this response for accuracy, completeness, and quality.
+
+ORIGINAL QUERY: "${conversation.query}"
+
+RESPONSE TO VERIFY (from ${response.aiProvider}):
+"${response.content}"
+
+VERIFICATION CRITERIA:
+1. Factual Accuracy - Are all stated facts correct?
+2. Completeness - Does it adequately address the query?
+3. Clarity - Is it clear and well-structured?
+4. Bias Detection - Any obvious bias or unsupported claims?
+5. Source Quality - Are implicit sources reliable?
+
+Respond in JSON format with:
+{
+  "accuracyScore": [1-10 rating],
+  "factualErrors": ["list of any factual errors found"],
+  "strengths": ["key strengths of the response"],
+  "weaknesses": ["areas for improvement"],
+  "overallAssessment": "detailed overall evaluation",
+  "recommendations": ["specific suggestions for improvement"]
+}`;
+
+      let verificationResult;
+      
+      // Route to appropriate AI service based on verifier
+      if (verifierAI === 'openai') {
+        verificationResult = await aiService.queryOpenAI(verificationPrompt);
+      } else if (verifierAI === 'anthropic') {
+        verificationResult = await aiService.queryAnthropic(verificationPrompt);
+      } else if (verifierAI === 'google') {
+        verificationResult = await aiService.queryGoogle(verificationPrompt);
+      } else if (verifierAI === 'perplexity') {
+        verificationResult = await aiService.queryPerplexity(verificationPrompt);
+      } else {
+        return res.status(400).json({ message: "Unsupported verifier AI" });
+      }
+
+      if (verificationResult.error) {
+        await storage.updateResponse(id, { verificationStatus: "failed" });
+        return res.status(500).json({ message: verificationResult.error });
+      }
+
+      // Parse verification results
+      let parsedResults;
+      try {
+        parsedResults = JSON.parse(verificationResult.content);
+      } catch (error) {
+        // Fallback: create structured results from unstructured content
+        parsedResults = {
+          accuracyScore: 5,
+          factualErrors: [],
+          strengths: ["Analysis provided"],
+          weaknesses: ["Could not parse detailed verification"],
+          overallAssessment: verificationResult.content,
+          recommendations: []
+        };
+      }
+
+      // Add verifier info and update response
+      const verificationData = {
+        ...parsedResults,
+        verifiedBy: verifierAI,
+        verifiedAt: new Date().toISOString()
+      };
+
+      const currentResults = response.verificationResults || [];
+      const updatedResults = [...currentResults, verificationData];
+
+      await storage.updateResponse(id, { 
+        verificationStatus: "complete",
+        verificationResults: updatedResults
+      });
+
+      res.json({
+        success: true,
+        verification: verificationData,
+        message: `Response verified by ${verifierAI}`
+      });
+
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Award response
   app.post("/api/responses/:id/award", async (req, res) => {
     try {
