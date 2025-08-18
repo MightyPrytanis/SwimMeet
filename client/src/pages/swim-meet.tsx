@@ -32,6 +32,7 @@ export default function SwimMeet() {
   const [mode, setMode] = useState<'dive' | 'turn' | 'work'>('dive');
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [showStats, setShowStats] = useState(false);
 
   // Fetch available AI providers - MINIMAL API CALLS
   const { data: providers = [] } = useQuery<AIProvider[]>({
@@ -53,6 +54,12 @@ export default function SwimMeet() {
       setResponses(updatedResponses);
     }
   }, [updatedResponses]);
+
+  // Fetch AI provider statistics
+  const { data: providerStats = {} } = useQuery<Record<string, any>>({
+    queryKey: ['/api/stats'],
+    refetchInterval: 30000, // Refresh stats every 30 seconds
+  });
 
   // Multi-AI query mutation
   const queryMutation = useMutation({
@@ -168,7 +175,112 @@ export default function SwimMeet() {
         <p style={{ margin: 0, fontSize: '1.1rem', opacity: 0.9 }}>
           AI Orchestration Platform • Multi-Agent Problem Solving
         </p>
+        <button
+          onClick={() => setShowStats(!showStats)}
+          style={{
+            marginTop: '10px',
+            padding: '8px 16px',
+            backgroundColor: showStats ? '#fbbf24' : 'rgba(255,255,255,0.2)',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          }}
+        >
+          {showStats ? 'Hide Stats Dashboard' : 'Show Stats Dashboard'}
+        </button>
       </div>
+
+      {/* Comprehensive Stats Dashboard */}
+      {showStats && (
+        <div style={{
+          marginBottom: '20px',
+          padding: '20px',
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          border: '2px solid #0ea5e9'
+        }}>
+          <h2 style={{ margin: '0 0 20px 0', color: '#0c4a6e', textAlign: 'center' }}>
+            📊 COMPREHENSIVE AI PROVIDER STATISTICS
+          </h2>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            {Object.entries(providerStats).map(([providerId, stats]) => {
+              const provider = providers.find(p => p.id === providerId);
+              if (!provider) return null;
+              
+              return (
+                <div key={providerId} style={{
+                  padding: '15px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  backgroundColor: '#f9fafb'
+                }}>
+                  <h3 style={{ margin: '0 0 10px 0', color: '#374151', textAlign: 'center' }}>
+                    {provider.name}
+                  </h3>
+                  
+                  {/* Award Counts */}
+                  <div style={{ marginBottom: '10px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '5px' }}>AWARDS</div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{ padding: '2px 6px', backgroundColor: '#fbbf24', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
+                        🥇 {stats.awards.gold}
+                      </span>
+                      <span style={{ padding: '2px 6px', backgroundColor: '#e5e7eb', color: 'black', borderRadius: '4px', fontSize: '11px' }}>
+                        🥈 {stats.awards.silver}
+                      </span>
+                      <span style={{ padding: '2px 6px', backgroundColor: '#d97706', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
+                        🥉 {stats.awards.bronze}
+                      </span>
+                      <span style={{ padding: '2px 6px', backgroundColor: '#16a34a', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
+                        ✅ {stats.awards.finished}
+                      </span>
+                      <span style={{ padding: '2px 6px', backgroundColor: '#6b7280', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
+                        ❌ {stats.awards.quit}
+                      </span>
+                      <span style={{ padding: '2px 6px', backgroundColor: '#dc2626', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
+                        💥 {stats.awards.titanic}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Performance Stats */}
+                  <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#6b7280' }}>Total Responses:</span>
+                      <span style={{ fontWeight: 'bold', color: '#374151' }}>{stats.totalResponses}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#6b7280' }}>Success Rate:</span>
+                      <span style={{ fontWeight: 'bold', color: stats.successRate >= 90 ? '#16a34a' : stats.successRate >= 70 ? '#eab308' : '#dc2626' }}>
+                        {stats.successRate}%
+                      </span>
+                    </div>
+                    {stats.avgResponseTimeMs && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#6b7280' }}>Avg Response Time:</span>
+                        <span style={{ fontWeight: 'bold', color: '#374151' }}>
+                          {(stats.avgResponseTimeMs / 1000).toFixed(1)}s
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {Object.keys(providerStats).length === 0 && (
+            <div style={{ textAlign: 'center', color: '#6b7280', fontStyle: 'italic' }}>
+              No statistics available yet. Submit some queries to generate data!
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Mode Selection */}
       <div style={{
@@ -248,6 +360,12 @@ export default function SwimMeet() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 'bold', color: '#374151' }}>{provider.name}</div>
                 <div style={{ fontSize: '12px', color: '#6b7280' }}>{provider.company}</div>
+                {providerStats[provider.id] && (
+                  <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>
+                    🏆 {providerStats[provider.id].awards.gold}G {providerStats[provider.id].awards.silver}S {providerStats[provider.id].awards.bronze}B
+                    {providerStats[provider.id].avgResponseTimeMs && ` • ⏱️ ${(providerStats[provider.id].avgResponseTimeMs / 1000).toFixed(1)}s`}
+                  </div>
+                )}
               </div>
               {selectedAIs.includes(provider.id) && (
                 <div style={{ color: '#0c4a6e', fontWeight: 'bold' }}>✓</div>

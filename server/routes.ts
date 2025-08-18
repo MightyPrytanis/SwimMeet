@@ -426,6 +426,26 @@ Provide only the reply text, no explanations.`;
 
   // Award response
   app.post("/api/responses/:id/award", async (req, res) => {
+    const { id } = req.params;
+    const { award } = req.body;
+    
+    const updatedResponse = await storage.updateResponse(id, { award });
+    
+    res.json({
+      success: true,
+      message: `Response awarded ${award}`,
+      response: updatedResponse
+    });
+  });
+
+  // Get AI provider statistics
+  app.get("/api/stats", async (req, res) => {
+    const stats = await storage.getProviderStats();
+    res.json(stats);
+  });
+
+  // Award response
+  app.post("/api/responses/:id/award", async (req, res) => {
     try {
       const { id } = req.params;
       const { award } = req.body;

@@ -120,6 +120,62 @@ export class MemStorage implements IStorage {
     }
     throw new Error(`Response with id ${id} not found`);
   }
+
+  async updateResponse(id: string, updates: Partial<Response>): Promise<Response> {
+    const response = this.responses.get(id);
+    if (response) {
+      Object.assign(response, updates);
+      this.responses.set(id, response);
+      return response;
+    }
+    throw new Error(`Response with id ${id} not found`);
+  }
+
+  async getProviderStats(): Promise<Record<string, any>> {
+    const allResponses = Array.from(this.responses.values());
+    const stats: Record<string, any> = {};
+
+    // Group responses by AI provider
+    const responsesByProvider = allResponses.reduce((acc, response) => {
+      if (!acc[response.aiProvider]) {
+        acc[response.aiProvider] = [];
+      }
+      acc[response.aiProvider].push(response);
+      return acc;
+    }, {} as Record<string, Response[]>);
+
+    // Calculate stats for each provider
+    Object.entries(responsesByProvider).forEach(([provider, responses]) => {
+      const completeResponses = responses.filter(r => r.status === 'complete');
+      const awardCounts = { gold: 0, silver: 0, bronze: 0, finished: 0, quit: 0, titanic: 0 };
+      
+      let totalResponseTime = 0;
+      let responseTimeCount = 0;
+
+      completeResponses.forEach(response => {
+        // Count awards
+        if (response.award && awardCounts.hasOwnProperty(response.award)) {
+          awardCounts[response.award as keyof typeof awardCounts]++;
+        }
+        
+        // Calculate average response times
+        if (response.responseTimeMs) {
+          totalResponseTime += parseInt(response.responseTimeMs);
+          responseTimeCount++;
+        }
+      });
+
+      stats[provider] = {
+        totalResponses: responses.length,
+        completeResponses: completeResponses.length,
+        awards: awardCounts,
+        avgResponseTimeMs: responseTimeCount > 0 ? Math.round(totalResponseTime / responseTimeCount) : null,
+        successRate: responses.length > 0 ? Math.round((completeResponses.length / responses.length) * 100) : 0
+      };
+    });
+
+    return stats;
+  }
 }
 
 export const storage = new MemStorage();

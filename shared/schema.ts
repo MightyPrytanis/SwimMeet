@@ -25,6 +25,8 @@ export const responses = pgTable("responses", {
   aiProvider: text("ai_provider").notNull(),
   content: text("content").notNull(),
   status: text("status").notNull().default("pending"), // pending, complete, error
+  award: text("award"), // gold, silver, bronze, finished, quit, titanic
+  responseTimeMs: varchar("response_time_ms"), // time taken to generate response
   metadata: json("metadata").$type<Record<string, any>>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });
