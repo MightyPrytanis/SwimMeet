@@ -16,6 +16,20 @@ export const conversations = pgTable("conversations", {
   userId: varchar("user_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
   query: text("query").notNull(),
+  mode: text("mode").notNull().default("dive"), // dive, turn, work
+  workflowState: json("workflow_state").$type<{
+    currentStep: number;
+    totalSteps: number;
+    collaborativeDocument: string;
+    stepHistory: {
+      step: number;
+      assignedAI: string;
+      objective: string;
+      completedAt?: string;
+      output: string;
+    }[];
+    sharedContext: Record<string, any>;
+  }>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -37,6 +51,14 @@ export const responses = pgTable("responses", {
     overallAssessment: string;
     recommendations: string[];
   }[]>().default([]),
+  workStep: varchar("work_step"), // For WORK mode: which step this response belongs to
+  handoffData: json("handoff_data").$type<{
+    previousStep?: number;
+    nextAI?: string;
+    contextSummary?: string;
+    taskSpecification?: string;
+    buildingBlocks?: string[];
+  }>().default({}),
   metadata: json("metadata").$type<Record<string, any>>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -49,6 +71,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertConversationSchema = createInsertSchema(conversations).pick({
   title: true,
   query: true,
+  mode: true,
+  workflowState: true,
 });
 
 export const insertResponseSchema = createInsertSchema(responses).pick({
@@ -56,6 +80,8 @@ export const insertResponseSchema = createInsertSchema(responses).pick({
   aiProvider: true,
   content: true,
   status: true,
+  workStep: true,
+  handoffData: true,
   metadata: true,
 });
 

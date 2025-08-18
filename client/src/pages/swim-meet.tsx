@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 
@@ -18,6 +18,28 @@ interface AIResponse {
   timestamp: string;
   metadata?: Record<string, any>;
   award?: 'gold' | 'silver' | 'bronze' | 'finished' | 'quit' | 'titanic';
+  workStep?: string;
+  handoffData?: {
+    previousStep?: number;
+    nextAI?: string;
+    contextSummary?: string;
+    taskSpecification?: string;
+    buildingBlocks?: string[];
+  };
+}
+
+interface WorkflowState {
+  currentStep: number;
+  totalSteps: number;
+  collaborativeDocument: string;
+  stepHistory: {
+    step: number;
+    assignedAI: string;
+    objective: string;
+    completedAt?: string;
+    output: string;
+  }[];
+  sharedContext: Record<string, any>;
 }
 
 interface QueryRequest {
@@ -36,6 +58,11 @@ export default function SwimMeet() {
   const [verifyingStates, setVerifyingStates] = useState<Record<string, boolean>>({});
   const [sharingStates, setSharingStates] = useState<Record<string, boolean>>({});
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
+  
+  // WORK mode state
+  const [workflowState, setWorkflowState] = useState<WorkflowState | null>(null);
+  const [stepPlanning, setStepPlanning] = useState<boolean>(false);
+  const [collaborativeDoc, setCollaborativeDoc] = useState<string>("");
 
   // Fetch available AI providers - MINIMAL API CALLS
   const { data: providers = [] } = useQuery<AIProvider[]>({
@@ -63,6 +90,20 @@ export default function SwimMeet() {
     queryKey: ['/api/stats'],
     refetchInterval: 30000, // Refresh stats every 30 seconds
   });
+
+  // Fetch workflow state for WORK mode
+  const { data: currentWorkflow } = useQuery<{ conversationId: string; workflowState: WorkflowState }>({
+    queryKey: ['/api/conversations', conversationId, 'workflow'],
+    enabled: mode === 'work' && !!conversationId,
+    refetchInterval: 3000, // Check workflow progress every 3 seconds
+  });
+
+  useEffect(() => {
+    if (currentWorkflow?.workflowState) {
+      setWorkflowState(currentWorkflow.workflowState);
+      setCollaborativeDoc(currentWorkflow.workflowState.collaborativeDocument);
+    }
+  }, [currentWorkflow]);
 
   // Multi-AI query mutation
   const queryMutation = useMutation({
@@ -548,8 +589,129 @@ export default function SwimMeet() {
         </button>
       </div>
 
-      {/* Responses */}
-      {responses.length > 0 && (
+      {/* WORK Mode Workflow Display */}
+      {mode === 'work' && workflowState && (
+        <div style={{
+          padding: '20px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          marginBottom: '20px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ margin: 0, color: '#374151', fontSize: '20px' }}>🏊‍♂️ WORK Mode: Collaborative Workflow</h3>
+            <div style={{
+              marginLeft: 'auto',
+              fontSize: '14px',
+              color: '#6b7280',
+              fontWeight: 'bold'
+            }}>
+              Step {workflowState.currentStep} of {workflowState.totalSteps}
+            </div>
+          </div>
+
+          {/* Workflow Progress */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '10px', 
+            marginBottom: '20px',
+            alignItems: 'center'
+          }}>
+            {workflowState.stepHistory.map((step, index) => {
+              const isActive = index + 1 === workflowState.currentStep;
+              const isCompleted = step.output !== "";
+              const isPending = index + 1 < workflowState.currentStep;
+              
+              return (
+                <React.Fragment key={step.step}>
+                  <div style={{
+                    padding: '10px 15px',
+                    borderRadius: '8px',
+                    backgroundColor: isCompleted ? '#16a34a' : isActive ? '#0c4a6e' : '#e5e7eb',
+                    color: isCompleted || isActive ? 'white' : '#6b7280',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    minWidth: '120px',
+                    textAlign: 'center',
+                    position: 'relative'
+                  }}>
+                    <div>Step {step.step}</div>
+                    <div style={{ fontSize: '10px', marginTop: '2px' }}>
+                      {step.assignedAI}
+                    </div>
+                    <div style={{ fontSize: '9px', marginTop: '2px', fontWeight: 'normal' }}>
+                      {step.objective.substring(0, 20)}...
+                    </div>
+                    {isActive && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '-3px',
+                        right: '-3px',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: '#fbbf24',
+                        animation: 'pulse 2s infinite'
+                      }} />
+                    )}
+                  </div>
+                  {index < workflowState.stepHistory.length - 1 && (
+                    <div style={{
+                      width: '20px',
+                      height: '2px',
+                      backgroundColor: isCompleted ? '#16a34a' : '#e5e7eb',
+                      margin: '0 5px'
+                    }} />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+
+          {/* Current Step Details */}
+          {workflowState.currentStep <= workflowState.totalSteps && (
+            <div style={{
+              padding: '15px',
+              backgroundColor: '#f0f9ff',
+              borderRadius: '8px',
+              border: '2px solid #0c4a6e',
+              marginBottom: '20px'
+            }}>
+              <h4 style={{ margin: '0 0 10px 0', color: '#0c4a6e' }}>
+                Current: {workflowState.stepHistory[workflowState.currentStep - 1]?.objective}
+              </h4>
+              <p style={{ margin: 0, color: '#374151', fontSize: '14px' }}>
+                <strong>Assigned AI:</strong> {workflowState.stepHistory[workflowState.currentStep - 1]?.assignedAI}
+              </p>
+            </div>
+          )}
+
+          {/* Collaborative Document Preview */}
+          {collaborativeDoc && (
+            <div style={{
+              padding: '15px',
+              backgroundColor: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              maxHeight: '300px',
+              overflowY: 'auto'
+            }}>
+              <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>📄 Collaborative Document</h4>
+              <div style={{
+                fontSize: '14px',
+                lineHeight: '1.6',
+                color: '#374151',
+                whiteSpace: 'pre-wrap'
+              }}>
+                {collaborativeDoc}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Standard DIVE/TURN Responses */}
+      {mode !== 'work' && responses.length > 0 && (
         <div style={{
           padding: '15px',
           backgroundColor: 'white',

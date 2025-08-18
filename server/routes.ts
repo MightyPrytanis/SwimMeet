@@ -5,6 +5,145 @@ import { encryptCredentials, decryptCredentials } from "./services/encryption";
 import { AIService } from "./services/ai-service";
 import { credentialsSchema, insertConversationSchema, insertResponseSchema, type QueryRequest, type AIProvider } from "@shared/schema";
 
+// WORK mode workflow planning functions
+function planWorkflowSteps(query: string, aiProviders: string[]) {
+  // Intelligent step planning based on query complexity
+  const steps = [];
+  
+  if (query.includes("analysis") || query.includes("research")) {
+    steps.push(
+      { assignedAI: aiProviders[0], objective: "Initial research and data gathering" },
+      { assignedAI: aiProviders[1] || aiProviders[0], objective: "Deep analysis and insight extraction" },
+      { assignedAI: aiProviders[2] || aiProviders[0], objective: "Synthesis and conclusion formulation" }
+    );
+  } else if (query.includes("plan") || query.includes("strategy")) {
+    steps.push(
+      { assignedAI: aiProviders[0], objective: "Situational assessment and goal clarification" },
+      { assignedAI: aiProviders[1] || aiProviders[0], objective: "Strategic framework development" },
+      { assignedAI: aiProviders[2] || aiProviders[0], objective: "Implementation roadmap and refinement" }
+    );
+  } else {
+    // General problem-solving workflow
+    steps.push(
+      { assignedAI: aiProviders[0], objective: "Problem breakdown and initial approach" },
+      { assignedAI: aiProviders[1] || aiProviders[0], objective: "Solution development and elaboration" },
+      { assignedAI: aiProviders[2] || aiProviders[0], objective: "Review, optimization, and finalization" }
+    );
+  }
+  
+  return steps;
+}
+
+async function initiateWorkflowStep(conversationId: string, workflowState: any, aiService: AIService) {
+  const currentStepData = workflowState.stepHistory[workflowState.currentStep - 1];
+  const contextSummary = buildContextSummary(workflowState);
+  
+  const workPrompt = `🏊‍♂️ SWIM MEET - WORK MODE (Collaborative Step ${workflowState.currentStep}/${workflowState.totalSteps})
+
+**Your Role**: ${currentStepData.assignedAI} - Step ${workflowState.currentStep} Specialist
+**Objective**: ${currentStepData.objective}
+
+**Original Query**: ${workflowState.sharedContext.originalQuery}
+
+**Collaborative Context**:
+${contextSummary}
+
+**Your Task**: 
+${currentStepData.objective}
+
+Please provide your contribution that builds upon any previous work and can be handed off to the next AI in the sequence. Focus on your specific objective while maintaining continuity with the overall solution.`;
+
+  // Create response for this step
+  const response = await storage.createResponse({
+    conversationId,
+    aiProvider: currentStepData.assignedAI,
+    content: "",
+    status: "pending",
+    workStep: `step-${workflowState.currentStep}`,
+    handoffData: {
+      previousStep: workflowState.currentStep > 1 ? workflowState.currentStep - 1 : undefined,
+      nextAI: workflowState.currentStep < workflowState.totalSteps ? workflowState.stepHistory[workflowState.currentStep]?.assignedAI : undefined,
+      contextSummary,
+      taskSpecification: currentStepData.objective
+    }
+  });
+
+  // Process AI request asynchronously
+  processWorkflowStep(currentStepData.assignedAI, workPrompt, response.id, conversationId, workflowState);
+}
+
+function buildContextSummary(workflowState: any): string {
+  const completedSteps = workflowState.stepHistory.filter((step: any) => step.output);
+  if (completedSteps.length === 0) {
+    return "This is the first step in the collaborative workflow.";
+  }
+  
+  return completedSteps.map((step: any, index: number) => 
+    `**Step ${step.step} (${step.assignedAI})**: ${step.output.substring(0, 200)}${step.output.length > 200 ? '...' : ''}`
+  ).join('\n\n');
+}
+
+async function processWorkflowStep(aiProvider: string, prompt: string, responseId: string, conversationId: string, workflowState: any) {
+  try {
+    const user = await storage.getUser("default-user");
+    let credentials: Record<string, string> = {};
+    if (user?.encryptedCredentials?.encrypted) {
+      credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+    }
+
+    const aiService = new AIService(credentials);
+    let result;
+
+    switch (aiProvider) {
+      case 'openai':
+        result = await aiService.queryOpenAI(prompt);
+        break;
+      case 'anthropic':
+        result = await aiService.queryAnthropic(prompt);
+        break;
+      case 'google':
+        result = await aiService.queryGemini(prompt);
+        break;
+      case 'perplexity':
+        result = await aiService.queryPerplexity(prompt);
+        break;
+      default:
+        result = { success: false, error: `Unsupported AI provider: ${aiProvider}` };
+    }
+
+    if (result.success) {
+      await storage.updateResponse(responseId, {
+        content: result.content,
+        status: "complete"
+      });
+
+      // Update workflow state and continue to next step
+      const updatedWorkflowState = { ...workflowState };
+      updatedWorkflowState.stepHistory[workflowState.currentStep - 1].output = result.content;
+      updatedWorkflowState.stepHistory[workflowState.currentStep - 1].completedAt = new Date().toISOString();
+      updatedWorkflowState.collaborativeDocument += `\n\n## Step ${workflowState.currentStep}: ${updatedWorkflowState.stepHistory[workflowState.currentStep - 1].objective}\n*By ${aiProvider}*\n\n${result.content}`;
+
+      await storage.updateConversationWorkflow(conversationId, updatedWorkflowState);
+
+      // If there are more steps, initiate the next one
+      if (workflowState.currentStep < workflowState.totalSteps) {
+        updatedWorkflowState.currentStep++;
+        await initiateWorkflowStep(conversationId, updatedWorkflowState, aiService);
+      }
+    } else {
+      await storage.updateResponse(responseId, {
+        content: `Error: ${result.error}`,
+        status: "error"
+      });
+    }
+  } catch (error: any) {
+    await storage.updateResponse(responseId, {
+      content: `Error: ${error.message}`,
+      status: "error"
+    });
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Test connection endpoint
   app.post("/api/credentials/test", async (req, res) => {
@@ -215,16 +354,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Providers array is required" });
       }
       
+      const { mode } = req.body;
+      
       // Create conversation if not provided
       let convId = conversationId;
       if (!convId) {
-        console.log("Creating conversation with query:", actualQuery);
+        console.log(`Creating ${mode || 'DIVE'} conversation with query:`, actualQuery);
+        
+        let workflowState = {};
+        // Initialize WORK mode workflow
+        if (mode === 'work') {
+          const steps = planWorkflowSteps(actualQuery, actualProviders);
+          workflowState = {
+            currentStep: 1,
+            totalSteps: steps.length,
+            collaborativeDocument: `# Collaborative Solution: ${actualQuery}\n\n*Building collaboratively with ${actualProviders.join(', ')}*\n\n`,
+            stepHistory: steps.map((step, index) => ({
+              step: index + 1,
+              assignedAI: step.assignedAI,
+              objective: step.objective,
+              output: ""
+            })),
+            sharedContext: { originalQuery: actualQuery, participatingAIs: actualProviders }
+          };
+        }
+        
         const conversation = await storage.createConversation(userId, {
           title: actualQuery.substring(0, 50) + (actualQuery.length > 50 ? "..." : ""),
-          query: actualQuery
+          query: actualQuery,
+          mode: mode || 'dive',
+          workflowState
         });
         convId = conversation.id;
         console.log("Created conversation with ID:", convId);
+        
+        // For WORK mode, start sequential workflow instead of parallel processing
+        if (mode === 'work') {
+          await initiateWorkflowStep(convId, workflowState, aiService);
+          return res.json({ conversationId: convId, workflowState, responses: [] });
+        }
       }
 
       // Get user credentials
@@ -702,6 +870,25 @@ Keep your response professional and constructive.`;
           aiProvider: response.aiProvider,
           award: response.metadata?.award
         }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get workflow state for WORK mode
+  app.get("/api/conversations/:conversationId/workflow", async (req, res) => {
+    try {
+      const { conversationId } = req.params;
+      const conversation = await storage.getConversation(conversationId);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      res.json({
+        conversationId,
+        workflowState: conversation.workflowState || null
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
