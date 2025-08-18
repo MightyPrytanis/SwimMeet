@@ -104,8 +104,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get available AI providers with REAL connection testing
+  // Get available AI providers with REAL connection testing - NO CACHING
   app.get("/api/providers", async (req, res) => {
+    // Force no caching
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     const userId = req.query.userId as string || "default-user";
     const user = await storage.getUser(userId);
     
@@ -118,7 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
 
-    // Test actual connections with real API calls
+    console.log("TESTING AI PROVIDERS WITH REAL API CALLS...");
     const aiService = new AIService(credentials);
     
     const providerTests = [
@@ -132,42 +137,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { id: 'llama', name: 'Llama 3.2', company: 'Meta', requiresApiKey: false }
     ];
 
-    // Test each provider with actual API calls
+    // Test each provider with actual API calls - REAL TESTING
     const providers: AIProvider[] = await Promise.all(
       providerTests.map(async (provider) => {
         let testResult;
         
         try {
+          console.log(`Testing ${provider.name}...`);
           switch (provider.id) {
             case 'openai':
-              testResult = await aiService.queryOpenAI("Test");
+              testResult = await aiService.queryOpenAI("Test connection");
               break;
             case 'anthropic':
-              testResult = await aiService.queryAnthropic("Test");
+              testResult = await aiService.queryAnthropic("Test connection");
               break;
             case 'google':
-              testResult = await aiService.queryGemini("Test");
+              testResult = await aiService.queryGemini("Test connection");
               break;
             case 'microsoft':
-              testResult = await aiService.queryMicrosoft("Test");
+              testResult = await aiService.queryMicrosoft("Test connection");
               break;
             case 'perplexity':
-              testResult = await aiService.queryPerplexity("Test");
+              testResult = await aiService.queryPerplexity("Test connection");
               break;
             case 'grok':
-              testResult = await aiService.queryGrok("Test");
+              testResult = await aiService.queryGrok("Test connection");
               break;
             case 'llama':
-              testResult = await aiService.queryLlama("Test");
+              testResult = await aiService.queryLlama("Test connection");
               break;
             case 'deepseek':
-              testResult = await aiService.queryDeepSeek("Test");
+              testResult = await aiService.queryDeepSeek("Test connection");
               break;
             default:
               testResult = { success: false, error: "Unknown provider" };
           }
+          console.log(`${provider.name}: ${testResult.success ? 'CONNECTED' : 'FAILED - ' + testResult.error}`);
         } catch (error: any) {
           testResult = { success: false, error: error.message };
+          console.log(`${provider.name}: ERROR - ${error.message}`);
         }
 
         return {
@@ -178,6 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       })
     );
 
+    console.log("REAL API TEST RESULTS:", providers.map(p => `${p.name}: ${p.status}`));
     res.json(providers);
   });
 
