@@ -100,11 +100,19 @@ export default function SwimMeet() {
   const handleAwardResponse = (responseId: string, award: string) => {
     console.log(`Awarding ${award} to response ${responseId} at ${new Date().toLocaleTimeString()}`);
     
+    // Optimistically update UI
     setResponses(prev => 
-      prev.map(r => r.id === responseId ? { ...r, award: award as any } : r)
+      prev.map(r => r.id === responseId ? { ...r, award: award as any, awardSaved: false } : r)
     );
     
-    awardMutation.mutate({ responseId, award });
+    // Save to backend
+    awardMutation.mutate({ responseId, award }, {
+      onSuccess: () => {
+        setResponses(prev => 
+          prev.map(r => r.id === responseId ? { ...r, awardSaved: true } : r)
+        );
+      }
+    });
   };
 
   const toggleAISelection = (aiId: string) => {
@@ -340,7 +348,7 @@ export default function SwimMeet() {
                 </div>
 
                 {/* Award Buttons */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   {['gold', 'silver', 'bronze', 'finished', 'quit', 'titanic'].map(award => (
                     <button
                       key={award}
@@ -360,10 +368,62 @@ export default function SwimMeet() {
                       {award}
                     </button>
                   ))}
+                  {response.award && (
+                    <div style={{
+                      marginLeft: '10px',
+                      fontSize: '12px',
+                      color: response.awardSaved ? '#16a34a' : '#eab308',
+                      fontWeight: 'bold'
+                    }}>
+                      {response.awardSaved ? '✓ Saved' : '⏳ Saving...'}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
+          
+          {/* Award Summary */}
+          {responses.some(r => r.award) && (
+            <div style={{
+              marginTop: '20px',
+              padding: '15px',
+              backgroundColor: '#f0f9ff',
+              border: '1px solid #0ea5e9',
+              borderRadius: '8px'
+            }}>
+              <h4 style={{ margin: '0 0 10px 0', color: '#0c4a6e' }}>Award Summary</h4>
+              {responses.filter(r => r.award).map(response => (
+                <div key={response.id} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '5px 0'
+                }}>
+                  <span style={{ fontWeight: 'bold' }}>{response.aiProvider}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      padding: '2px 8px',
+                      backgroundColor: getAwardColor(response.award),
+                      color: ['gold', 'bronze', 'titanic'].includes(response.award!) ? 'white' : 'black',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase'
+                    }}>
+                      {response.award}
+                    </span>
+                    <span style={{
+                      fontSize: '12px',
+                      color: response.awardSaved ? '#16a34a' : '#eab308'
+                    }}>
+                      {response.awardSaved ? '✓' : '⏳'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
