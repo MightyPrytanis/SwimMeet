@@ -444,7 +444,7 @@ Provide only the reply text, no explanations.`;
     res.json(stats);
   });
 
-  // Backstroke verification - AI-to-AI fact-checking
+  // TURN Mode verification - AI-to-AI fact-checking
   app.post("/api/responses/:id/verify", async (req, res) => {
     try {
       const { id } = req.params;
@@ -476,7 +476,7 @@ Provide only the reply text, no explanations.`;
 
       const aiService = new AIService(credentials);
       
-      const verificationPrompt = `BACKSTROKE VERIFICATION TASK
+      const verificationPrompt = `TURN MODE VERIFICATION TASK
       
 You are performing AI-to-AI verification. Carefully analyze this response for accuracy, completeness, and quality.
 
