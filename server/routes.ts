@@ -130,11 +130,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { id: 'openai', name: 'ChatGPT-4', company: 'OpenAI', requiresApiKey: true },
       { id: 'anthropic', name: 'Claude 4', company: 'Anthropic', requiresApiKey: true },
       { id: 'google', name: 'Gemini Pro', company: 'Google', requiresApiKey: true },
-      { id: 'microsoft', name: 'Copilot', company: 'Microsoft', requiresApiKey: false },
       { id: 'perplexity', name: 'Perplexity', company: 'Perplexity AI', requiresApiKey: true },
       { id: 'deepseek', name: 'DeepSeek', company: 'DeepSeek AI', requiresApiKey: true },
       { id: 'grok', name: 'Grok', company: 'xAI', requiresApiKey: true },
-      { id: 'llama', name: 'Llama 3.2', company: 'Meta', requiresApiKey: false }
+      // Removed microsoft/llama per user request - API issues on their end
     ];
 
     // Test each provider with actual API calls - REAL TESTING
@@ -154,18 +153,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             case 'google':
               testResult = await aiService.queryGemini("Test connection");
               break;
-            case 'microsoft':
-              testResult = await aiService.queryMicrosoft("Test connection");
-              break;
+
             case 'perplexity':
               testResult = await aiService.queryPerplexity("Test connection");
               break;
             case 'grok':
               testResult = await aiService.queryGrok("Test connection");
               break;
-            case 'llama':
-              testResult = await aiService.queryLlama("Test connection");
-              break;
+
             case 'deepseek':
               testResult = await aiService.queryDeepSeek("Test connection");
               break;
