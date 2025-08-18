@@ -120,6 +120,7 @@ export default function SwimMeet() {
       case 'connected': return '#16a34a'; // Green
       case 'setup_required': return '#eab308'; // Yellow
       case 'error': return '#dc2626'; // Red
+      case 'disabled': return '#9ca3af'; // Light gray for disabled
       default: return '#6b7280'; // Gray
     }
   };
@@ -214,7 +215,7 @@ export default function SwimMeet() {
           {providers.map(provider => (
             <div
               key={provider.id}
-              onClick={() => toggleAISelection(provider.id)}
+              onClick={() => provider.status !== 'disabled' && toggleAISelection(provider.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -222,7 +223,8 @@ export default function SwimMeet() {
                 border: `2px solid ${selectedAIs.includes(provider.id) ? '#0c4a6e' : '#e5e7eb'}`,
                 backgroundColor: selectedAIs.includes(provider.id) ? '#eff6ff' : 'white',
                 borderRadius: '6px',
-                cursor: 'pointer',
+                cursor: provider.status === 'disabled' ? 'not-allowed' : 'pointer',
+                opacity: provider.status === 'disabled' ? 0.5 : 1,
                 transition: 'all 0.2s'
               }}
             >

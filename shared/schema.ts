@@ -70,7 +70,7 @@ export interface AIProvider {
   name: string;
   company: string;
   requiresApiKey: boolean;
-  status: 'connected' | 'setup_required' | 'error';
+  status: 'connected' | 'setup_required' | 'error' | 'disabled';
 }
 
 export interface QueryRequest {

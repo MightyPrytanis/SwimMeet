@@ -133,8 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { id: 'perplexity', name: 'Perplexity', company: 'Perplexity AI', requiresApiKey: true },
       { id: 'deepseek', name: 'DeepSeek', company: 'DeepSeek AI', requiresApiKey: true },
       { id: 'grok', name: 'Grok', company: 'xAI', requiresApiKey: true },
-      // Removed microsoft/llama per user request - API issues on their end
     ];
+
+
 
     // Test each provider with actual API calls - REAL TESTING
     const providers: AIProvider[] = await Promise.all(
@@ -182,7 +183,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     );
 
     console.log("REAL API TEST RESULTS:", providers.map(p => `${p.name}: ${p.status}`));
-    res.json(providers);
+    
+    // Add grayed-out disabled providers (API issues on their end)
+    const disabledProviders = [
+      { id: 'microsoft', name: 'Copilot', company: 'Microsoft', status: 'disabled' as const, requiresApiKey: false },
+      { id: 'llama', name: 'Llama 3.2', company: 'Meta', status: 'disabled' as const, requiresApiKey: false },
+    ];
+
+    const allProviders = [...providers, ...disabledProviders];
+    res.json(allProviders);
   });
 
   // Submit query to multiple AIs
