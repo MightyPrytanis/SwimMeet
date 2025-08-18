@@ -124,6 +124,70 @@ export default function SwimMeet() {
     });
   };
 
+  // TURN verification mutation
+  const verifyMutation = useMutation({
+    mutationFn: async ({ responseId, verifierAI }: { responseId: string, verifierAI: string }) => {
+      const response = await fetch(`/api/responses/${responseId}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verifierAI })
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stats'] });
+      if (conversationId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/conversations/${conversationId}/responses`] });
+      }
+    }
+  });
+
+  // Share critique mutation  
+  const shareCritiqueMutation = useMutation({
+    mutationFn: async ({ responseId }: { responseId: string }) => {
+      const response = await fetch(`/api/responses/${responseId}/share-critique`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      if (conversationId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/conversations/${conversationId}/responses`] });
+      }
+    }
+  });
+
+  const handleTurnVerification = async (response: AIResponse) => {
+    if (verifyingStates[response.id] || response.verificationStatus === 'pending') return;
+    
+    setVerifyingStates(prev => ({
+      ...prev,
+      [response.id]: true
+    }));
+
+    try {
+      await verifyMutation.mutateAsync({ responseId: response.id, verifierAI: selectedVerifier });
+    } catch (error) {
+      console.error('Failed to verify response:', error);
+    } finally {
+      setVerifyingStates(prev => {
+        const newState = { ...prev };
+        delete newState[response.id];
+        return newState;
+      });
+    }
+  };
+
+  const handleShareCritique = async (response: AIResponse) => {
+    try {
+      await shareCritiqueMutation.mutateAsync({ responseId: response.id });
+    } catch (error) {
+      console.error('Failed to share critique:', error);
+    }
+  };
+
   const toggleAISelection = (aiId: string) => {
     setSelectedAIs(prev => 
       prev.includes(aiId) 
@@ -482,8 +546,8 @@ export default function SwimMeet() {
                   {response.content}
                 </div>
 
-                {/* Award Buttons */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                {/* Award and Analysis Buttons */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '10px' }}>
                   {['gold', 'silver', 'bronze', 'finished', 'quit', 'titanic'].map(award => (
                     <button
                       key={award}
@@ -514,6 +578,107 @@ export default function SwimMeet() {
                     </div>
                   )}
                 </div>
+
+                {/* DIVE-TURN Bridge: TURN Analysis Buttons */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button
+                    onClick={() => handleTurnVerification(response)}
+                    disabled={verifyingStates[response.id]}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: response.verificationStatus === 'complete' ? '#16a34a' : 
+                                     verifyingStates[response.id] ? '#fbbf24' : '#0ea5e9',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: verifyingStates[response.id] ? 'not-allowed' : 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {verifyingStates[response.id] ? '⏳ Analyzing...' : 
+                     response.verificationStatus === 'complete' ? '✓ TURN Verified' : '🔍 TURN Analysis'}
+                  </button>
+
+                  {response.verificationStatus === 'complete' && (
+                    <button
+                      onClick={() => handleShareCritique(response)}
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: response.metadata?.critiqueResponse ? '#16a34a' : '#7c3aed',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {response.metadata?.critiqueResponse ? '✓ Shared with AI' : '📤 Share Critique'}
+                    </button>
+                  )}
+
+                  {/* Verifier AI Selector */}
+                  <select
+                    value={selectedVerifier}
+                    onChange={(e) => setSelectedVerifier(e.target.value)}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '11px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '4px',
+                      backgroundColor: 'white'
+                    }}
+                  >
+                    <option value="anthropic">Claude Verifier</option>
+                    <option value="openai">GPT Verifier</option>
+                    <option value="google">Gemini Verifier</option>
+                    <option value="perplexity">Perplexity Verifier</option>
+                  </select>
+                </div>
+
+                {/* Display Verification Results */}
+                {response.verificationResults && response.verificationResults.length > 0 && (
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '10px',
+                    backgroundColor: '#f0f9ff',
+                    borderRadius: '6px',
+                    border: '1px solid #0ea5e9'
+                  }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#0c4a6e', marginBottom: '5px' }}>
+                      TURN Analysis by {response.verificationResults[0].verifiedBy}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#374151' }}>
+                      <div>🎯 Accuracy: {response.verificationResults[0].accuracyScore}/10</div>
+                      {response.verificationResults[0].factualErrors.length > 0 && (
+                        <div style={{ color: '#dc2626' }}>❌ Errors: {response.verificationResults[0].factualErrors.join(', ')}</div>
+                      )}
+                      <div>✅ Strengths: {response.verificationResults[0].strengths.join(', ')}</div>
+                      {response.verificationResults[0].weaknesses.length > 0 && (
+                        <div>⚠️ Areas to improve: {response.verificationResults[0].weaknesses.join(', ')}</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Display AI's Response to Critique */}
+                {response.metadata?.critiqueResponse && (
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '10px',
+                    backgroundColor: '#f3e8ff',
+                    borderRadius: '6px',
+                    border: '1px solid #7c3aed'
+                  }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#7c3aed', marginBottom: '5px' }}>
+                      {response.aiProvider}'s Response to Critique:
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#374151', whiteSpace: 'pre-wrap' }}>
+                      {response.metadata.critiqueResponse.aiResponse}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

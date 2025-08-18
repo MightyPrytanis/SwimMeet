@@ -97,5 +97,23 @@ export interface AIResponse {
   content: string;
   status: 'pending' | 'complete' | 'error';
   timestamp: string;
-  metadata?: Record<string, any>;
+  award?: 'gold' | 'silver' | 'bronze' | 'finished' | 'quit' | 'titanic';
+  awardSaved?: boolean;
+  verificationStatus?: 'none' | 'pending' | 'complete' | 'failed';
+  verificationResults?: {
+    verifiedBy: string;
+    accuracyScore: number;
+    factualErrors: string[];
+    strengths: string[];
+    weaknesses: string[];
+    overallAssessment: string;
+    recommendations: string[];
+  }[];
+  metadata?: {
+    critiqueResponse?: {
+      sharedAt: string;
+      aiResponse: string;
+    };
+    [key: string]: any;
+  };
 }

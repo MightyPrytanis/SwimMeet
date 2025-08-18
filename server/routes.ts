@@ -510,7 +510,7 @@ Respond in JSON format with:
       } else if (verifierAI === 'anthropic') {
         verificationResult = await aiService.queryAnthropic(verificationPrompt);
       } else if (verifierAI === 'google') {
-        verificationResult = await aiService.queryGoogle(verificationPrompt);
+        verificationResult = await aiService.queryGemini(verificationPrompt);
       } else if (verifierAI === 'perplexity') {
         verificationResult = await aiService.queryPerplexity(verificationPrompt);
       } else {
@@ -525,7 +525,7 @@ Respond in JSON format with:
       // Parse verification results
       let parsedResults;
       try {
-        parsedResults = JSON.parse(verificationResult.content);
+        parsedResults = JSON.parse(verificationResult.content || '{}');
       } catch (error) {
         // Fallback: create structured results from unstructured content
         parsedResults = {
@@ -557,6 +557,104 @@ Respond in JSON format with:
         success: true,
         verification: verificationData,
         message: `Response verified by ${verifierAI}`
+      });
+
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Share TURN analysis with original AI
+  app.post("/api/responses/:id/share-critique", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.body.userId || "default-user";
+      
+      const response = await storage.getResponse(id);
+      if (!response) {
+        return res.status(404).json({ message: "Response not found" });
+      }
+
+      if (!response.verificationResults || response.verificationResults.length === 0) {
+        return res.status(400).json({ message: "No verification results to share" });
+      }
+
+      const conversation = await storage.getConversation(response.conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          return res.status(400).json({ message: "Failed to decrypt credentials" });
+        }
+      }
+
+      const aiService = new AIService(credentials);
+      const latestVerification = response.verificationResults[response.verificationResults.length - 1];
+      
+      const sharePrompt = `TURN MODE CRITIQUE SHARING
+
+Your colleague AI (${latestVerification.verifiedBy}) has analyzed your previous response and provided feedback. Please review this critique professionally and provide your thoughts on the assessment.
+
+ORIGINAL QUERY: "${conversation.query}"
+
+YOUR ORIGINAL RESPONSE:
+"${response.content}"
+
+COLLEAGUE'S CRITIQUE:
+- Accuracy Score: ${latestVerification.accuracyScore}/10
+- Factual Errors Found: ${latestVerification.factualErrors.join('; ') || 'None identified'}
+- Strengths: ${latestVerification.strengths.join('; ')}
+- Weaknesses: ${latestVerification.weaknesses.join('; ')}
+- Overall Assessment: ${latestVerification.overallAssessment}
+- Recommendations: ${latestVerification.recommendations.join('; ')}
+
+Please respond with:
+1. Your thoughts on the critique's accuracy
+2. Any corrections or clarifications you'd like to make
+3. How you might improve future responses based on this feedback
+
+Keep your response professional and constructive.`;
+
+      let shareResult;
+      
+      // Route to the original AI provider
+      if (response.aiProvider === 'openai') {
+        shareResult = await aiService.queryOpenAI(sharePrompt);
+      } else if (response.aiProvider === 'anthropic') {
+        shareResult = await aiService.queryAnthropic(sharePrompt);
+      } else if (response.aiProvider === 'google') {
+        shareResult = await aiService.queryGemini(sharePrompt);
+      } else if (response.aiProvider === 'perplexity') {
+        shareResult = await aiService.queryPerplexity(sharePrompt);
+      } else {
+        return res.status(400).json({ message: "Unsupported AI provider for sharing" });
+      }
+
+      if (shareResult.error) {
+        return res.status(500).json({ message: shareResult.error });
+      }
+
+      // Store the AI's response to the critique
+      const updatedMetadata = {
+        ...response.metadata,
+        critiqueResponse: {
+          sharedAt: new Date().toISOString(),
+          aiResponse: shareResult.content
+        }
+      };
+
+      await storage.updateResponse(id, { metadata: updatedMetadata });
+
+      res.json({
+        success: true,
+        aiResponse: shareResult.content,
+        message: `Critique shared with ${response.aiProvider}`
       });
 
     } catch (error: any) {
