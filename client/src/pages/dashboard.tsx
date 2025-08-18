@@ -19,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Settings, History, MessageSquare, Search, Users, HelpCircle, Play, BookOpen, Waves } from "lucide-react";
 import type { AIResponse } from "@shared/schema";
 import { EventDiagnostic } from "@/components/event-diagnostic";
+import SimpleTest from "@/components/simple-test";
 import { AwardButton } from "@/components/award-button";
 import { ActionDropdown } from "@/components/action-dropdown";
 import { ModeSelector } from "@/components/mode-selector";
@@ -434,6 +435,7 @@ This is the final stage of the work - make it count!`;
 
       {/* Event Diagnostic - Step 1 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <SimpleTest />
         <EventDiagnostic />
       </div>
 
