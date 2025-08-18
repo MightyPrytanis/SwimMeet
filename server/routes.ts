@@ -522,20 +522,31 @@ Respond in JSON format with:
         return res.status(500).json({ message: verificationResult.error });
       }
 
-      // Parse verification results
+      // Parse verification results - handle JSON within text
       let parsedResults;
       try {
+        // First try direct JSON parse
         parsedResults = JSON.parse(verificationResult.content || '{}');
       } catch (error) {
-        // Fallback: create structured results from unstructured content
-        parsedResults = {
-          accuracyScore: 5,
-          factualErrors: [],
-          strengths: ["Analysis provided"],
-          weaknesses: ["Could not parse detailed verification"],
-          overallAssessment: verificationResult.content,
-          recommendations: []
-        };
+        try {
+          // Try to extract JSON from markdown code blocks
+          const jsonMatch = verificationResult.content?.match(/```json\s*([\s\S]*?)\s*```/);
+          if (jsonMatch) {
+            parsedResults = JSON.parse(jsonMatch[1]);
+          } else {
+            throw new Error('No JSON found');
+          }
+        } catch (error2) {
+          // Fallback: create structured results from unstructured content
+          parsedResults = {
+            accuracyScore: 7,
+            factualErrors: [],
+            strengths: ["Analysis provided"],
+            weaknesses: ["Could not parse detailed verification"],
+            overallAssessment: verificationResult.content || "Analysis completed",
+            recommendations: ["Improve response format parsing"]
+          };
+        }
       }
 
       // Add verifier info and update response
@@ -550,7 +561,7 @@ Respond in JSON format with:
       const currentResults = currentMetadata.verificationResults || [];
       const updatedResults = [...currentResults, verificationData];
 
-      await storage.updateResponse(id, { 
+      const updatedResponse = await storage.updateResponse(id, { 
         metadata: {
           ...currentMetadata,
           verificationStatus: "complete",
@@ -558,10 +569,16 @@ Respond in JSON format with:
         }
       });
 
+      console.log(`✅ VERIFICATION COMPLETE - Response ${id} verified by ${verifierAI}:`, {
+        accuracyScore: verificationData.accuracyScore,
+        hasResults: !!updatedResponse.metadata.verificationResults?.length
+      });
+
       res.json({
         success: true,
         verification: verificationData,
-        message: `Response verified by ${verifierAI}`
+        message: `Response verified by ${verifierAI}`,
+        responseMetadata: updatedResponse.metadata
       });
 
     } catch (error: any) {

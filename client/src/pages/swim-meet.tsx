@@ -46,8 +46,8 @@ export default function SwimMeet() {
   // Poll for response updates when we have an active conversation - MINIMAL COST
   const { data: updatedResponses } = useQuery<AIResponse[]>({
     queryKey: ['/api/conversations', conversationId, 'responses'],
-    enabled: !!conversationId && responses.some(r => r.status === 'pending'),
-    refetchInterval: 5000, // Poll every 5 seconds, only when responses are pending
+    enabled: !!conversationId,
+    refetchInterval: responses.some(r => r.status === 'pending' || verifyingStates[r.id]) ? 3000 : false,
   });
 
   // Update responses when polling returns new data
@@ -134,10 +134,23 @@ export default function SwimMeet() {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      console.log('✅ TURN Verification completed:', data);
+      
+      // Force immediate UI update by updating local state
+      if (data.responseMetadata) {
+        setResponses(prev => prev.map(r => 
+          r.id === variables.responseId 
+            ? { ...r, metadata: data.responseMetadata }
+            : r
+        ));
+      }
+      
+      // Invalidate and refetch queries
       queryClient.invalidateQueries({ queryKey: ['/api/stats'] });
       if (conversationId) {
-        queryClient.invalidateQueries({ queryKey: [`/api/conversations/${conversationId}/responses`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/conversations', conversationId, 'responses'] });
+        queryClient.refetchQueries({ queryKey: ['/api/conversations', conversationId, 'responses'] });
       }
     }
   });
@@ -637,7 +650,9 @@ export default function SwimMeet() {
                   </select>
                 </div>
 
-                {/* Display Verification Results */}
+
+                
+                {/* Display Verification Results - ALWAYS SHOW IF EXISTS */}
                 {response.metadata?.verificationResults && response.metadata.verificationResults.length > 0 && (
                   <div style={{
                     marginTop: '10px',
@@ -647,21 +662,43 @@ export default function SwimMeet() {
                     border: '1px solid #0ea5e9'
                   }}>
                     <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#0c4a6e', marginBottom: '5px' }}>
-                      TURN Analysis by {response.metadata.verificationResults[0].verifiedBy}
+                      🔍 TURN Analysis by {response.metadata.verificationResults[0].verifiedBy}
                     </div>
                     <div style={{ fontSize: '11px', color: '#374151' }}>
-                      <div>🎯 Accuracy: {response.metadata.verificationResults[0].accuracyScore}/10</div>
+                      <div style={{ fontWeight: 'bold', color: '#0ea5e9' }}>
+                        🎯 Accuracy Score: {response.metadata.verificationResults[0].accuracyScore}/10
+                      </div>
                       {response.metadata.verificationResults[0].factualErrors && response.metadata.verificationResults[0].factualErrors.length > 0 && (
-                        <div style={{ color: '#dc2626' }}>❌ Errors: {response.metadata.verificationResults[0].factualErrors.join(', ')}</div>
+                        <div style={{ color: '#dc2626', marginTop: '3px' }}>
+                          ❌ Errors Found: {response.metadata.verificationResults[0].factualErrors.join(', ')}
+                        </div>
                       )}
-                      <div>✅ Strengths: {response.metadata.verificationResults[0].strengths.join(', ')}</div>
+                      <div style={{ color: '#16a34a', marginTop: '3px' }}>
+                        ✅ Strengths: {response.metadata.verificationResults[0].strengths?.join(', ') || 'Analysis provided'}
+                      </div>
                       {response.metadata.verificationResults[0].weaknesses && response.metadata.verificationResults[0].weaknesses.length > 0 && (
-                        <div>⚠️ Areas to improve: {response.metadata.verificationResults[0].weaknesses.join(', ')}</div>
+                        <div style={{ color: '#ea580c', marginTop: '3px' }}>
+                          ⚠️ Areas to improve: {response.metadata.verificationResults[0].weaknesses.join(', ')}
+                        </div>
                       )}
-                      <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
-                        📋 Assessment: {response.metadata.verificationResults[0].overallAssessment}
+                      <div style={{ marginTop: '5px', fontStyle: 'italic', backgroundColor: '#f8fafc', padding: '5px', borderRadius: '3px' }}>
+                        📋 Overall Assessment: {response.metadata.verificationResults[0].overallAssessment}
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Fallback display for debugging */}
+                {response.metadata?.verificationStatus === 'complete' && (!response.metadata?.verificationResults || response.metadata.verificationResults.length === 0) && (
+                  <div style={{
+                    marginTop: '10px',
+                    padding: '10px',
+                    backgroundColor: '#fef3c7',
+                    borderRadius: '6px',
+                    border: '1px solid #f59e0b',
+                    fontSize: '11px'
+                  }}>
+                    ⚠️ Verification completed but results not displaying properly. Check console logs.
                   </div>
                 )}
 
