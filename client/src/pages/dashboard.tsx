@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { getConversationResponses, submitQuery } from "@/lib/api";
@@ -7,7 +7,8 @@ import { createTruthfulnessPrompt } from "@/components/truthfulness-standards";
 import { HelpContent } from "@/components/help-content";
 import QueryInput from "@/components/query-input";
 import ResponseGrid from "@/components/response-grid";
-import BulkActions from "@/components/bulk-actions";
+import { ResponseCard } from "@/components/response-card";
+
 import ConversationHistory from "@/components/conversation-history";
 import CredentialsModal from "@/components/credentials-modal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -17,7 +18,11 @@ import { SimpleTabs, SimpleTabsContent, SimpleTabsList, SimpleTabsTrigger } from
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Settings, History, MessageSquare, Search, Users, HelpCircle, Play, BookOpen, Waves } from "lucide-react";
 import type { AIResponse } from "@shared/schema";
-import { DebugTest } from "@/components/debug-test";
+import { EventDiagnostic } from "@/components/event-diagnostic";
+import { AwardButton } from "@/components/award-button";
+import { ActionDropdown } from "@/components/action-dropdown";
+import { ModeSelector } from "@/components/mode-selector";
+import { BulkActions } from "@/components/bulk-actions";
 
 export default function Dashboard() {
   const [selectedAIs, setSelectedAIs] = useState<string[]>([]);
@@ -27,8 +32,58 @@ export default function Dashboard() {
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("dive");
+  const [awards, setAwards] = useState<Record<string, string>>({});
+  const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const { toast } = useToast();
+
+  // Award handler following the roadmap pattern
+  const handleAward = useCallback((responseId: string, awardType: string) => {
+    console.log('Award handler called:', responseId, awardType);
+    
+    // Update state
+    setAwards(prev => ({
+      ...prev,
+      [responseId]: awardType
+    }));
+    
+    // Persist to localStorage
+    localStorage.setItem('swim-meet-awards', JSON.stringify({
+      ...JSON.parse(localStorage.getItem('swim-meet-awards') || '{}'),
+      [responseId]: { type: awardType, timestamp: Date.now() }
+    }));
+  }, []);
+
+  // Action handler for dropdowns
+  const handleAction = useCallback((responseId: string, action: string) => {
+    console.log(`Action ${action} on response ${responseId}`);
+    
+    if (action === 'fact-check') {
+      // Implement fact check
+      toast({ title: "Fact Check", description: `Starting fact check for response ${responseId}` });
+    } else if (action === 'humanize') {
+      // Implement humanize
+      toast({ title: "Humanize", description: `Humanizing response ${responseId}` });
+    } else if (action === 'reply') {
+      // Implement reply
+      toast({ title: "Reply", description: `Generating reply for response ${responseId}` });
+    }
+  }, [toast]);
+
+  // Mode change handler
+  const handleModeChange = useCallback((newMode: string) => {
+    console.log('Mode changing to:', newMode);
+    setActiveTab(newMode);
+  }, []);
+
+  // Bulk action handler
+  const handleBulkAction = useCallback((action: string, selectedResponses: string[]) => {
+    console.log(`Bulk action ${action} on:`, selectedResponses);
+    toast({ 
+      title: "Bulk Action", 
+      description: `${action} on ${selectedResponses.length} responses` 
+    });
+  }, [toast]);
 
   // Poll for response updates when we have a conversation
   const { data: latestResponses } = useQuery({
@@ -377,70 +432,27 @@ This is the final stage of the work - make it count!`;
       {/* Swimming Lane Divider */}
       <div className="h-2 lane-divider"></div>
 
+      {/* Event Diagnostic - Step 1 */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <EventDiagnostic />
+      </div>
+
       {/* Swimming Events */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <SimpleTabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           {/* Event Selection Podium */}
           <div className="bg-white rounded-xl shadow-lg border-4 border-yellow-400 p-4">
-            <SimpleTabsList className="grid w-full grid-cols-3 gap-4 bg-gradient-to-r from-blue-100 to-blue-50 p-2 rounded-lg">
-              <SimpleTabsTrigger 
-                value="dive" 
-                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
-                data-testid="tab-dive"
-              >
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  {/* Swimmer diving from starting block - literal dive action */}
-                  <rect x="2" y="16" width="6" height="2" rx="1"/> {/* Starting block */}
-                  <circle cx="12" cy="6" r="2"/> {/* Head */}
-                  <path d="M10 8 C10 8 8 10 6 12 C8 14 12 16 16 14 C18 12 16 10 14 8"/> {/* Body in dive position */}
-                  <path d="M8 10 L6 12 M16 10 L18 12"/> {/* Arms extended */}
-                  <path d="M20 18 L22 20 M20 20 L22 18"/> {/* Water splash */}
-                </svg>
-                <div className="text-center">
-                  <span className="font-varsity text-lg">Dive</span>
-                  <p className="text-xs opacity-75">Direct Analysis</p>
-                </div>
-              </SimpleTabsTrigger>
-              <SimpleTabsTrigger 
-                value="turn" 
-                className="data-[state=active]:bg-green-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
-                data-testid="tab-turn"
-              >
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  {/* Swimmer doing underwater flip turn - literal turn action */}
-                  <circle cx="12" cy="12" r="2"/> {/* Head */}
-                  <path d="M10 12 C8 10 6 12 8 14 C10 16 14 16 16 14 C18 12 16 10 14 12"/> {/* Body curled in flip */}
-                  <path d="M2 20 L22 20"/> {/* Pool wall */}
-                  <path d="M8 8 Q12 6 16 8"/> {/* Curved motion line */}
-                  <path d="M6 16 Q12 18 18 16"/> {/* Water ripples */}
-                </svg>
-                <div className="text-center">
-                  <span className="font-varsity text-lg">Turn</span>
-                  <p className="text-xs opacity-75">Verification</p>
-                </div>
-              </SimpleTabsTrigger>
-              <SimpleTabsTrigger 
-                value="work" 
-                className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex flex-col items-center space-y-2 py-6 rounded-lg transition-all hover:scale-105"
-                data-testid="tab-work"
-              >
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  {/* Group of swimmers doing breaststroke - literal work action */}
-                  <circle cx="6" cy="8" r="1.5"/> {/* Swimmer 1 head */}
-                  <circle cx="12" cy="8" r="1.5"/> {/* Swimmer 2 head */}
-                  <circle cx="18" cy="8" r="1.5"/> {/* Swimmer 3 head */}
-                  <path d="M4 10 C3 11 3 13 5 13 C7 13 7 11 6 10"/> {/* Swimmer 1 breaststroke arms */}
-                  <path d="M10 10 C9 11 9 13 11 13 C13 13 13 11 12 10"/> {/* Swimmer 2 breaststroke arms */}
-                  <path d="M16 10 C15 11 15 13 17 13 C19 13 19 11 18 10"/> {/* Swimmer 3 breaststroke arms */}
-                  <path d="M2 16 L22 16"/> {/* Water line */}
-                </svg>
-                <div className="text-center">
-                  <span className="font-varsity text-lg">Work</span>
-                  <p className="text-xs opacity-75">Collaboration</p>
-                </div>
-              </SimpleTabsTrigger>
-            </SimpleTabsList>
+            <ModeSelector currentMode={activeTab} onModeChange={handleModeChange} />
+
           </div>
+
+          {/* Bulk Actions */}
+          {responses.length > 0 && (
+            <BulkActions 
+              selectedResponses={selectedResponses} 
+              onBulkAction={handleBulkAction} 
+            />
+          )}
 
           {/* Dive Event - Main Competition Pool */}
           <SimpleTabsContent value="dive" className="space-y-8">
@@ -471,12 +483,19 @@ This is the final stage of the work - make it count!`;
               </CardContent>
             </Card>
 
-            <ResponseGrid
-              responses={responses}
-              originalQuery={currentQuery}
-              onFactCheck={handleFactCheck}
-              onReply={handleReply}
-            />
+            {/* Response Cards with New Award System */}
+            {responses.length > 0 && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {responses.map((response) => (
+                  <ResponseCard
+                    key={response.id}
+                    response={response}
+                    onAward={handleAward}
+                    onAction={handleAction}
+                  />
+                ))}
+              </div>
+            )}
 
             {responses.length > 0 && (
               <Card className="bg-gradient-to-r from-yellow-50 to-orange-100 border-yellow-300">
@@ -534,38 +553,13 @@ This is the final stage of the work - make it count!`;
                     </div>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {responses.filter(r => r.status === 'complete').map((response) => (
-                        <Card key={response.id} className="border-green-200 hover:shadow-md transition-shadow cursor-pointer" 
-                              onClick={() => handleTurnVerification(response)}>
-                          <div className="border-b border-green-200 p-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-3">
-                                <AIProviderIcon provider={response.aiProvider} className="w-8 h-8" status="connected" />
-                                <div>
-                                  <h4 className="font-semibold text-green-900">
-                                    {getProviderDisplayName(response.aiProvider)}
-                                  </h4>
-                                  <p className="text-sm text-green-600">Original Response</p>
-                                </div>
-                              </div>
-                              <Button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleTurnVerification(response);
-                                }}
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                                size="sm"
-                              >
-                                Verify
-                              </Button>
-                            </div>
-                          </div>
-                          <CardContent className="p-4">
-                            <p className="text-green-800 text-sm line-clamp-3">
-                              {response.content?.substring(0, 200)}...
-                            </p>
-                          </CardContent>
-                        </Card>
+                      {responses.filter(r => r.status === 'completed').map((response) => (
+                        <ResponseCard
+                          key={response.id}
+                          response={response}
+                          onAward={handleAward}
+                          onAction={handleAction}
+                        />
                       ))}
                     </div>
                   </div>
