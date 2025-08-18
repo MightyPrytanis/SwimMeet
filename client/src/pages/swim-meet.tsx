@@ -31,12 +31,27 @@ export default function SwimMeet() {
   const [selectedAIs, setSelectedAIs] = useState<string[]>([]);
   const [mode, setMode] = useState<'dive' | 'turn' | 'work'>('dive');
   const [responses, setResponses] = useState<AIResponse[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   // Fetch available AI providers
   const { data: providers = [] } = useQuery<AIProvider[]>({
     queryKey: ['/api/providers'],
-    refetchInterval: 5000, // Refresh status every 5 seconds
+    refetchInterval: 30000, // Refresh status every 30 seconds (reduced from 5 seconds)
   });
+
+  // Poll for response updates when we have an active conversation
+  const { data: updatedResponses } = useQuery<AIResponse[]>({
+    queryKey: ['/api/conversations', conversationId, 'responses'],
+    enabled: !!conversationId,
+    refetchInterval: 2000, // Poll every 2 seconds for response updates
+  });
+
+  // Update responses when polling returns new data
+  useEffect(() => {
+    if (updatedResponses) {
+      setResponses(updatedResponses);
+    }
+  }, [updatedResponses]);
 
   // Multi-AI query mutation
   const queryMutation = useMutation({
@@ -50,6 +65,7 @@ export default function SwimMeet() {
     },
     onSuccess: (data) => {
       setResponses(data.responses || []);
+      setConversationId(data.conversationId);
     }
   });
 
