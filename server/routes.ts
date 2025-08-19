@@ -404,10 +404,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create AI service instance
       const aiService = new AIService(credentials);
 
-      // For WORK mode, start sequential workflow instead of parallel processing
+      // WORK mode is not yet implemented - fall back to DIVE mode
       if (mode === 'work') {
-        await initiateWorkflowStep(convId, workflowState, aiService);
-        return res.json({ conversationId: convId, workflowState, responses: [] });
+        console.log("WORK mode requested but not implemented - falling back to DIVE mode");
       }
 
       // Create pending responses
