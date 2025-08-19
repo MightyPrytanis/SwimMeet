@@ -18,14 +18,7 @@ interface AIResponse {
   timestamp: string;
   metadata?: Record<string, any>;
   award?: 'gold' | 'silver' | 'bronze' | 'finished' | 'quit' | 'titanic';
-  workStep?: string;
-  handoffData?: {
-    previousStep?: number;
-    nextAI?: string;
-    contextSummary?: string;
-    taskSpecification?: string;
-    buildingBlocks?: string[];
-  };
+  awardSaved?: boolean;
 }
 
 interface WorkflowState {
@@ -46,6 +39,197 @@ interface QueryRequest {
   query: string;
   selectedAIs: string[];
   mode: 'dive' | 'turn' | 'work';
+}
+
+// WORK Mode Workflow Display Component
+function WorkflowDisplay({ conversationId }: { conversationId: string }) {
+  const { data: workflow } = useQuery<any>({
+    queryKey: [`/api/conversations/${conversationId}/workflow`],
+    refetchInterval: 3000,
+    enabled: !!conversationId
+  });
+
+  const { data: workResponses = [] } = useQuery<AIResponse[]>({
+    queryKey: [`/api/conversations/${conversationId}/responses`],
+    refetchInterval: 2000,
+    enabled: !!conversationId
+  });
+
+  if (!workflow?.workflowState) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280' }}>
+        Setting up collaborative workflow...
+      </div>
+    );
+  }
+
+  const { workflowState } = workflow;
+  const collaborativeDoc = workflowState.collaborativeDoc || "";
+
+  return (
+    <div style={{
+      padding: '20px',
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      marginBottom: '20px'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ margin: 0, color: '#374151', fontSize: '20px' }}>
+          🏊‍♂️ WORK Mode: Collaborative Analysis
+        </h3>
+        <div style={{
+          marginLeft: 'auto',
+          fontSize: '14px',
+          color: '#6b7280',
+          fontWeight: 'bold'
+        }}>
+          Step {workflowState.currentStep + 1} of {workflowState.totalSteps}
+        </div>
+      </div>
+
+      {/* Workflow Progress */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '10px', 
+        marginBottom: '20px',
+        alignItems: 'center',
+        overflowX: 'auto'
+      }}>
+        {workflowState.steps?.map((step: any, index: number) => {
+          const isActive = index === workflowState.currentStep;
+          const isCompleted = step.completed;
+          const isPending = index < workflowState.currentStep;
+          
+          return (
+            <React.Fragment key={step.step}>
+              <div style={{
+                padding: '12px 16px',
+                borderRadius: '8px',
+                backgroundColor: isCompleted ? '#16a34a' : isActive ? '#0c4a6e' : '#e5e7eb',
+                color: isCompleted || isActive ? 'white' : '#6b7280',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                minWidth: '140px',
+                textAlign: 'center',
+                position: 'relative',
+                border: isActive ? '2px solid #fbbf24' : 'none'
+              }}>
+                <div>Step {step.step}</div>
+                <div style={{ fontSize: '10px', marginTop: '2px' }}>
+                  {step.assignedAI}
+                </div>
+                <div style={{ fontSize: '9px', marginTop: '2px', fontWeight: 'normal' }}>
+                  {step.objective.substring(0, 25)}...
+                </div>
+                {isActive && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-5px',
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    backgroundColor: '#fbbf24',
+                    border: '2px solid white',
+                    animation: 'pulse 2s infinite'
+                  }} />
+                )}
+              </div>
+              {index < workflowState.steps.length - 1 && (
+                <div style={{
+                  width: '20px',
+                  height: '3px',
+                  backgroundColor: isCompleted ? '#16a34a' : '#e5e7eb',
+                  margin: '0 5px'
+                }} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+
+      {/* Current Step Status */}
+      {workflowState.currentStep < workflowState.steps?.length && (
+        <div style={{
+          padding: '15px',
+          backgroundColor: '#f0f9ff',
+          borderRadius: '8px',
+          border: '2px solid #0c4a6e',
+          marginBottom: '20px'
+        }}>
+          <h4 style={{ margin: '0 0 8px 0', color: '#0c4a6e', fontSize: '16px' }}>
+            Current Task
+          </h4>
+          <p style={{ margin: '0 0 8px 0', color: '#374151', fontSize: '14px' }}>
+            <strong>{workflowState.steps[workflowState.currentStep]?.assignedAI}</strong> is working on:
+          </p>
+          <p style={{ margin: 0, color: '#6b7280', fontSize: '13px', fontStyle: 'italic' }}>
+            {workflowState.steps[workflowState.currentStep]?.objective}
+          </p>
+        </div>
+      )}
+
+      {/* Latest Responses */}
+      {workResponses.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <h4 style={{ margin: '0 0 15px 0', color: '#374151' }}>Latest AI Contributions</h4>
+          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+            {workResponses.slice(-2).map(response => (
+              <div key={response.id} style={{
+                padding: '12px',
+                backgroundColor: '#f9fafb',
+                borderRadius: '6px',
+                border: '1px solid #e5e7eb',
+                marginBottom: '10px'
+              }}>
+                <div style={{ 
+                  fontSize: '12px', 
+                  fontWeight: 'bold', 
+                  color: '#6b7280',
+                  marginBottom: '5px'
+                }}>
+                  {response.aiProvider} • Step {response.workflowStep || '?'}
+                </div>
+                <div style={{ 
+                  fontSize: '13px', 
+                  color: '#374151',
+                  lineHeight: '1.4'
+                }}>
+                  {response.content.substring(0, 200)}...
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Collaborative Document Preview */}
+      {collaborativeDoc && (
+        <div style={{
+          padding: '15px',
+          backgroundColor: '#f9fafb',
+          borderRadius: '8px',
+          border: '1px solid #e5e7eb',
+          maxHeight: '400px',
+          overflowY: 'auto'
+        }}>
+          <h4 style={{ margin: '0 0 12px 0', color: '#374151' }}>
+            📄 Collaborative Document (Live)
+          </h4>
+          <div style={{
+            fontSize: '13px',
+            lineHeight: '1.6',
+            color: '#374151',
+            whiteSpace: 'pre-wrap',
+            fontFamily: 'system-ui, -apple-system, sans-serif'
+          }}>
+            {collaborativeDoc}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function SwimMeet() {
@@ -589,20 +773,9 @@ export default function SwimMeet() {
         </button>
       </div>
 
-      {/* WORK Mode Notice */}
-      {mode === 'work' && (
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#fef3c7',
-          borderRadius: '8px',
-          border: '2px solid #f59e0b',
-          marginBottom: '20px'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', color: '#92400e' }}>🚧 WORK Mode: Under Development</h3>
-          <p style={{ margin: 0, color: '#92400e' }}>
-            WORK mode (collaborative workflows) is not yet functional. Your query will be processed in DIVE mode instead, where all selected AIs will work on it simultaneously.
-          </p>
-        </div>
+      {/* WORK Mode Workflow Display */}
+      {mode === 'work' && conversationId && (
+        <WorkflowDisplay conversationId={conversationId} />
       )}
 
       {/* AI Responses */}

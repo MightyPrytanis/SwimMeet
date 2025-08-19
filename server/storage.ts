@@ -12,6 +12,7 @@ export interface IStorage {
   createConversation(userId: string, conversation: InsertConversation): Promise<Conversation>;
   getUserConversations(userId: string): Promise<Conversation[]>;
   getConversation(id: string): Promise<Conversation | undefined>;
+  updateConversation(id: string, data: Partial<Conversation>): Promise<Conversation | undefined>;
   updateConversationWorkflow(conversationId: string, workflowState: any): Promise<void>;
   
   // Response methods
@@ -83,6 +84,16 @@ export class MemStorage implements IStorage {
 
   async getConversation(id: string): Promise<Conversation | undefined> {
     return this.conversations.get(id);
+  }
+
+  async updateConversation(id: string, data: Partial<Conversation>): Promise<Conversation | undefined> {
+    const conversation = this.conversations.get(id);
+    if (conversation) {
+      const updated = { ...conversation, ...data };
+      this.conversations.set(id, updated);
+      return updated;
+    }
+    return undefined;
   }
 
   async updateConversationWorkflow(conversationId: string, workflowState: any): Promise<void> {

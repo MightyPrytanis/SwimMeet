@@ -361,29 +361,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!convId) {
         console.log(`Creating ${mode || 'DIVE'} conversation with query:`, actualQuery);
         
-        let workflowState = {};
-        // Initialize WORK mode workflow
-        if (mode === 'work') {
-          const steps = planWorkflowSteps(actualQuery, actualProviders);
-          workflowState = {
-            currentStep: 1,
-            totalSteps: steps.length,
-            collaborativeDocument: `# Collaborative Solution: ${actualQuery}\n\n*Building collaboratively with ${actualProviders.join(', ')}*\n\n`,
-            stepHistory: steps.map((step, index) => ({
-              step: index + 1,
-              assignedAI: step.assignedAI,
-              objective: step.objective,
-              output: ""
-            })),
-            sharedContext: { originalQuery: actualQuery, participatingAIs: actualProviders }
-          };
-        }
-        
         const conversation = await storage.createConversation(userId, {
           title: actualQuery.substring(0, 50) + (actualQuery.length > 50 ? "..." : ""),
           query: actualQuery,
-          mode: mode || 'dive',
-          workflowState
+          mode: mode || 'dive'
         });
         convId = conversation.id;
         console.log("Created conversation with ID:", convId);
@@ -404,9 +385,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create AI service instance
       const aiService = new AIService(credentials);
 
-      // WORK mode is not yet implemented - fall back to DIVE mode
+      // WORK mode: Sequential collaborative processing
       if (mode === 'work') {
-        console.log("WORK mode requested but not implemented - falling back to DIVE mode");
+        console.log("Starting WORK mode sequential processing");
+        
+        // Create initial workflow state
+        const workPlan = await planCollaborativeWorkflow(actualQuery, actualProviders, aiService);
+        
+        // Store workflow state in conversation
+        await storage.updateConversation(convId, { 
+          metadata: { 
+            workflowState: workPlan,
+            collaborativeDoc: `# ${actualQuery}\n\n*Collaborative analysis by: ${actualProviders.join(', ')}*\n\n---\n\n`
+          } 
+        });
+        
+        // Start first step
+        const firstStepResult = await processWorkflowStepNew(convId, workPlan, 0, aiService);
+        
+        return res.json({ 
+          conversationId: convId, 
+          workflowState: workPlan, 
+          responses: firstStepResult ? [firstStepResult] : [] 
+        });
       }
 
       // Create pending responses
@@ -895,6 +896,213 @@ Keep your response professional and constructive.`;
     }
   });
 
+  // Continue workflow step for WORK mode
+  app.post("/api/conversations/:id/continue-workflow", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const conversation = await storage.getConversation(id);
+      
+      if (!conversation?.metadata?.workflowState) {
+        return res.status(400).json({ message: "No workflow state found" });
+      }
+      
+      const workflowState = conversation.metadata.workflowState;
+      const currentStep = workflowState.currentStep;
+      
+      if (currentStep >= workflowState.steps.length) {
+        return res.status(200).json({ message: "Workflow complete", workflowState });
+      }
+      
+      // Get user credentials for AI service
+      const userId = req.body.userId || "default-user";
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          return res.status(400).json({ message: "Failed to decrypt credentials" });
+        }
+      }
+      
+      const aiService = new AIService(credentials);
+      const stepResult = await processWorkflowStepNew(id, workflowState, currentStep, aiService);
+      
+      // Update workflow state
+      workflowState.currentStep = currentStep + 1;
+      await storage.updateConversation(id, { 
+        metadata: { 
+          ...conversation.metadata,
+          workflowState 
+        } 
+      });
+      
+      res.json({ 
+        workflowState, 
+        stepResult: stepResult || null,
+        isComplete: currentStep + 1 >= workflowState.steps.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Collaborative workflow planning
+async function planCollaborativeWorkflow(query: string, providers: string[], aiService: any): Promise<any> {
+  const steps = [
+    {
+      step: 1,
+      assignedAI: providers[0] || 'anthropic',
+      objective: `Analyze the core problem: "${query}" - Identify key components, requirements, and approach`,
+      prompt: `You are the first AI in a collaborative workflow. Analyze this problem thoroughly:
+
+"${query}"
+
+Your job is to:
+1. Break down the core components of this problem
+2. Identify what information/analysis is needed
+3. Provide your initial analysis and findings
+4. Set up the foundation for the next AI to build upon
+
+Be comprehensive but organized. The next AI will build on your work.`,
+      completed: false,
+      output: ""
+    },
+    {
+      step: 2,
+      assignedAI: providers[1] || providers[0] || 'openai',
+      objective: `Build on the foundation analysis and develop detailed solutions/recommendations`,
+      prompt: `You are the second AI in a collaborative workflow. The previous AI has analyzed: "${query}"
+
+Previous analysis will be provided to you. Your job is to:
+1. Review and build upon the previous analysis
+2. Develop detailed solutions, recommendations, or next steps  
+3. Add depth and practical insights
+4. Prepare comprehensive material for final synthesis
+
+Build constructively on what came before while adding your unique perspective.`,
+      completed: false,
+      output: ""
+    }
+  ];
+  
+  // Add third step if we have 3+ providers
+  if (providers.length >= 3) {
+    steps.push({
+      step: 3,
+      assignedAI: providers[2],
+      objective: `Synthesize all previous work into a comprehensive, actionable final deliverable`,
+      prompt: `You are the final AI in this collaborative workflow for: "${query}"
+
+You will receive all previous analyses and solutions. Your job is to:
+1. Synthesize all previous work into a coherent whole
+2. Resolve any contradictions or gaps
+3. Create a comprehensive, actionable final deliverable
+4. Ensure practical utility and clear next steps
+
+Create the definitive response that incorporates the best of all previous work.`,
+      completed: false,
+      output: ""
+    });
+  }
+  
+  return {
+    originalQuery: query,
+    participatingAIs: providers,
+    currentStep: 0,
+    totalSteps: steps.length,
+    steps,
+    collaborativeDoc: "",
+    startedAt: new Date().toISOString()
+  };
+}
+
+// Process a single workflow step - NEW IMPLEMENTATION
+async function processWorkflowStepNew(conversationId: string, workflowState: any, stepIndex: number, aiService: any): Promise<any> {
+  if (stepIndex >= workflowState.steps.length) return null;
+  
+  const step = workflowState.steps[stepIndex];
+  const storageInstance = storage;
+  
+  // Create response record
+  const response = await storageInstance.createResponse({
+    conversationId,
+    aiProvider: step.assignedAI,
+    content: "",
+    status: "pending"
+  });
+  
+  try {
+    // Build context from previous steps
+    let contextPrompt = step.prompt;
+    if (stepIndex > 0) {
+      const previousOutputs = workflowState.steps
+        .slice(0, stepIndex)
+        .filter((s: any) => s.output)
+        .map((s: any, i: number) => `\n--- ${s.assignedAI} Analysis (Step ${i + 1}) ---\n${s.output}`)
+        .join('\n');
+      
+      if (previousOutputs) {
+        contextPrompt += `\n\nPREVIOUS COLLABORATIVE WORK:\n${previousOutputs}\n\nNow build upon this work with your analysis:`;
+      }
+    }
+    
+    // Query the AI
+    const result = await aiService.queryMultiple(contextPrompt, [step.assignedAI]);
+    const aiResult = result[step.assignedAI];
+    
+    if (aiResult.success && aiResult.content) {
+      // Update response
+      await storageInstance.updateResponseContent(response.id, aiResult.content, "complete");
+      
+      // Update step in workflow state
+      step.completed = true;
+      step.output = aiResult.content;
+      step.completedAt = new Date().toISOString();
+      
+      // Update collaborative document
+      const conversation = await storageInstance.getConversation(conversationId);
+      const currentDoc = conversation?.metadata?.collaborativeDoc || "";
+      const updatedDoc = currentDoc + `\n## Step ${stepIndex + 1}: ${step.assignedAI}\n*${step.objective}*\n\n${aiResult.content}\n\n---\n`;
+      
+      await storageInstance.updateConversation(conversationId, {
+        metadata: {
+          ...conversation?.metadata,
+          workflowState,
+          collaborativeDoc: updatedDoc
+        }
+      });
+      
+      // Auto-continue to next step after 2 seconds
+      if (stepIndex + 1 < workflowState.steps.length) {
+        setTimeout(async () => {
+          try {
+            await processWorkflowStepNew(conversationId, workflowState, stepIndex + 1, aiService);
+          } catch (error) {
+            console.error("Error in auto-continue workflow:", error);
+          }
+        }, 2000);
+      }
+      
+      return {
+        id: response.id,
+        aiProvider: response.aiProvider,
+        content: aiResult.content,
+        status: "complete",
+        timestamp: new Date().toISOString(),
+        workflowStep: stepIndex + 1
+      };
+    } else {
+      await storageInstance.updateResponseContent(response.id, aiResult.error || "Unknown error", "error");
+      return null;
+    }
+  } catch (error) {
+    console.error("Workflow step error:", error);
+    await storageInstance.updateResponseContent(response.id, `Error: ${error}`, "error");
+    return null;
+  }
 }
