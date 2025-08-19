@@ -388,11 +388,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         convId = conversation.id;
         console.log("Created conversation with ID:", convId);
         
-        // For WORK mode, start sequential workflow instead of parallel processing
-        if (mode === 'work') {
-          await initiateWorkflowStep(convId, workflowState, aiService);
-          return res.json({ conversationId: convId, workflowState, responses: [] });
-        }
       }
 
       // Get user credentials
@@ -408,6 +403,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create AI service instance
       const aiService = new AIService(credentials);
+
+      // For WORK mode, start sequential workflow instead of parallel processing
+      if (mode === 'work') {
+        await initiateWorkflowStep(convId, workflowState, aiService);
+        return res.json({ conversationId: convId, workflowState, responses: [] });
+      }
 
       // Create pending responses
       const responsePromises = actualProviders.map(async (aiProvider) => {
