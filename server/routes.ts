@@ -7,6 +7,8 @@ import { credentialsSchema, insertConversationSchema, insertResponseSchema, inse
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 
 // Extend session interface
 declare module 'express-session' {
@@ -631,8 +633,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: r.content,
         status: r.status,
         timestamp: r.createdAt?.toISOString(),
-        metadata: r.metadata
+        metadata: r.metadata,
+        workStep: r.workStep
       })));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get WORK mode workflow status (Protected route)
+  app.get("/api/conversations/:id/workflow", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const conversation = await storage.getConversation(id);
+      
+      if (!conversation?.workflowState) {
+        return res.json({ status: 'no_workflow' });
+      }
+      
+      const workflowState = conversation.workflowState;
+      const responses = await storage.getConversationResponses(id);
+      
+      // Calculate progress
+      const totalSteps = workflowState.steps?.length || 0;
+      const completedSteps = responses.filter(r => r.status === 'complete').length;
+      const currentStep = workflowState.currentStep || 0;
+      
+      res.json({
+        status: 'active',
+        totalSteps,
+        currentStep,
+        completedSteps,
+        steps: workflowState.steps?.map((step: any, index: number) => ({
+          stepNumber: index + 1,
+          assignedAI: step.assignedAI,
+          objective: step.objective,
+          completed: step.completed || false,
+          status: responses.find(r => r.workStep === `step-${index + 1}`)?.status || 'pending'
+        })) || [],
+        collaborativeDoc: workflowState.collaborativeDoc || ""
+      });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -648,10 +688,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: c.id,
         title: c.title,
         query: c.query,
+        mode: c.mode,
         timestamp: c.createdAt?.toISOString()
       })));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // File upload endpoints
+  app.post("/api/objects/upload", authenticateToken, async (req: any, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/objects/attach", authenticateToken, async (req: any, res) => {
+    try {
+      const { fileURL, fileName } = req.body;
+      const userId = req.user.userId;
+      
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        fileURL,
+        {
+          owner: userId,
+          visibility: "private"
+        }
+      );
+      
+      res.json({ objectPath, fileName });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Serve private objects
+  app.get("/objects/:objectPath(*)", authenticateToken, async (req: any, res) => {
+    const userId = req.user?.userId;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: ObjectPermission.READ,
+      });
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 
