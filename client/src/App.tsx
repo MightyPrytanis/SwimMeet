@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Dashboard from "@/pages/dashboard";
 import ButtonTest from "@/pages/button-test";
-import SwimMeetSimple from "@/pages/swim-meet-simple";
+import SwimMeetFixed from "@/pages/swim-meet-fixed";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,7 +13,7 @@ function Router() {
     <Switch>
       <Route path="/test" component={ButtonTest} />
       <Route path="/dashboard" component={Dashboard} />
-      <Route path="/" component={SwimMeetSimple} />
+      <Route path="/" component={SwimMeetFixed} />
       <Route component={NotFound} />
     </Switch>
   );
