@@ -223,7 +223,7 @@ export function AuthForm({ onAuth }: AuthFormProps) {
           color: '#0c4a6e'
         }}>
           💾 All your conversations, statistics, and documents are permanently saved to the database. 
-          Access your EEOC work and other projects anytime by logging in.
+          Access your research projects and analysis work anytime by logging in.
         </div>
       </div>
     </div>

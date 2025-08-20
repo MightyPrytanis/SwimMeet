@@ -8,6 +8,13 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
 
+// Extend session interface
+declare module 'express-session' {
+  interface SessionData {
+    userId: string;
+  }
+}
+
 // WORK mode workflow planning functions
 function planWorkflowSteps(query: string, aiProviders: string[]) {
   // Intelligent step planning based on query complexity
@@ -870,7 +877,7 @@ Respond in JSON format with:
 
       console.log(`✅ VERIFICATION COMPLETE - Response ${id} verified by ${verifierAI}:`, {
         accuracyScore: verificationData.accuracyScore,
-        hasResults: !!updatedResponse.metadata.verificationResults?.length
+        hasResults: !!(updatedResponse.metadata && updatedResponse.metadata.verificationResults?.length)
       });
 
       res.json({
@@ -1037,9 +1044,10 @@ Keep your response professional and constructive.`;
       }
       
       const workflowState = conversation.workflowState;
-      const currentStep = workflowState.currentStep;
+      const currentStep = workflowState.currentStep ?? 0;
+      const workflowSteps = workflowState.steps ?? [];
       
-      if (currentStep >= workflowState.steps.length) {
+      if (currentStep >= workflowSteps.length) {
         return res.status(200).json({ message: "Workflow complete", workflowState });
       }
       
@@ -1067,7 +1075,7 @@ Keep your response professional and constructive.`;
       res.json({ 
         workflowState, 
         stepResult: stepResult || null,
-        isComplete: currentStep + 1 >= workflowState.steps.length
+        isComplete: currentStep + 1 >= workflowSteps.length
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

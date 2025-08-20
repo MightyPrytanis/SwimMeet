@@ -928,7 +928,7 @@ export default function SwimMeet() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder={
             mode === 'work' 
-              ? "Describe your multi-AI project (e.g., 'Analyze these employment documents and help prepare an EEOC complaint')..."
+              ? "Describe your multi-AI project (e.g., 'Analyze these research documents and help prepare a comprehensive report')..."
               : "Enter your query for the AI agents..."
           }
           style={{
