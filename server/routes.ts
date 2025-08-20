@@ -619,8 +619,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get conversation responses
-  app.get("/api/conversations/:id/responses", async (req, res) => {
+  // Get conversation responses (Protected route)
+  app.get("/api/conversations/:id/responses", authenticateToken, async (req: any, res) => {
     try {
       const { id } = req.params;
       const responses = await storage.getConversationResponses(id);
@@ -638,10 +638,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user conversations
-  app.get("/api/conversations", async (req, res) => {
+  // Get user conversations (Protected route)
+  app.get("/api/conversations", authenticateToken, async (req: any, res) => {
     try {
-      const userId = req.query.userId as string || "default-user";
+      const userId = req.user.userId; // Get userId from authenticated token
       const conversations = await storage.getUserConversations(userId);
       
       res.json(conversations.map(c => ({
