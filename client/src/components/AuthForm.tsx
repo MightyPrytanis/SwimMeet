@@ -153,7 +153,7 @@ export function AuthForm({ onAuth }: AuthFormProps) {
             />
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '16px' }}>
             <label style={{
               display: 'block',
               marginBottom: '6px',
@@ -178,6 +178,39 @@ export function AuthForm({ onAuth }: AuthFormProps) {
               }}
               data-testid="input-password"
             />
+          </div>
+
+          {/* Security Badge */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '20px',
+            padding: '8px 12px',
+            backgroundColor: '#f0fdf4',
+            border: '1px solid #16a34a',
+            borderRadius: '6px',
+            fontSize: '12px',
+            color: '#15803d'
+          }}>
+            <div style={{
+              width: '16px',
+              height: '16px',
+              marginRight: '8px',
+              backgroundColor: '#16a34a',
+              borderRadius: '2px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '10px',
+              fontWeight: 'bold'
+            }}>
+              🔒
+            </div>
+            <span style={{ fontWeight: 'bold' }}>
+              Protected by enterprise-grade adaptive security
+            </span>
           </div>
 
           {error && (
