@@ -18,17 +18,21 @@ export const conversations = pgTable("conversations", {
   query: text("query").notNull(),
   mode: text("mode").notNull().default("dive"), // dive, turn, work
   workflowState: json("workflow_state").$type<{
-    currentStep: number;
-    totalSteps: number;
-    collaborativeDocument: string;
-    stepHistory: {
+    originalQuery?: string;
+    participatingAIs?: string[];
+    currentStep?: number;
+    totalSteps?: number;
+    collaborativeDoc?: string;
+    startedAt?: string;
+    steps?: {
       step: number;
       assignedAI: string;
       objective: string;
-      completedAt?: string;
+      prompt: string;
+      completed: boolean;
       output: string;
+      completedAt?: string;
     }[];
-    sharedContext: Record<string, any>;
   }>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });

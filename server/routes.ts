@@ -394,10 +394,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Store workflow state in conversation
         await storage.updateConversation(convId, { 
-          metadata: { 
-            workflowState: workPlan,
+          workflowState: {
+            ...workPlan,
             collaborativeDoc: `# ${actualQuery}\n\n*Collaborative analysis by: ${actualProviders.join(', ')}*\n\n---\n\n`
-          } 
+          }
         });
         
         // Start first step
@@ -889,7 +889,7 @@ Keep your response professional and constructive.`;
 
       res.json({
         conversationId,
-        workflowState: conversation.metadata?.workflowState || null
+        workflowState: conversation.workflowState || null
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -902,11 +902,11 @@ Keep your response professional and constructive.`;
       const { id } = req.params;
       const conversation = await storage.getConversation(id);
       
-      if (!conversation?.metadata?.workflowState) {
+      if (!conversation?.workflowState) {
         return res.status(400).json({ message: "No workflow state found" });
       }
       
-      const workflowState = conversation.metadata.workflowState;
+      const workflowState = conversation.workflowState;
       const currentStep = workflowState.currentStep;
       
       if (currentStep >= workflowState.steps.length) {
@@ -931,10 +931,7 @@ Keep your response professional and constructive.`;
       // Update workflow state
       workflowState.currentStep = currentStep + 1;
       await storage.updateConversation(id, { 
-        metadata: { 
-          ...conversation.metadata,
-          workflowState 
-        } 
+        workflowState 
       });
       
       res.json({ 
@@ -1066,13 +1063,12 @@ async function processWorkflowStepNew(conversationId: string, workflowState: any
       
       // Update collaborative document
       const conversation = await storageInstance.getConversation(conversationId);
-      const currentDoc = conversation?.metadata?.collaborativeDoc || "";
+      const currentDoc = conversation?.workflowState?.collaborativeDoc || "";
       const updatedDoc = currentDoc + `\n## Step ${stepIndex + 1}: ${step.assignedAI}\n*${step.objective}*\n\n${aiResult.content}\n\n---\n`;
       
       await storageInstance.updateConversation(conversationId, {
-        metadata: {
-          ...conversation?.metadata,
-          workflowState,
+        workflowState: {
+          ...workflowState,
           collaborativeDoc: updatedDoc
         }
       });
