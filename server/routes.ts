@@ -889,7 +889,7 @@ Keep your response professional and constructive.`;
 
       res.json({
         conversationId,
-        workflowState: conversation.workflowState || null
+        workflowState: conversation.metadata?.workflowState || null
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
