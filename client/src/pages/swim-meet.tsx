@@ -695,7 +695,7 @@ export default function SwimMeet() {
           border: '2px solid #0ea5e9'
         }}>
           <h2 style={{ margin: '0 0 20px 0', color: '#0c4a6e', textAlign: 'center' }}>
-            📊 COMPREHENSIVE AI PROVIDER STATISTICS
+            COMPREHENSIVE AI PROVIDER STATISTICS
           </h2>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
@@ -719,22 +719,22 @@ export default function SwimMeet() {
                     <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '5px' }}>AWARDS</div>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <span style={{ padding: '2px 6px', backgroundColor: '#fbbf24', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
-                        🥇 {stats.awards.gold}
+                        GOLD {stats.awards.gold}
                       </span>
                       <span style={{ padding: '2px 6px', backgroundColor: '#e5e7eb', color: 'black', borderRadius: '4px', fontSize: '11px' }}>
-                        🥈 {stats.awards.silver}
+                        SILVER {stats.awards.silver}
                       </span>
                       <span style={{ padding: '2px 6px', backgroundColor: '#d97706', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
-                        🥉 {stats.awards.bronze}
+                        BRONZE {stats.awards.bronze}
                       </span>
                       <span style={{ padding: '2px 6px', backgroundColor: '#16a34a', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
-                        ✅ {stats.awards.finished}
+                        COMPLETE {stats.awards.finished}
                       </span>
                       <span style={{ padding: '2px 6px', backgroundColor: '#6b7280', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
-                        ❌ {stats.awards.quit}
+                        QUIT {stats.awards.quit}
                       </span>
                       <span style={{ padding: '2px 6px', backgroundColor: '#dc2626', color: 'white', borderRadius: '4px', fontSize: '11px' }}>
-                        💥 {stats.awards.titanic}
+                        FAIL {stats.awards.titanic}
                       </span>
                     </div>
                   </div>

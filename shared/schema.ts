@@ -32,6 +32,14 @@ export const conversations = pgTable("conversations", {
     totalSteps?: number;
     collaborativeDoc?: string;
     startedAt?: string;
+    strategy?: 'sequential' | 'parallel_merge' | 'specialist_teams' | 'iterative_refinement' | 'competitive_selection';
+    queryAnalysis?: {
+      complexity: 'simple' | 'moderate' | 'complex' | 'expert';
+      type: 'analytical' | 'creative' | 'technical' | 'strategic' | 'research';
+      scope: 'focused' | 'multi-faceted' | 'interdisciplinary';
+      timeframe: 'immediate' | 'planning' | 'long-term';
+      collaboration_need: 'low' | 'medium' | 'high' | 'critical';
+    };
     steps?: {
       step: number;
       assignedAI: string;
