@@ -86,7 +86,7 @@ function WorkflowDisplay({ conversationId }: { conversationId: string }) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
         <h3 style={{ margin: 0, color: '#374151', fontSize: '20px' }}>
-          🏊‍♂️ WORK Mode: Collaborative Analysis
+          WORK Mode: Collaborative Analysis
         </h3>
         <div style={{
           marginLeft: 'auto',
@@ -225,7 +225,7 @@ function WorkflowDisplay({ conversationId }: { conversationId: string }) {
           overflowY: 'auto'
         }}>
           <h4 style={{ margin: '0 0 12px 0', color: '#374151' }}>
-            📄 Collaborative Document (Live)
+            Collaborative Document (Live)
           </h4>
           <div style={{
             fontSize: '13px',
@@ -246,6 +246,7 @@ export default function SwimMeet() {
   // Authentication state
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [user, setUser] = useState<{ id: string; username: string } | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   
   // App state
   const [query, setQuery] = useState("");
@@ -289,16 +290,21 @@ export default function SwimMeet() {
         } else {
           localStorage.removeItem('authToken');
         }
+        setAuthLoading(false);
       })
       .catch(() => {
         localStorage.removeItem('authToken');
+        setAuthLoading(false);
       });
+    } else {
+      setAuthLoading(false);
     }
   }, []);
 
   const handleAuth = (token: string, userData: { id: string; username: string }) => {
     setAuthToken(token);
     setUser(userData);
+    setAuthLoading(false);
   };
 
   const handleLogout = () => {
@@ -308,6 +314,31 @@ export default function SwimMeet() {
     // Clear any cached data
     queryClient.clear();
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#f8fafc'
+      }}>
+        <div style={{
+          padding: '20px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          textAlign: 'center'
+        }}>
+          <div style={{ marginBottom: '10px', fontSize: '14px', color: '#6b7280' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Show auth form if not authenticated
   if (!authToken || !user) {

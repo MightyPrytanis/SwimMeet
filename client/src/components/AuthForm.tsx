@@ -67,7 +67,7 @@ export function AuthForm({ onAuth }: AuthFormProps) {
             color: '#0c4a6e',
             margin: '0 0 8px 0'
           }}>
-            🏊‍♂️ SWIM MEET
+            SWIM MEET
           </h1>
           <p style={{
             color: '#6b7280',
