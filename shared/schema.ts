@@ -17,6 +17,14 @@ export const conversations = pgTable("conversations", {
   title: text("title").notNull(),
   query: text("query").notNull(),
   mode: text("mode").notNull().default("dive"), // dive, turn, work
+  attachedFiles: json("attached_files").$type<{
+    id: string;
+    filename: string;
+    size: number;
+    type: string;
+    objectPath: string;
+    uploadedAt: string;
+  }[]>().default([]),
   workflowState: json("workflow_state").$type<{
     originalQuery?: string;
     participatingAIs?: string[];
@@ -77,6 +85,7 @@ export const insertConversationSchema = createInsertSchema(conversations).pick({
   query: true,
   mode: true,
   workflowState: true,
+  attachedFiles: true,
 });
 
 export const insertResponseSchema = createInsertSchema(responses).pick({

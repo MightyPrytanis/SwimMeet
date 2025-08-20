@@ -70,6 +70,8 @@ export class MemStorage implements IStorage {
       ...insertConversation,
       id,
       userId,
+      attachedFiles: insertConversation.attachedFiles || [],
+      workflowState: insertConversation.workflowState || {},
       createdAt: new Date(),
     };
     this.conversations.set(id, conversation);

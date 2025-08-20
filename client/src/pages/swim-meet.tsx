@@ -39,6 +39,14 @@ interface QueryRequest {
   query: string;
   selectedAIs: string[];
   mode: 'dive' | 'turn' | 'work';
+  attachedFiles?: Array<{
+    id: string;
+    filename: string;
+    size: number;
+    type: string;
+    objectPath: string;
+    uploadedAt: string;
+  }>;
 }
 
 // WORK Mode Workflow Display Component
@@ -243,6 +251,14 @@ export default function SwimMeet() {
   const [verifyingStates, setVerifyingStates] = useState<Record<string, boolean>>({});
   const [sharingStates, setSharingStates] = useState<Record<string, boolean>>({});
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
+  const [attachedFiles, setAttachedFiles] = useState<Array<{
+    id: string;
+    filename: string;
+    size: number;
+    type: string;
+    objectPath: string;
+    uploadedAt: string;
+  }>>([]);
   
   // WORK mode state
   const [workflowState, setWorkflowState] = useState<WorkflowState | null>(null);
@@ -324,13 +340,34 @@ export default function SwimMeet() {
   const handleSubmitQuery = () => {
     if (!query.trim() || selectedAIs.length === 0) return;
     
-    console.log(`Submitting ${mode.toUpperCase()} query to ${selectedAIs.length} AIs at ${new Date().toLocaleTimeString()}`);
+    console.log(`Submitting ${mode.toUpperCase()} query to ${selectedAIs.length} AIs with ${attachedFiles.length} files at ${new Date().toLocaleTimeString()}`);
     
     queryMutation.mutate({
       query: query.trim(),
       selectedAIs,
-      mode
+      mode,
+      attachedFiles: attachedFiles.length > 0 ? attachedFiles : undefined
     });
+  };
+
+  const handleFilesAttached = (result: any) => {
+    console.log('Files uploaded:', result);
+    
+    // Process uploaded files
+    const uploadedFiles = result.successful.map((file: any) => ({
+      id: Math.random().toString(36),
+      filename: file.name,
+      size: file.size,
+      type: file.type || 'application/octet-stream',
+      objectPath: file.uploadURL, // This will be the path to the uploaded file
+      uploadedAt: new Date().toISOString()
+    }));
+
+    setAttachedFiles(prev => [...prev, ...uploadedFiles]);
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    setAttachedFiles(prev => prev.filter(f => f.id !== fileId));
   };
 
   const handleAwardResponse = (responseId: string, award: string) => {
@@ -514,8 +551,8 @@ export default function SwimMeet() {
           margin: '0 0 10px 0', 
           fontSize: '2.5rem', 
           fontWeight: 'bold',
-          fontFamily: '"Big Shoulders Inline Display", cursive',
-          letterSpacing: '3px'
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          letterSpacing: '2px'
         }}>
           SWIM MEET
         </h1>
@@ -745,11 +782,17 @@ export default function SwimMeet() {
         borderRadius: '8px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}>
-        <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>Query</h3>
+        <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>
+          {mode === 'work' ? 'Project Description' : 'Query'}
+        </h3>
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter your query for the AI agents..."
+          placeholder={
+            mode === 'work' 
+              ? "Describe your multi-AI project (e.g., 'Analyze these employment documents and help prepare an EEOC complaint')..."
+              : "Enter your query for the AI agents..."
+          }
           style={{
             width: '100%',
             height: '100px',
@@ -761,6 +804,40 @@ export default function SwimMeet() {
             resize: 'vertical'
           }}
         />
+        
+        {/* File Attachments - Coming Soon */}
+        <div style={{ marginTop: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151' }}>
+              Documents & Files:
+            </span>
+            <button
+              style={{
+                padding: '6px 12px',
+                border: '1px solid #e5e7eb',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                color: '#6b7280',
+                cursor: 'not-allowed',
+                fontSize: '12px'
+              }}
+              disabled
+              data-testid="button-attach-files"
+            >
+              📎 Attach Files (Coming Soon)
+            </button>
+          </div>
+          
+          {/* Display attached files */}
+          {attachedFiles.length > 0 && (
+            <div style={{ marginBottom: '10px' }}>
+              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+                {attachedFiles.length} file{attachedFiles.length === 1 ? '' : 's'} attached
+              </div>
+            </div>
+          )}
+        </div>
+        
         <button
           onClick={handleSubmitQuery}
           disabled={!query.trim() || selectedAIs.length === 0 || queryMutation.isPending}
@@ -775,6 +852,7 @@ export default function SwimMeet() {
             fontSize: '16px',
             fontWeight: 'bold'
           }}
+          data-testid="button-submit-query"
         >
           {queryMutation.isPending ? 'Processing...' : `Submit to ${selectedAIs.length} AIs`}
         </button>
