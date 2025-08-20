@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
+import { AuthForm } from "@/components/AuthForm";
 
 interface AIProvider {
   id: string;
@@ -242,6 +243,11 @@ function WorkflowDisplay({ conversationId }: { conversationId: string }) {
 }
 
 export default function SwimMeet() {
+  // Authentication state
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
+  
+  // App state
   const [query, setQuery] = useState("");
   const [selectedAIs, setSelectedAIs] = useState<string[]>([]);
   const [mode, setMode] = useState<'dive' | 'turn' | 'work'>('dive');
@@ -265,11 +271,68 @@ export default function SwimMeet() {
   const [stepPlanning, setStepPlanning] = useState<boolean>(false);
   const [collaborativeDoc, setCollaborativeDoc] = useState<string>("");
 
+  // Check for existing auth token on load
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      // Verify token is still valid
+      fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.id) {
+          setAuthToken(token);
+          setUser({ id: data.id, username: data.username });
+        } else {
+          localStorage.removeItem('authToken');
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('authToken');
+      });
+    }
+  }, []);
+
+  const handleAuth = (token: string, userData: { id: string; username: string }) => {
+    setAuthToken(token);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    setAuthToken(null);
+    setUser(null);
+    // Clear any cached data
+    queryClient.clear();
+  };
+
+  // Show auth form if not authenticated
+  if (!authToken || !user) {
+    return <AuthForm onAuth={handleAuth} />;
+  }
+
+  // Helper function for authenticated requests
+  const makeAuthenticatedRequest = (url: string, options: RequestInit = {}) => {
+    return fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+  };
+
   // Fetch available AI providers - MINIMAL API CALLS
   const { data: providers = [] } = useQuery<AIProvider[]>({
     queryKey: ['/api/providers'],
+    queryFn: () => makeAuthenticatedRequest('/api/providers').then(res => res.json()),
     refetchInterval: 300000, // Refresh status every 5 minutes to minimize API costs
     staleTime: 240000, // Cache for 4 minutes
+    enabled: !!authToken,
   });
 
   // Poll for response updates when we have an active conversation - MINIMAL COST
@@ -309,9 +372,8 @@ export default function SwimMeet() {
   // Multi-AI query mutation
   const queryMutation = useMutation({
     mutationFn: async (queryRequest: QueryRequest) => {
-      const response = await fetch('/api/query', {
+      const response = await makeAuthenticatedRequest('/api/query', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(queryRequest)
       });
       return response.json();
@@ -538,6 +600,51 @@ export default function SwimMeet() {
       fontFamily: 'Arial, sans-serif',
       backgroundColor: '#f8fafc'
     }}>
+      {/* User Authentication Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        padding: '12px 20px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        border: '1px solid #e5e7eb'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <div style={{
+            width: '8px',
+            height: '8px',
+            backgroundColor: '#16a34a',
+            borderRadius: '50%'
+          }}></div>
+          <span style={{ color: '#374151', fontSize: '14px' }}>
+            Logged in as <strong>{user.username}</strong>
+          </span>
+        </div>
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: '6px 12px',
+            backgroundColor: '#f3f4f6',
+            color: '#374151',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }}
+          data-testid="button-logout"
+        >
+          Logout
+        </button>
+      </div>
+
       {/* Header */}
       <div style={{
         textAlign: 'center',

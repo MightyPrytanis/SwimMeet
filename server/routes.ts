@@ -3,7 +3,10 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { encryptCredentials, decryptCredentials } from "./services/encryption";
 import { AIService } from "./services/ai-service";
-import { credentialsSchema, insertConversationSchema, insertResponseSchema, type QueryRequest, type AIProvider } from "@shared/schema";
+import { credentialsSchema, insertConversationSchema, insertResponseSchema, insertUserSchema, type QueryRequest, type AIProvider } from "@shared/schema";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import session from 'express-session';
 
 // WORK mode workflow planning functions
 function planWorkflowSteps(query: string, aiProviders: string[]) {
@@ -144,7 +147,134 @@ async function processWorkflowStep(aiProvider: string, prompt: string, responseI
   }
 }
 
+// JWT secret - in production this should be a secure environment variable
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+// Middleware to verify JWT token
+function authenticateToken(req: any, res: any, next: any) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure session middleware for optional session-based auth
+  app.use(session({
+    secret: JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+      secure: false, // Set to true in production with HTTPS
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  }));
+
+  // Auth routes - completely portable, no Replit dependencies
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { username, password } = insertUserSchema.parse(req.body);
+      
+      // Check if user exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create user
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword
+      });
+
+      // Generate token
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      res.status(201).json({
+        message: 'User created successfully',
+        token,
+        user: { id: user.id, username: user.username }
+      });
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      res.status(400).json({ error: error.message || 'Registration failed' });
+    }
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { username, password } = insertUserSchema.parse(req.body);
+      
+      // Find user
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Check password
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Generate token
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      // Set session
+      req.session.userId = user.id;
+
+      res.json({
+        message: 'Login successful',
+        token,
+        user: { id: user.id, username: user.username }
+      });
+    } catch (error: any) {
+      console.error('Login error:', error);
+      res.status(400).json({ error: error.message || 'Login failed' });
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        return res.status(500).json({ error: 'Logout failed' });
+      }
+      res.json({ message: 'Logout successful' });
+    });
+  });
+
+  app.get('/api/auth/me', authenticateToken, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.json({ id: user.id, username: user.username });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get user info' });
+    }
+  });
   // Test connection endpoint
   app.post("/api/credentials/test", async (req, res) => {
     try {
@@ -333,12 +463,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(allProviders);
   });
 
-  // Submit query to multiple AIs
-  app.post("/api/query", async (req, res) => {
+  // Submit query to multiple AIs (Protected route)
+  app.post("/api/query", authenticateToken, async (req: any, res) => {
     try {
       console.log("Request body:", JSON.stringify(req.body, null, 2));
       const { prompt, providers, query, selectedAIs, conversationId } = req.body as QueryRequest & { prompt?: string, providers?: string[] };
-      const userId = req.body.userId || "default-user";
+      const userId = req.user.userId; // Get userId from authenticated token
       
       // Support both old and new request formats
       const actualQuery = prompt || query;
