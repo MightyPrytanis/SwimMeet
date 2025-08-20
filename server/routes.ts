@@ -558,13 +558,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Query AI in background
         setImmediate(async () => {
-          const result = await aiService.queryMultiple(actualQuery, [aiProvider]);
-          const aiResult = result[aiProvider];
-          
-          if (aiResult.success && aiResult.content) {
-            await storage.updateResponseContent(response.id, aiResult.content, "complete");
-          } else {
-            await storage.updateResponseContent(response.id, aiResult.error || "Unknown error", "error");
+          try {
+            console.log(`🤖 Starting AI query for ${aiProvider}...`);
+            let aiResult;
+            
+            // Call individual AI methods directly instead of queryMultiple
+            switch (aiProvider) {
+              case 'openai':
+                aiResult = await aiService.queryOpenAI(actualQuery);
+                break;
+              case 'anthropic':
+                aiResult = await aiService.queryAnthropic(actualQuery);
+                break;
+              case 'google':
+                aiResult = await aiService.queryGemini(actualQuery);
+                break;
+              case 'perplexity':
+                aiResult = await aiService.queryPerplexity(actualQuery);
+                break;
+              case 'grok':
+                aiResult = await aiService.queryGrok(actualQuery);
+                break;
+              case 'deepseek':
+                aiResult = await aiService.queryDeepSeek(actualQuery);
+                break;
+              default:
+                aiResult = { success: false, error: `Unknown provider: ${aiProvider}` };
+            }
+            
+            console.log(`✅ ${aiProvider} response: ${aiResult.success ? 'SUCCESS' : 'FAILED - ' + aiResult.error}`);
+            
+            if (aiResult.success && aiResult.content) {
+              await storage.updateResponseContent(response.id, aiResult.content, "complete");
+            } else {
+              await storage.updateResponseContent(response.id, aiResult.error || "Unknown error", "error");
+            }
+          } catch (error: any) {
+            console.error(`❌ Error processing ${aiProvider}:`, error.message);
+            await storage.updateResponseContent(response.id, `Error: ${error.message}`, "error");
           }
         });
 
