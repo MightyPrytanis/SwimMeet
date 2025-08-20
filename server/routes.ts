@@ -1264,22 +1264,34 @@ async function processWorkflowStepNew(conversationId: string, workflowState: any
       const currentDoc = conversation?.workflowState?.collaborativeDoc || "";
       const updatedDoc = currentDoc + `\n## Step ${stepIndex + 1}: ${step.assignedAI}\n*${step.objective}*\n\n${aiResult.content}\n\n---\n`;
       
+      // Update the workflow state with the new step data  
+      const updatedWorkflowState = {
+        ...workflowState,
+        collaborativeDoc: updatedDoc,
+        currentStep: stepIndex + 1
+      };
+      
+      // Also update the step data in the workflow state
+      updatedWorkflowState.steps[stepIndex] = step;
+      
       await storageInstance.updateConversation(conversationId, {
-        workflowState: {
-          ...workflowState,
-          collaborativeDoc: updatedDoc
-        }
+        workflowState: updatedWorkflowState
       });
       
-      // Auto-continue to next step after 2 seconds
+      console.log(`✅ WORK MODE: Step ${stepIndex + 1} complete by ${step.assignedAI}. Next step: ${stepIndex + 2}/${workflowState.steps.length}`);
+      
+      // IMMEDIATE continuation to next step (no setTimeout delay)
       if (stepIndex + 1 < workflowState.steps.length) {
-        setTimeout(async () => {
-          try {
-            await processWorkflowStepNew(conversationId, workflowState, stepIndex + 1, aiService);
-          } catch (error) {
-            console.error("Error in auto-continue workflow:", error);
-          }
-        }, 2000);
+        console.log(`🔄 WORK MODE: Immediately continuing to step ${stepIndex + 2}/${workflowState.steps.length} with ${workflowState.steps[stepIndex + 1].assignedAI}`);
+        
+        // Direct function call instead of setImmediate to ensure execution
+        try {
+          await processWorkflowStepNew(conversationId, updatedWorkflowState, stepIndex + 1, aiService);
+        } catch (error) {
+          console.error("❌ Error in workflow continuation:", error);
+        }
+      } else {
+        console.log(`🏁 WORK MODE: Workflow complete! All ${workflowState.steps.length} steps finished.`);
       }
       
       return {
