@@ -68,11 +68,12 @@ function WorkflowDisplay({ conversationId }: { conversationId: string }) {
 
   return (
     <div style={{
-      padding: '20px',
+      padding: '24px',
       backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      marginBottom: '20px'
+      borderRadius: '12px',
+      border: '2px solid #0ea5e9',
+      boxShadow: '0 4px 12px rgba(14, 165, 233, 0.1)',
+      marginBottom: '24px'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
         <h3 style={{ margin: 0, color: '#374151', fontSize: '20px' }}>
@@ -189,7 +190,7 @@ function WorkflowDisplay({ conversationId }: { conversationId: string }) {
                   color: '#6b7280',
                   marginBottom: '5px'
                 }}>
-                  {response.aiProvider} • Step {response.workflowStep || '?'}
+                  {response.aiProvider} • Step {response.metadata?.workStep || '?'}
                 </div>
                 <div style={{ 
                   fontSize: '13px', 
@@ -475,7 +476,7 @@ export default function SwimMeet() {
       case 'connected': return '#16a34a'; // Green
       case 'setup_required': return '#eab308'; // Yellow
       case 'error': return '#dc2626'; // Red
-      case 'disabled': return '#9ca3af'; // Light gray for disabled
+      case 'loading': return '#9ca3af'; // Light gray for loading
       default: return '#6b7280'; // Gray
     }
   };
@@ -509,7 +510,13 @@ export default function SwimMeet() {
         color: 'white',
         borderRadius: '12px'
       }}>
-        <h1 style={{ margin: '0 0 10px 0', fontSize: '2.5rem', fontWeight: 'bold' }}>
+        <h1 style={{ 
+          margin: '0 0 10px 0', 
+          fontSize: '2.5rem', 
+          fontWeight: 'bold',
+          fontFamily: '"Big Shoulders Inline Display", cursive',
+          letterSpacing: '3px'
+        }}>
           SWIM MEET
         </h1>
         <p style={{ margin: 0, fontSize: '1.1rem', opacity: 0.9 }}>
@@ -689,7 +696,7 @@ export default function SwimMeet() {
           {providers.map(provider => (
             <div
               key={provider.id}
-              onClick={() => provider.status !== 'disabled' && toggleAISelection(provider.id)}
+              onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -697,8 +704,8 @@ export default function SwimMeet() {
                 border: `2px solid ${selectedAIs.includes(provider.id) ? '#0c4a6e' : '#e5e7eb'}`,
                 backgroundColor: selectedAIs.includes(provider.id) ? '#eff6ff' : 'white',
                 borderRadius: '6px',
-                cursor: provider.status === 'disabled' ? 'not-allowed' : 'pointer',
-                opacity: provider.status === 'disabled' ? 0.5 : 1,
+                cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
+                opacity: provider.status === 'error' ? 0.5 : 1,
                 transition: 'all 0.2s'
               }}
             >
@@ -922,36 +929,50 @@ export default function SwimMeet() {
 
 
                 
-                {/* Display Verification Results - ALWAYS SHOW IF EXISTS */}
+                {/* Enhanced TURN Analysis Results */}
                 {response.metadata?.verificationResults && response.metadata.verificationResults.length > 0 && (
                   <div style={{
-                    marginTop: '10px',
-                    padding: '10px',
+                    marginTop: '15px',
+                    padding: '15px',
                     backgroundColor: '#f0f9ff',
-                    borderRadius: '6px',
-                    border: '1px solid #0ea5e9'
+                    borderRadius: '8px',
+                    border: '2px solid #0ea5e9'
                   }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#0c4a6e', marginBottom: '5px' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#0c4a6e', marginBottom: '10px' }}>
                       🔍 TURN Analysis by {response.metadata.verificationResults[0].verifiedBy}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#374151' }}>
-                      <div style={{ fontWeight: 'bold', color: '#0ea5e9' }}>
+                    <div style={{ fontSize: '12px', color: '#374151' }}>
+                      <div style={{ 
+                        fontWeight: 'bold', 
+                        color: '#0ea5e9',
+                        backgroundColor: 'white',
+                        padding: '8px',
+                        borderRadius: '4px',
+                        marginBottom: '8px'
+                      }}>
                         🎯 Accuracy Score: {response.metadata.verificationResults[0].accuracyScore}/10
                       </div>
                       {response.metadata.verificationResults[0].factualErrors && response.metadata.verificationResults[0].factualErrors.length > 0 && (
-                        <div style={{ color: '#dc2626', marginTop: '3px' }}>
+                        <div style={{ color: '#dc2626', marginTop: '5px', backgroundColor: '#fef2f2', padding: '6px', borderRadius: '4px' }}>
                           ❌ Errors Found: {response.metadata.verificationResults[0].factualErrors.join(', ')}
                         </div>
                       )}
-                      <div style={{ color: '#16a34a', marginTop: '3px' }}>
+                      <div style={{ color: '#16a34a', marginTop: '5px', backgroundColor: '#f0fdf4', padding: '6px', borderRadius: '4px' }}>
                         ✅ Strengths: {response.metadata.verificationResults[0].strengths?.join(', ') || 'Analysis provided'}
                       </div>
                       {response.metadata.verificationResults[0].weaknesses && response.metadata.verificationResults[0].weaknesses.length > 0 && (
-                        <div style={{ color: '#ea580c', marginTop: '3px' }}>
+                        <div style={{ color: '#ea580c', marginTop: '5px', backgroundColor: '#fff7ed', padding: '6px', borderRadius: '4px' }}>
                           ⚠️ Areas to improve: {response.metadata.verificationResults[0].weaknesses.join(', ')}
                         </div>
                       )}
-                      <div style={{ marginTop: '5px', fontStyle: 'italic', backgroundColor: '#f8fafc', padding: '5px', borderRadius: '3px' }}>
+                      <div style={{ 
+                        marginTop: '8px', 
+                        fontStyle: 'italic', 
+                        backgroundColor: '#f8fafc', 
+                        padding: '8px', 
+                        borderRadius: '4px',
+                        border: '1px solid #e2e8f0'
+                      }}>
                         📋 Overall Assessment: {response.metadata.verificationResults[0].overallAssessment}
                       </div>
                     </div>
