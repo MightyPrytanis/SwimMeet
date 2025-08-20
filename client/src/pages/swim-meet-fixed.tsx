@@ -84,6 +84,15 @@ export default function SwimMeetFixed() {
     }
   });
 
+  // Query to fetch updated responses for a conversation
+  const { data: conversationResponses } = useQuery<AIResponse[]>({
+    queryKey: [`/api/conversations/${conversationId}/responses`],
+    queryFn: () => makeAuthenticatedRequest(`/api/conversations/${conversationId}/responses`).then(res => res.json()),
+    enabled: !!authToken && !!conversationId,
+    refetchInterval: 2000, // Poll every 2 seconds
+    staleTime: 0, // Always consider stale to fetch fresh data
+  });
+
   // ALL EFFECTS BEFORE CONDITIONAL LOGIC
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -109,6 +118,13 @@ export default function SwimMeetFixed() {
       setAuthLoading(false);
     }
   }, []);
+
+  // Update responses when conversation data changes
+  useEffect(() => {
+    if (conversationResponses) {
+      setResponses(conversationResponses);
+    }
+  }, [conversationResponses]);
 
   // EVENT HANDLERS
   const handleAuth = (token: string, userData: { id: string; username: string }) => {
