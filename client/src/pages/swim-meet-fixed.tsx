@@ -64,6 +64,34 @@ export default function SwimMeetFixed() {
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
 
+  // File upload handler
+  const handleFilesSelected = async (files: FileList) => {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+
+    try {
+      const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAttachedFiles(prev => [...prev, ...result.files]);
+      } else {
+        alert('File upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('File upload failed');
+    }
+  };
+
   // Helper function for authenticated requests
   const makeAuthenticatedRequest = (url: string, options: RequestInit = {}) => {
     return fetch(url, {
