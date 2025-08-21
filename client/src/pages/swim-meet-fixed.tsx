@@ -359,11 +359,12 @@ export default function SwimMeetFixed() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
             <img 
-              src="/attached_assets/Screenshot 2025-08-21 at 9.08.49 AM_1755789687482.png"
+              src="attached_assets/Screenshot 2025-08-21 at 9.08.49 AM_1755789687482.png"
               alt="Swim Meet Logo"
               style={{
                 height: '60px',
-                width: 'auto'
+                width: 'auto',
+                objectFit: 'contain'
               }}
             />
             <div>
@@ -548,7 +549,7 @@ export default function SwimMeetFixed() {
           <h3 className="panel-heading">Select AI Providers</h3>
           {mode === 'dive' && (
             <div className="mode-explanation dive-explanation">
-              <strong>DIVE Mode:</strong> Choose as many AI team members as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.
+              <strong>DIVE Mode:</strong> Choose as many AI competitors as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.
             </div>
           )}
           {mode === 'turn' && (
@@ -559,6 +560,9 @@ export default function SwimMeetFixed() {
           {mode === 'work' && (
             <div className="mode-explanation work-explanation">
               <strong>WORK Mode:</strong> Choose AI team members for the project. They will agree on roles for each agent, or you can designate them yourself. Sequential collaboration on complex problems.
+              <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f8ff', borderLeft: '4px solid #007BFF', fontSize: '14px' }}>
+                <strong>Role Assignment:</strong> After selecting AIs, you can assign specific roles like "Analyst", "Designer", "Reviewer" by clicking the role button next to each selected AI.
+              </div>
             </div>
           )}
           
@@ -575,21 +579,24 @@ export default function SwimMeetFixed() {
             const isSelected = selectedAIs.includes(provider.id);
             let panelClass = randomPanelType;
             
-            // Selected providers get photoplate treatment
-            if (isSelected) {
-              panelClass = `photoplate-accent ${randomVariant}`;
-            }
+            // Only apply special styling to actually selected providers
+            // Remove any persistent highlighting that's not tied to selection state
             
             return (
               <div
                 key={provider.id}
-                className={panelClass}
+                className={`${panelClass} ${isSelected ? 'provider-selected' : ''} hover-tooltip-trigger`}
                 onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
                 style={{
                   cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
-                  opacity: provider.status === 'error' ? 0.5 : 1
+                  opacity: provider.status === 'error' ? 0.5 : 1,
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  border: isSelected ? '3px solid #007BFF' : '2px solid transparent',
+                  transform: isSelected ? 'scale(1.05)' : 'scale(1)'
                 }}
                 data-testid={`provider-${provider.id}`}
+                title={`Click to ${isSelected ? 'deselect' : 'select'} ${provider.name}. Status: ${provider.status.replace('_', ' ')}`}
               >
                 <div className="swim-provider-header">
                   <div>
@@ -598,12 +605,73 @@ export default function SwimMeetFixed() {
                   </div>
                   <div className={`swim-status swim-status--${provider.status}`}>
                     {provider.status.replace('_', ' ')}
+                    {isSelected && <span style={{ marginLeft: '8px', color: '#007BFF' }}>✓</span>}
+                  </div>
+                </div>
+                
+                {/* Hover tooltip */}
+                <div className="hover-tooltip">
+                  <div className="tooltip-content">
+                    <strong>{provider.name}</strong><br/>
+                    Company: {provider.company}<br/>
+                    Status: {provider.status.replace('_', ' ')}<br/>
+                    {mode === 'dive' && 'Simultaneous competition mode'}
+                    {mode === 'turn' && 'Sequential verification mode'}
+                    {mode === 'work' && 'Collaborative workflow mode'}
                   </div>
                 </div>
               </div>
             );
             })}
           </div>
+
+          {/* WORK Mode Role Assignment Section */}
+          {mode === 'work' && selectedAIs.length > 0 && (
+            <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#fff8f0', borderRadius: '8px', border: '2px solid #f59e0b' }}>
+              <h4 style={{ margin: '0 0 15px 0', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Users size={20} />
+                Role Assignment
+              </h4>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {selectedAIs.map((aiId, index) => {
+                  const provider = providers?.find(p => p.id === aiId);
+                  const roleOptions = ['Analyst', 'Designer', 'Reviewer', 'Strategist', 'Technical Lead', 'Auto-assign'];
+                  
+                  return (
+                    <div key={aiId} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      padding: '12px',
+                      backgroundColor: 'white',
+                      borderRadius: '6px',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      <div>
+                        <strong>{provider?.name}</strong>
+                        <div style={{ fontSize: '12px', color: '#6b7280' }}>{provider?.company}</div>
+                      </div>
+                      <select 
+                        defaultValue="Auto-assign"
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          border: '1px solid #d1d5db',
+                          backgroundColor: 'white',
+                          fontSize: '14px'
+                        }}
+                        data-testid={`role-select-${aiId}`}
+                      >
+                        {roleOptions.map(role => (
+                          <option key={role} value={role}>{role}</option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* File Upload Interface with mode-specific explanation */}
