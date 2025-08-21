@@ -1083,8 +1083,8 @@ body {
 }
 
 .turn-mode {
-  background: linear-gradient(135deg, #dc262615 0%, #991b1b15 100%);
-  border: 2px solid #dc262640;
+  background: linear-gradient(135deg, #16a34a15 0%, #15803d15 100%);
+  border: 2px solid #16a34a40;
 }
 
 .work-mode {
@@ -1108,9 +1108,9 @@ body {
 }
 
 .turn-explanation {
-  background: #fef2f2;
-  border-left: 4px solid #dc2626;
-  color: #991b1b;
+  background: #f0fdf4;
+  border-left: 4px solid #16a34a;
+  color: #15803d;
 }
 
 .work-explanation {
@@ -1154,15 +1154,15 @@ body {
 }
 
 .turn-panel {
-  background: linear-gradient(135deg, #dc262620 0%, #991b1b20 100%);
-  border: 2px solid #dc262660;
+  background: linear-gradient(135deg, #16a34a20 0%, #15803d20 100%);
+  border: 2px solid #16a34a60;
 }
 
 .turn-panel.swim-mode-panel--active {
-  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 32px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.3);
 }
 
 .work-panel {
