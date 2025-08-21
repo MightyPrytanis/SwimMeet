@@ -357,13 +357,23 @@ export default function SwimMeetFixed() {
       {/* Modernist Header - Glass Panel Design */}
       <header className="swim-panel swim-panel--elevated swim-section">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1 className="swim-brand swim-title" style={{ margin: '0', fontSize: '2rem' }}>
-              SWIM MEET
-            </h1>
-            <p className="swim-caption" style={{ margin: '0' }}>
-              User: {user?.username}
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
+            <img 
+              src="/attached_assets/Screenshot 2025-08-21 at 9.08.49 AM_1755789687482.png"
+              alt="Swim Meet Logo"
+              style={{
+                height: '60px',
+                width: 'auto'
+              }}
+            />
+            <div>
+              <h1 className="swim-brand swim-title" style={{ margin: '0', fontSize: '2rem' }}>
+                SWIM MEET
+              </h1>
+              <p className="swim-caption" style={{ margin: '0' }}>
+                User: {user?.username}
+              </p>
+            </div>
           </div>
           <div style={{ position: 'relative' }}>
             <button
@@ -507,77 +517,53 @@ export default function SwimMeetFixed() {
             { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
           ].map(m => {
             const isActive = mode === m.id;
-            
-            // Get mode-specific styling
-            let modeColor, modeGradient, modeBorder;
-            if (m.id === 'dive') {
-              modeColor = 'hsl(var(--dive-primary))';
-              modeGradient = isActive 
-                ? 'linear-gradient(135deg, hsl(var(--dive-primary)) 0%, hsl(var(--dive-secondary)) 100%)' 
-                : 'linear-gradient(135deg, hsl(var(--dive-primary) / 0.15) 0%, hsl(var(--dive-secondary) / 0.1) 100%)';
-              modeBorder = isActive ? 'hsl(var(--dive-primary))' : 'hsl(var(--dive-primary) / 0.4)';
-            } else if (m.id === 'turn') {
-              modeColor = 'hsl(var(--turn-primary))';
-              modeGradient = isActive 
-                ? 'linear-gradient(135deg, hsl(var(--turn-primary)) 0%, hsl(var(--turn-secondary)) 100%)' 
-                : 'linear-gradient(135deg, hsl(var(--turn-primary) / 0.15) 0%, hsl(var(--turn-secondary) / 0.1) 100%)';
-              modeBorder = isActive ? 'hsl(var(--turn-primary))' : 'hsl(var(--turn-primary) / 0.4)';
-            } else {
-              modeColor = 'hsl(var(--work-primary))';
-              modeGradient = isActive 
-                ? 'linear-gradient(135deg, hsl(var(--work-primary)) 0%, hsl(var(--work-secondary)) 100%)' 
-                : 'linear-gradient(135deg, hsl(var(--work-primary) / 0.15) 0%, hsl(var(--work-secondary) / 0.1) 100%)';
-              modeBorder = isActive ? 'hsl(var(--work-primary))' : 'hsl(var(--work-primary) / 0.4)';
-            }
+            const panelClass = `swim-mode-panel ${m.id}-panel ${isActive ? 'swim-mode-panel--active' : ''}`;
             
             return (
               <div
                 key={m.id}
-                className={`swim-mode-panel ${isActive ? 'swim-mode-panel--active' : ''}`}
-                onClick={() => setMode(m.id as any)}
+                className={panelClass}
+                onClick={() => setMode(m.id as 'dive' | 'turn' | 'work')}
+                style={{ cursor: 'pointer' }}
                 data-testid={`mode-${m.id}`}
-                style={{
-                  background: modeGradient,
-                  border: `2px solid ${modeBorder}`,
-                  transform: isActive ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
-                  boxShadow: isActive ? '0 8px 32px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.1)',
-                  transition: 'all 0.3s cubic-bezier(0.2, 0, 0.2, 1)'
-                }}
               >
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  marginBottom: 'calc(var(--grid-unit) / 2)',
-                  color: isActive ? 'white' : modeColor
-                }}>
-                  {m.icon}
+                <div className="swim-mode-title">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'calc(var(--grid-unit) / 2)', marginBottom: 'calc(var(--grid-unit) / 2)' }}>
+                    {m.icon}
+                    {m.name}
+                  </div>
                 </div>
-                <div className="swim-mode-title" style={{ 
-                  color: isActive ? 'white' : modeColor,
-                  textShadow: isActive ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
-                }}>
-                  {m.name}
-                </div>
-                <div className="swim-mode-description" style={{ 
-                  color: isActive ? 'rgba(255,255,255,0.9)' : `${modeColor}aa`,
-                  textShadow: isActive ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
-                }}>
-                  {m.desc}
-                </div>
+                <div className="swim-mode-description">{m.desc}</div>
               </div>
             );
           })}
         </div>
       </section>
 
-      <div className="steel-frame-divider"></div>
-
-      {/* Modernist AI Provider Selection */}
-      <section className="swim-section">
-        <h3 className="panel-heading">Select AI Providers</h3>
-        <div className="provider-grid">
-          {providers.map((provider, index) => {
+      {/* Mode-specific content areas with explanatory text */}
+      <div className={`mode-themed-container ${mode}-mode`}>
+        
+        {/* AI Provider Selection with mode-specific explanation */}
+        <section className="swim-section">
+          <h3 className="panel-heading">Select AI Providers</h3>
+          {mode === 'dive' && (
+            <div className="mode-explanation dive-explanation">
+              <strong>DIVE Mode:</strong> Choose as many AI team members as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.
+            </div>
+          )}
+          {mode === 'turn' && (
+            <div className="mode-explanation turn-explanation">
+              <strong>TURN Mode:</strong> Choose primary AI providers, then select a verifier AI. The verifier will fact-check and critique the primary responses for accuracy.
+            </div>
+          )}
+          {mode === 'work' && (
+            <div className="mode-explanation work-explanation">
+              <strong>WORK Mode:</strong> Choose AI team members for the project. They will agree on roles for each agent, or you can designate them yourself. Sequential collaboration on complex problems.
+            </div>
+          )}
+          
+          <div className="provider-grid">
+            {providers.map((provider, index) => {
             // Random panel type distribution
             const panelTypes = ['glass-panel-large', 'provider-panel', 'photoplate-accent'];
             const randomPanelType = panelTypes[index % panelTypes.length];
@@ -616,18 +602,32 @@ export default function SwimMeetFixed() {
                 </div>
               </div>
             );
-          })}
-        </div>
-      </section>
+            })}
+          </div>
+        </section>
 
-      <div className="steel-frame-divider"></div>
-
-      {/* Modernist File Upload Interface */}
-      <section className="glass-panel-large swim-section">
-        <div className="swim-feature-header">
-          <Upload size={20} />
-          <h3 className="panel-heading">File Attachments</h3>
-        </div>
+        {/* File Upload Interface with mode-specific explanation */}
+        <section className="swim-section">
+          <div className="swim-feature-header">
+            <Upload size={20} />
+            <h3 className="panel-heading">File Attachments</h3>
+          </div>
+          
+          {mode === 'dive' && (
+            <div className="mode-explanation dive-explanation">
+              <strong>File Support:</strong> Attach documents, images, or data files. All selected AIs will receive and analyze these files simultaneously.
+            </div>
+          )}
+          {mode === 'turn' && (
+            <div className="mode-explanation turn-explanation">
+              <strong>File Support:</strong> Attach files for analysis. The verifier AI will also review file-based responses for accuracy and completeness.
+            </div>
+          )}
+          {mode === 'work' && (
+            <div className="mode-explanation work-explanation">
+              <strong>File Support:</strong> Upload project files, specifications, or reference materials. AI team members will use these throughout the collaborative workflow.
+            </div>
+          )}
           
         <div style={{ display: 'flex', gap: 'var(--panel-gap)', alignItems: 'center', marginBottom: 'var(--section-gap)' }}>
           <StandardFileUpload
@@ -686,12 +686,10 @@ export default function SwimMeetFixed() {
               </div>
             </div>
           )}
-      </section>
+        </section>
 
-      <div className="steel-frame-divider"></div>
-
-      {/* Modernist Query Input - Primary Action Panel */}
-      <section className="glass-panel-large swim-section">
+        {/* Query Input Section */}
+        <section className="swim-section">
         <h3 className="panel-heading">Query Input</h3>
         <div className="swim-query-container">
           <textarea
@@ -713,7 +711,10 @@ export default function SwimMeetFixed() {
             </div>
           </button>
         </div>
-      </section>
+        </section>
+      </div>
+
+      <div className="steel-frame-divider"></div>
 
       <div>
         {/* WORK Mode Progress Monitor */}

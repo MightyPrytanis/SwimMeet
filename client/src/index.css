@@ -16,6 +16,14 @@
   --crystal-blue: #F0F8FF;
   --pristine-blue: #4A90E2;
   --clear-blue: #6BB6FF;
+  
+  /* Mode-specific colors */
+  --dive-blue: #007BFF;
+  --dive-blue-light: #E3F2FD;
+  --turn-teal: #00A6A6;
+  --turn-teal-light: #E0F7FA;
+  --work-gold: #DAA520;
+  --work-gold-light: #FFF8DC;
 }
 
 /* Swimming theme animations */
