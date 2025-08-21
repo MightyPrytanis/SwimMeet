@@ -337,23 +337,14 @@ export default function SwimMeetFixed() {
 
   return (
     <div className="swim-grid swim-grid--main">
-      {/* Precision Steel Header Framework */}
-      <header className="steel-frame swim-section">
+      {/* Modernist Header - Glass Panel Design */}
+      <header className="swim-panel swim-panel--elevated swim-section">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 className="swim-brand swim-title" style={{ 
-              margin: '0', 
-              fontSize: '2rem',
-              color: 'hsl(var(--chrome-silver))',
-              fontWeight: 'var(--font-weight-bold)'
-            }}>
+            <h1 className="swim-brand swim-title" style={{ margin: '0', fontSize: '2rem' }}>
               SWIM MEET
             </h1>
-            <p className="swim-caption" style={{ 
-              margin: '0',
-              color: 'hsl(var(--chrome-silver))',
-              opacity: 0.8
-            }}>
+            <p className="swim-caption" style={{ margin: '0' }}>
               User: {user?.username}
             </p>
           </div>
@@ -425,265 +416,111 @@ export default function SwimMeetFixed() {
         </section>
       )}
 
-      {/* Precision Tetris Mode Selection Grid */}
-      <section style={{
-        display: 'grid',
-        gridTemplateColumns: '2fr 1fr 1fr',
-        gridTemplateRows: '1fr 1fr',
-        gap: '1px', // Minimal gap for precision fitting
-        marginBottom: 'var(--section-gap)',
-        height: '200px' // Fixed height for precision layout
-      }}>
-        {/* DIVE - Large Primary Panel */}
-        <div
-          className={`glass-panel-large ${mode === 'dive' ? 'active' : ''}`}
-          onClick={() => setMode('dive')}
-          data-testid="button-mode-dive"
-          style={{
-            gridArea: '1 / 1 / 3 / 2', // Spans both rows, first column
-            padding: 'var(--panel-gap)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            background: mode === 'dive' 
-              ? `linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(135, 206, 235, 0.1) 100%)`
-              : 'var(--glass-large-bg)',
-            border: mode === 'dive' 
-              ? `2px solid hsl(var(--surface-blue))`
-              : `1px solid hsl(var(--steel-primary))`
-          }}
-        >
-          <Play size={32} style={{ 
-            marginBottom: '12px',
-            color: mode === 'dive' ? 'hsl(var(--surface-blue))' : 'hsl(var(--chrome-silver))'
-          }} />
-          <h4 style={{ 
-            margin: '0 0 8px 0', 
-            fontSize: '1.5rem',
-            fontWeight: 'var(--font-weight-bold)',
-            color: mode === 'dive' ? 'hsl(var(--surface-blue))' : 'hsl(var(--chrome-silver))'
-          }}>
-            DIVE
-          </h4>
-          <p style={{ 
-            margin: '0', 
-            fontSize: '0.9rem',
-            color: mode === 'dive' ? 'hsl(var(--underwater-teal))' : 'hsl(var(--chrome-silver))',
-            opacity: 0.8
-          }}>
-            Multiple AIs respond simultaneously
-          </p>
-        </div>
-
-        {/* TURN - Steel Frame Panel */}
-        <div
-          className={`steel-frame ${mode === 'turn' ? 'active' : ''}`}
-          onClick={() => setMode('turn')}
-          data-testid="button-mode-turn"
-          style={{
-            gridArea: '1 / 2 / 2 / 3', // First row, second column
-            padding: 'var(--panel-gap)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            background: mode === 'turn' 
-              ? `hsl(var(--steel-secondary))`
-              : `hsl(var(--steel-primary))`,
-            border: mode === 'turn' 
-              ? `2px solid hsl(var(--underwater-teal))`
-              : 'none'
-          }}
-        >
-          <GitBranch size={24} style={{ 
-            marginBottom: '8px',
-            color: 'hsl(var(--chrome-silver))'
-          }} />
-          <h4 style={{ 
-            margin: '0 0 4px 0', 
-            fontSize: '1.1rem',
-            fontWeight: 'var(--font-weight-bold)',
-            color: 'hsl(var(--chrome-silver))'
-          }}>
-            TURN
-          </h4>
-          <p style={{ 
-            margin: '0', 
-            fontSize: '0.8rem',
-            color: 'hsl(var(--chrome-silver))',
-            opacity: 0.8
-          }}>
-            AI fact-checking
-          </p>
-        </div>
-
-        {/* WORK - Medium Glass Panel */}
-        <div
-          className={`glass-panel-medium ${mode === 'work' ? 'active' : ''}`}
-          onClick={() => setMode('work')}
-          data-testid="button-mode-work"
-          style={{
-            gridArea: '1 / 3 / 3 / 4', // Spans both rows, third column
-            padding: 'var(--panel-gap)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            background: mode === 'work' 
-              ? `rgba(184, 134, 11, 0.1)`
-              : 'var(--glass-medium-bg)',
-            border: mode === 'work' 
-              ? `2px solid hsl(var(--work-primary))`
-              : `1px solid hsl(var(--steel-secondary))`
-          }}
-        >
-          <Users size={28} style={{ 
-            marginBottom: '10px',
-            color: mode === 'work' ? 'hsl(var(--work-primary))' : 'hsl(var(--chrome-silver))'
-          }} />
-          <h4 style={{ 
-            margin: '0 0 6px 0', 
-            fontSize: '1.3rem',
-            fontWeight: 'var(--font-weight-bold)',
-            color: mode === 'work' ? 'hsl(var(--work-primary))' : 'hsl(var(--chrome-silver))'
-          }}>
-            WORK
-          </h4>
-          <p style={{ 
-            margin: '0', 
-            fontSize: '0.85rem',
-            color: mode === 'work' ? 'hsl(var(--work-primary))' : 'hsl(var(--chrome-silver))',
-            opacity: 0.8
-          }}>
-            Multi-step collaborative solving
-          </p>
-        </div>
-
-        {/* Stats Panel - Small Steel Support */}
-        <div
-          className="steel-support"
-          style={{
-            gridArea: '2 / 2 / 3 / 3', // Second row, second column
-            padding: 'calc(var(--panel-gap) / 2)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center'
-          }}
-        >
-          <BarChart3 size={20} style={{ 
-            marginBottom: '4px',
-            color: 'hsl(var(--chrome-silver))'
-          }} />
-          <p style={{ 
-            margin: '0', 
-            fontSize: '0.7rem',
-            color: 'hsl(var(--chrome-silver))',
-            opacity: 0.7
-          }}>
-            Stats
-          </p>
+      {/* Modernist Mode Selection - Distinctly Styled Panels */}
+      <section className="swim-section">
+        <h3 className="swim-subtitle">Workflow Mode</h3>
+        <div className="swim-mode-selector">
+          {[
+            { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <Play size={20} /> },
+            { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <GitBranch size={20} /> },
+            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
+          ].map(m => {
+            const isActive = mode === m.id;
+            
+            // Get mode-specific styling
+            let modeColor, modeGradient, modeBorder;
+            if (m.id === 'dive') {
+              modeColor = 'hsl(var(--dive-primary))';
+              modeGradient = isActive 
+                ? 'linear-gradient(135deg, hsl(var(--dive-primary)) 0%, hsl(var(--dive-secondary)) 100%)' 
+                : 'linear-gradient(135deg, hsl(var(--dive-primary) / 0.15) 0%, hsl(var(--dive-secondary) / 0.1) 100%)';
+              modeBorder = isActive ? 'hsl(var(--dive-primary))' : 'hsl(var(--dive-primary) / 0.4)';
+            } else if (m.id === 'turn') {
+              modeColor = 'hsl(var(--turn-primary))';
+              modeGradient = isActive 
+                ? 'linear-gradient(135deg, hsl(var(--turn-primary)) 0%, hsl(var(--turn-secondary)) 100%)' 
+                : 'linear-gradient(135deg, hsl(var(--turn-primary) / 0.15) 0%, hsl(var(--turn-secondary) / 0.1) 100%)';
+              modeBorder = isActive ? 'hsl(var(--turn-primary))' : 'hsl(var(--turn-primary) / 0.4)';
+            } else {
+              modeColor = 'hsl(var(--work-primary))';
+              modeGradient = isActive 
+                ? 'linear-gradient(135deg, hsl(var(--work-primary)) 0%, hsl(var(--work-secondary)) 100%)' 
+                : 'linear-gradient(135deg, hsl(var(--work-primary) / 0.15) 0%, hsl(var(--work-secondary) / 0.1) 100%)';
+              modeBorder = isActive ? 'hsl(var(--work-primary))' : 'hsl(var(--work-primary) / 0.4)';
+            }
+            
+            return (
+              <div
+                key={m.id}
+                className={`swim-mode-panel ${isActive ? 'swim-mode-panel--active' : ''}`}
+                onClick={() => setMode(m.id as any)}
+                data-testid={`mode-${m.id}`}
+                style={{
+                  background: modeGradient,
+                  border: `2px solid ${modeBorder}`,
+                  transform: isActive ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
+                  boxShadow: isActive ? '0 8px 32px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s cubic-bezier(0.2, 0, 0.2, 1)'
+                }}
+              >
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  marginBottom: 'calc(var(--grid-unit) / 2)',
+                  color: isActive ? 'white' : modeColor
+                }}>
+                  {m.icon}
+                </div>
+                <div className="swim-mode-title" style={{ 
+                  color: isActive ? 'white' : modeColor,
+                  textShadow: isActive ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+                }}>
+                  {m.name}
+                </div>
+                <div className="swim-mode-description" style={{ 
+                  color: isActive ? 'rgba(255,255,255,0.9)' : `${modeColor}aa`,
+                  textShadow: isActive ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
+                }}>
+                  {m.desc}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Precision AI Provider Grid */}
+      {/* Modernist AI Provider Selection */}
       <section className="swim-section">
-        <h3 className="swim-subtitle" style={{ 
-          marginBottom: 'var(--panel-gap)',
-          color: 'hsl(var(--chrome-silver))',
-          fontWeight: 'var(--font-weight-medium)'
-        }}>
-          Select AI Providers
-        </h3>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
-          gap: '1px', // Minimal gap for precision fitting
-          marginBottom: 'var(--section-gap)',
-          height: '160px'
-        }}>
-          {providers.map((provider, index) => (
+        <h3 className="swim-subtitle">Select AI Providers</h3>
+        <div className="swim-providers">
+          {providers.map(provider => (
             <div
               key={provider.id}
-              className={`glass-panel-medium ${selectedAIs.includes(provider.id) ? 'active' : ''}`}
+              className={`swim-panel swim-provider ${selectedAIs.includes(provider.id) ? 'swim-provider--selected' : ''}`}
               onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
-              data-testid={`provider-${provider.id}`}
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 'calc(var(--panel-gap) * 0.75)',
                 cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
-                opacity: provider.status === 'error' ? 0.5 : 1,
-                background: selectedAIs.includes(provider.id) 
-                  ? 'linear-gradient(135deg, rgba(135, 206, 235, 0.1) 0%, rgba(74, 139, 139, 0.08) 100%)'
-                  : 'var(--glass-medium-bg)',
-                border: selectedAIs.includes(provider.id) 
-                  ? `2px solid hsl(var(--surface-blue))` 
-                  : `1px solid hsl(var(--steel-secondary))`,
-                position: 'relative',
-                textAlign: 'center'
+                opacity: provider.status === 'error' ? 0.5 : 1
               }}
+              data-testid={`provider-${provider.id}`}
             >
-              {/* Status Indicator - Steel Badge */}
-              <div style={{
-                position: 'absolute',
-                top: '4px',
-                right: '4px',
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: provider.status === 'connected' 
-                  ? '#16a34a' : provider.status === 'setup_required' 
-                  ? '#eab308' : '#dc2626'
-              }}></div>
-              
-              <h4 style={{ 
-                margin: '0 0 4px 0', 
-                fontSize: '0.9rem',
-                fontWeight: 'var(--font-weight-semibold)',
-                color: selectedAIs.includes(provider.id) 
-                  ? 'hsl(var(--surface-blue))' 
-                  : 'hsl(var(--chrome-silver))'
-              }}>
-                {provider.name}
-              </h4>
-              <p style={{ 
-                margin: '0 0 4px 0', 
-                fontSize: '0.7rem',
-                color: 'hsl(var(--chrome-silver))',
-                opacity: 0.7
-              }}>
-                {provider.company}
-              </p>
-              <div style={{
-                fontSize: '0.6rem',
-                color: provider.status === 'connected' 
-                  ? '#16a34a' : provider.status === 'setup_required' 
-                  ? '#eab308' : '#dc2626',
-                fontWeight: 'var(--font-weight-medium)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                {provider.status.replace('_', ' ')}
+              <div className="swim-provider-header">
+                <div>
+                  <div className="swim-provider-name">{provider.name}</div>
+                  <div className="swim-provider-company">{provider.company}</div>
+                </div>
+                <div className={`swim-status swim-status--${provider.status}`}>
+                  {provider.status.replace('_', ' ')}
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Glass Panel File Upload Interface */}
-      <section className="glass-panel-large swim-section">
+      {/* Modernist File Upload Interface */}
+      <section className="swim-panel swim-section">
         <div className="swim-feature-header">
           <Upload size={20} />
           <h3 className="swim-subtitle">File Attachments</h3>
@@ -761,15 +598,9 @@ export default function SwimMeetFixed() {
           )}
       </section>
 
-      {/* Precision Glass Query Interface */}
-      <section className="glass-panel-large swim-section">
-        <h3 className="swim-subtitle" style={{
-          marginBottom: 'var(--panel-gap)',
-          color: 'hsl(var(--chrome-silver))',
-          fontWeight: 'var(--font-weight-medium)'
-        }}>
-          Query Input
-        </h3>
+      {/* Modernist Query Input - Primary Action Panel */}
+      <section className="swim-panel swim-panel--primary swim-section">
+        <h3 className="swim-subtitle">Query Input</h3>
         <div className="swim-query-container">
           <textarea
             value={query}
@@ -777,36 +608,12 @@ export default function SwimMeetFixed() {
             placeholder="Enter your query here..."
             data-testid="input-query"
             className="swim-textarea"
-            style={{
-              background: 'var(--glass-medium-bg)',
-              border: `1px solid hsl(var(--steel-secondary))`,
-              borderRadius: '0', // Sharp glass edges
-              color: 'hsl(var(--chrome-silver))',
-              fontFamily: 'var(--font-primary)',
-              fontSize: '1rem',
-              padding: 'var(--panel-gap)',
-              minHeight: '120px',
-              width: '100%',
-              marginBottom: 'var(--panel-gap)',
-              resize: 'vertical'
-            }}
           />
           <button
             onClick={handleSubmitQuery}
             disabled={!query.trim() || selectedAIs.length === 0 || isQuerying}
             data-testid="button-submit-query"
-            className="steel-frame"
-            style={{
-              width: '100%',
-              padding: 'var(--panel-gap)',
-              fontSize: '1.1rem',
-              fontWeight: 'var(--font-weight-semibold)',
-              cursor: (!query.trim() || selectedAIs.length === 0 || isQuerying) ? 'not-allowed' : 'pointer',
-              opacity: (!query.trim() || selectedAIs.length === 0 || isQuerying) ? 0.6 : 1,
-              color: 'hsl(var(--chrome-silver))',
-              border: `2px solid hsl(var(--steel-secondary))`,
-              transition: 'all var(--duration-fast) var(--easing-standard)'
-            }}
+            className={`swim-button swim-button--primary swim-button--large ${isQuerying ? 'swim-button--disabled' : ''}`}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(var(--grid-unit) / 2)' }}>
               {getModeIcon()}
