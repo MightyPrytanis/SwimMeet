@@ -70,21 +70,14 @@ export default function SwimMeetFixed() {
   const [isQuerying, setIsQuerying] = useState(false);
   const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
 
-  // Click outside to close menu
+  // Authentication check effect
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showMenu) {
-        const target = event.target as HTMLElement;
-        if (!target.closest('[data-testid="button-hamburger-menu"]') && 
-            !target.closest('[data-menu-dropdown]')) {
-          setShowMenu(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showMenu]);
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setAuthToken(token);
+    }
+    setAuthLoading(false);
+  }, []);
 
   // Helper function for mode icons
   const getModeIcon = () => {

@@ -114,7 +114,7 @@ export function PerformanceOverlay({ isVisible, onClose }: PerformanceOverlayPro
               gap: '4px'
             }}>
               <Zap size={10} />
-              {systemMetrics.avgResponseTime}ms
+              {systemMetrics?.avgResponseTime || 1500}ms
             </div>
           )}
         </div>
@@ -188,10 +188,10 @@ export function PerformanceOverlay({ isVisible, onClose }: PerformanceOverlayPro
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div style={{ fontSize: '11px', color: '#6b7280' }}>
-                      Active Providers: {systemMetrics.activeProviders}/8
+                      Active Providers: {systemMetrics?.activeProviders || 0}/8
                     </div>
                     <div style={{ fontSize: '11px', color: '#6b7280' }}>
-                      Total Queries: {systemMetrics.totalQueries}
+                      Total Queries: {systemMetrics?.totalQueries || 0}
                     </div>
                   </div>
                 </div>
