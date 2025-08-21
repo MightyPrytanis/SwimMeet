@@ -173,6 +173,19 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
+/* UNIFORM PANEL PADDING SYSTEM */
+.swim-panel {
+  padding: calc(var(--grid-unit) * 2);
+}
+
+.swim-panel--compact {
+  padding: var(--grid-unit);
+}
+
+.swim-panel--spacious {
+  padding: calc(var(--grid-unit) * 3);
+}
+
 /* Dark mode panel adaptations */
 [data-theme="dark"] .swim-panel {
   background: var(--glass-dark);
@@ -305,6 +318,92 @@ body {
 .swim-button--ghost:hover {
   background: hsla(var(--chrome-silver), 0.5);
   border-color: hsl(var(--chrome-silver));
+}
+
+/* === FILE ATTACHMENT CARDS === */
+.swim-file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--grid-unit) * 1.5);
+  background: var(--glass-light);
+  border: 1px solid hsla(var(--chrome-silver), 0.3);
+  margin-bottom: calc(var(--grid-unit) / 2);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.swim-file-card:hover {
+  border-color: hsl(var(--surface-blue));
+  transform: translateY(-1px);
+}
+
+.swim-file-info {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--grid-unit) / 2);
+}
+
+.swim-file-actions {
+  display: flex;
+  gap: calc(var(--grid-unit) / 2);
+}
+
+/* === RESPONSE CARDS === */
+.swim-response-card {
+  padding: calc(var(--grid-unit) * 2);
+  background: var(--glass-light);
+  border: 1px solid hsla(var(--chrome-silver), 0.3);
+  margin-bottom: calc(var(--grid-unit) * 1.5);
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.swim-response-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: calc(var(--grid-unit) * 1.5);
+}
+
+.swim-response-actions {
+  display: flex;
+  gap: calc(var(--grid-unit) / 2);
+  align-items: center;
+}
+
+.swim-response-content {
+  color: hsl(var(--deep-pool-blue));
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.swim-response-time {
+  margin-top: calc(var(--grid-unit) * 1.5);
+  font-size: 0.75rem;
+  color: hsl(var(--chrome-silver));
+}
+
+/* === WORKFLOW CARDS === */
+.swim-workflow-card {
+  padding: calc(var(--grid-unit) * 2);
+  background: var(--glass-light);
+  border: 1px solid hsla(var(--chrome-silver), 0.3);
+  margin-bottom: calc(var(--grid-unit));
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.swim-progress-bar {
+  width: 100%;
+  height: calc(var(--grid-unit));
+  background: hsla(var(--chrome-silver), 0.3);
+  border-radius: calc(var(--grid-unit) / 2);
+  overflow: hidden;
+  margin-bottom: calc(var(--grid-unit) * 1.5);
+}
+
+.swim-progress-fill {
+  height: 100%;
+  background: hsl(var(--work-primary));
+  transition: width 0.3s ease;
 }
 
 /* === STATUS INDICATORS === */

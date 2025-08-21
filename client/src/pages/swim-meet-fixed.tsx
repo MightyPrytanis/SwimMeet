@@ -618,54 +618,41 @@ export default function SwimMeetFixed() {
         </div>
 
           {attachedFiles.length > 0 && (
-            <div style={{ marginTop: '10px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+            <div className="swim-section--compact">
+              <div className="swim-caption" style={{ marginBottom: 'calc(var(--grid-unit) / 2)' }}>
                 Attached Files ({attachedFiles.length}):
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {attachedFiles.map((file, index) => (
-                  <div key={index} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 12px',
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '4px',
-                    border: '1px solid #e5e7eb'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <FileText className="w-4 h-4 text-gray-500" />
-                      <span style={{ fontSize: '14px' }}>{file.name}</span>
-                      <span style={{ fontSize: '12px', color: '#6b7280' }}>
+                  <div key={index} className="swim-file-card">
+                    <div className="swim-file-info">
+                      <FileText size={16} style={{ color: 'hsl(var(--chrome-silver))' }} />
+                      <span className="swim-caption">{file.name}</span>
+                      <span className="swim-caption" style={{ color: 'hsl(var(--chrome-silver))' }}>
                         ({(file.size / 1024 / 1024).toFixed(1)} MB)
                       </span>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div className="swim-file-actions">
                       <button
                         onClick={() => downloadFile(file.path, file.name)}
+                        className="swim-button swim-button--secondary"
                         style={{
-                          padding: '4px 8px',
-                          backgroundColor: '#0ea5e9',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px'
+                          padding: 'calc(var(--grid-unit) / 2) var(--grid-unit)',
+                          fontSize: '12px',
+                          minWidth: 'auto'
                         }}
                         data-testid={`button-download-${index}`}
                       >
-                        <Download className="w-3 h-3" />
+                        <Download size={14} />
                       </button>
                       <button
                         onClick={() => removeFile(index)}
+                        className="swim-button swim-button--ghost"
                         style={{
-                          padding: '4px 8px',
-                          backgroundColor: '#dc2626',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px'
+                          padding: 'calc(var(--grid-unit) / 2) var(--grid-unit)',
+                          fontSize: '12px',
+                          color: '#dc2626',
+                          minWidth: 'auto'
                         }}
                         data-testid={`button-remove-${index}`}
                       >
@@ -805,76 +792,46 @@ export default function SwimMeetFixed() {
             <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>
               {mode === 'work' ? 'Collaborative Results' : 'AI Responses'}
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               {responses.map(response => (
-                <div key={response.id} style={{
-                  padding: '15px',
-                  backgroundColor: '#f9fafb',
-                  borderRadius: '6px',
-                  border: '1px solid #e5e7eb'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '10px'
-                  }}>
-                    <div style={{ fontWeight: 'bold', color: '#374151' }}>
+                <div key={response.id} className="swim-response-card">
+                  <div className="swim-response-header">
+                    <div className="swim-subtitle" style={{ margin: 0 }}>
                       {response.aiProvider.toUpperCase()}
                       {mode === 'work' && responses.indexOf(response) >= 0 && (
-                        <span style={{ 
-                          marginLeft: '8px', 
-                          fontSize: '12px', 
-                          color: '#f59e0b',
-                          fontWeight: 'normal'
+                        <span className="swim-caption" style={{ 
+                          marginLeft: 'calc(var(--grid-unit) / 2)', 
+                          color: 'hsl(var(--work-primary))'
                         }}>
                           (Step {responses.indexOf(response) + 1})
                         </span>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <div style={{
-                        padding: '4px 8px',
-                        backgroundColor: response.status === 'complete' ? '#dcfce7' : '#fef3c7',
-                        color: response.status === 'complete' ? '#16a34a' : '#eab308',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
+                    <div className="swim-response-actions">
+                      <div className={`swim-status swim-status--${response.status === 'complete' ? 'connected' : 'setup-required'}`}>
                         {response.status.toUpperCase()}
                       </div>
                       {response.status === 'complete' && (
                         <button
                           onClick={() => downloadFile(`data:text/plain;charset=utf-8,${encodeURIComponent(response.content)}`, `${response.aiProvider}-response.txt`)}
+                          className="swim-button swim-button--secondary"
                           style={{
-                            padding: '4px 8px',
-                            backgroundColor: '#0ea5e9',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px'
+                            padding: 'calc(var(--grid-unit) / 2) var(--grid-unit)',
+                            fontSize: '12px',
+                            minWidth: 'auto'
                           }}
                           data-testid={`button-download-response-${response.id}`}
                         >
-                          <Download className="w-3 h-3" />
+                          <Download size={14} />
                         </button>
                       )}
                     </div>
                   </div>
-                  <div style={{
-                    color: '#374151',
-                    lineHeight: '1.6',
-                    whiteSpace: 'pre-wrap'
-                  }}>
+                  <div className="swim-response-content">
                     {response.content}
                   </div>
                   {response.responseTime && (
-                    <div style={{
-                      marginTop: '10px',
-                      fontSize: '12px',
-                      color: '#6b7280'
-                    }}>
+                    <div className="swim-response-time">
                       Response time: {(response.responseTime / 1000).toFixed(1)}s
                     </div>
                   )}
