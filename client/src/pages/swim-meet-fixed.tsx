@@ -408,7 +408,7 @@ export default function SwimMeetFixed() {
             </button>
             
             {/* Admin Panel - Only for David Towne */}
-            {user?.username === 'dtowne' && (
+            {user?.username === 'davidtowne' && (
               <button
                 className="swim-button swim-button--secondary"
                 onClick={() => setShowAdminPanel(!showAdminPanel)}
@@ -928,7 +928,7 @@ export default function SwimMeetFixed() {
         {/* File Upload - Only show when settings are visible */}
         {showSettings && (
           <StandardFileUpload
-            onFilesUploaded={handleFilesSelected}
+            onFilesSelected={handleFilesSelected}
           />
         )}
 
@@ -940,7 +940,7 @@ export default function SwimMeetFixed() {
         )}
 
         {/* Admin Panel - User Whitelist Management */}
-        {showAdminPanel && user?.username === 'dtowne' && (
+        {showAdminPanel && user?.username === 'davidtowne' && (
           <section className="glass-panel-large swim-section">
             <h3 className="panel-heading" style={{ color: '#ffd700' }}>
               🛡️ Admin Panel - User Whitelist Management
@@ -951,7 +951,7 @@ export default function SwimMeetFixed() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'calc(var(--grid-unit) / 2)' }}>
                 {[
-                  'David Towne (dtowne)',
+                  'David Towne (davidtowne)',
                   'John Barreto (jbarreto)',
                   'Mekel Miller (mmiller)',
                   'Patricia Sampier (psampier)',
