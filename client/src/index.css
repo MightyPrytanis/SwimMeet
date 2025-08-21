@@ -5,13 +5,13 @@
 @tailwind utilities;
 
 :root {
-  --steel-gunmetal: #3a4451;
-  --steel-charcoal: #2a3441;
+  --steel-gunmetal: #334455;
+  --steel-charcoal: #202832;
   --glass-green: #238472;
   --pool-blue: #87CEEB;
   --water-blue: #4A8B8B;
-  --deep-blue: #1B4B73;
-  --lane-white: #F8FAFB;
+  --deep-blue: #003366;
+  --lane-white: #FFFFFF;
 }
 
 /* Swimming theme animations */
