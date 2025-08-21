@@ -276,9 +276,7 @@ body {
 
 /* === STEP 6: ACCENT PHOTOPLATE PANEL === */
 .photoplate-accent {
-  background: 
-    linear-gradient(rgba(29, 78, 216, 0.4), rgba(147, 197, 253, 0.2)),
-    url('@assets/cd52183cebee63b8e5fc96043a956598_1755302637147.jpg');
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.6), rgba(147, 197, 253, 0.3));
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -296,21 +294,15 @@ body {
 }
 
 .photoplate-accent.variant-2 {
-  background: 
-    linear-gradient(rgba(37, 99, 235, 0.4), rgba(147, 197, 253, 0.2)),
-    url('@assets/This-print-by-Robert-Bailey-is-called-Freestylers-212x300_1755302698327.png');
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.6), rgba(147, 197, 253, 0.3));
 }
 
 .photoplate-accent.variant-3 {
-  background: 
-    linear-gradient(rgba(59, 130, 246, 0.4), rgba(219, 234, 254, 0.2)),
-    url('@assets/swimming-relay-sticker_1755302715466.jpg');
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(219, 234, 254, 0.3));
 }
 
 .photoplate-accent.variant-4 {
-  background: 
-    linear-gradient(rgba(29, 78, 216, 0.4), rgba(147, 197, 253, 0.2)),
-    url('@assets/uwYo56vY_1755302724761.png');
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.6), rgba(147, 197, 253, 0.3));
 }
 
 .photoplate-accent::before {
