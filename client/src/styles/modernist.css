@@ -299,7 +299,7 @@ body {
 .photoplate-accent {
   background: 
     linear-gradient(rgba(0, 51, 102, 0.7), rgba(0, 51, 102, 0.7)),
-    url('@assets/image_1755777377873.png');
+    url('@assets/cd52183cebee63b8e5fc96043a956598_1755302637147.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -314,6 +314,24 @@ body {
   transform: scale(1.02);
   position: relative;
   overflow: hidden;
+}
+
+.photoplate-accent.variant-2 {
+  background: 
+    linear-gradient(rgba(0, 51, 102, 0.6), rgba(0, 51, 102, 0.6)),
+    url('@assets/This-print-by-Robert-Bailey-is-called-Freestylers-212x300_1755302698327.png');
+}
+
+.photoplate-accent.variant-3 {
+  background: 
+    linear-gradient(rgba(0, 51, 102, 0.65), rgba(0, 51, 102, 0.65)),
+    url('@assets/swimming-relay-sticker_1755302715466.jpg');
+}
+
+.photoplate-accent.variant-4 {
+  background: 
+    linear-gradient(rgba(0, 51, 102, 0.7), rgba(0, 51, 102, 0.7)),
+    url('@assets/uwYo56vY_1755302724761.png');
 }
 
 .photoplate-accent::before {

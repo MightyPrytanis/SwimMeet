@@ -577,28 +577,46 @@ export default function SwimMeetFixed() {
       <section className="swim-section">
         <h3 className="panel-heading">Select AI Providers</h3>
         <div className="provider-grid">
-          {providers.map(provider => (
-            <div
-              key={provider.id}
-              className={`provider-panel ${selectedAIs.includes(provider.id) ? 'photoplate-accent' : ''}`}
-              onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
-              style={{
-                cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
-                opacity: provider.status === 'error' ? 0.5 : 1
-              }}
-              data-testid={`provider-${provider.id}`}
-            >
-              <div className="swim-provider-header">
-                <div>
-                  <div className="swim-provider-name">{provider.name}</div>
-                  <div className="swim-provider-company">{provider.company}</div>
-                </div>
-                <div className={`swim-status swim-status--${provider.status}`}>
-                  {provider.status.replace('_', ' ')}
+          {providers.map((provider, index) => {
+            // Random panel type distribution
+            const panelTypes = ['glass-panel-large', 'provider-panel', 'photoplate-accent'];
+            const randomPanelType = panelTypes[index % panelTypes.length];
+            
+            // Random photoplate variant for selected providers
+            const photoplateVariants = ['', 'variant-2', 'variant-3', 'variant-4'];
+            const randomVariant = photoplateVariants[index % photoplateVariants.length];
+            
+            const isSelected = selectedAIs.includes(provider.id);
+            let panelClass = randomPanelType;
+            
+            // Selected providers get photoplate treatment
+            if (isSelected) {
+              panelClass = `photoplate-accent ${randomVariant}`;
+            }
+            
+            return (
+              <div
+                key={provider.id}
+                className={panelClass}
+                onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
+                style={{
+                  cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
+                  opacity: provider.status === 'error' ? 0.5 : 1
+                }}
+                data-testid={`provider-${provider.id}`}
+              >
+                <div className="swim-provider-header">
+                  <div>
+                    <div className="swim-provider-name">{provider.name}</div>
+                    <div className="swim-provider-company">{provider.company}</div>
+                  </div>
+                  <div className={`swim-status swim-status--${provider.status}`}>
+                    {provider.status.replace('_', ' ')}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
