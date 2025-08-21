@@ -5,15 +5,17 @@
 @tailwind utilities;
 
 :root {
-  --steel-gunmetal: #5A6F7F;
-  --steel-charcoal: #334455;
-  --glass-green: #238472;
-  --pool-blue: #00BFFF;
-  --water-blue: #1E90FF;
-  --deep-blue: #0066CC;
+  --steel-gunmetal: #708090;
+  --steel-charcoal: #4A5568;
+  --glass-green: #00D4AA;
+  --pool-blue: #00CCFF;
+  --water-blue: #0099FF;
+  --deep-blue: #0066FF;
   --lane-white: #FFFFFF;
-  --bright-cyan: #00E6FF;
-  --crystal-blue: #B0E0E6;
+  --bright-cyan: #00FFFF;
+  --crystal-blue: #E0F6FF;
+  --pristine-aqua: #00F0FF;
+  --clear-blue: #33AAFF;
 }
 
 /* Swimming theme animations */
