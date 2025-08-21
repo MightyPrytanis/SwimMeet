@@ -358,15 +358,21 @@ export default function SwimMeetFixed() {
       <header className="swim-panel swim-panel--elevated swim-section">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
-            <img 
-              src="/attached_assets/Screenshot 2025-08-21 at 9.08.49 AM_1755789687482.png"
-              alt="Swim Meet Logo"
-              style={{
-                height: '60px',
-                width: 'auto',
-                objectFit: 'contain'
-              }}
-            />
+            <div style={{
+              height: '60px',
+              width: '200px',
+              background: 'linear-gradient(135deg, #007BFF 0%, #0056D6 100%)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '24px',
+              letterSpacing: '2px'
+            }}>
+              SWIM MEET
+            </div>
             <div>
               <h1 className="swim-brand swim-title" style={{ margin: '0', fontSize: '2rem' }}>
                 SWIM MEET
