@@ -176,14 +176,17 @@ body {
 /* UNIFORM PANEL PADDING SYSTEM */
 .swim-panel {
   padding: calc(var(--grid-unit) * 2);
+  margin: 0; /* Zero exterior spacing */
 }
 
 .swim-panel--compact {
   padding: var(--grid-unit);
+  margin: 0; /* Zero exterior spacing */
 }
 
 .swim-panel--spacious {
   padding: calc(var(--grid-unit) * 3);
+  margin: 0; /* Zero exterior spacing */
 }
 
 /* Dark mode panel adaptations */
@@ -206,7 +209,19 @@ body {
 .swim-grid {
   display: grid;
   gap: var(--panel-gap);
-  padding: var(--page-margin);
+  padding: 0; /* Zero exterior spacing */
+}
+
+/* === STEP 2: GLASS PANEL COMPONENT === */
+.glass-panel-large {
+  background: linear-gradient(135deg, 
+    hsla(var(--lane-white), 0.08) 0%, 
+    hsla(var(--water-blue), 0.05) 100%);
+  border: 1px solid hsl(var(--steel-gunmetal));
+  /* NO border-radius - sharp corners only */
+  box-shadow: inset 0 1px 2px hsla(248, 248, 251, 0.15);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 .swim-grid--main {
@@ -226,11 +241,11 @@ body {
 }
 
 .swim-section {
-  margin-bottom: var(--section-gap);
+  margin-bottom: 0; /* Zero exterior spacing */
 }
 
 .swim-section--compact {
-  margin-bottom: var(--panel-gap);
+  margin-bottom: 0; /* Zero exterior spacing */
 }
 
 /* === MODERNIST TYPOGRAPHY === */
