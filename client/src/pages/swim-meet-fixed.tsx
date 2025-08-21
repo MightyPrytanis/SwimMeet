@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
+import { CloudStorageSettings } from "@/components/CloudStorageSettings";
 import { Download, FileText, Upload, Play, GitBranch, Users } from "lucide-react";
 
 // Types
@@ -60,6 +61,7 @@ export default function SwimMeetFixed() {
   const [responses, setResponses] = useState<AIResponse[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showStats, setShowStats] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
@@ -367,6 +369,22 @@ export default function SwimMeetFixed() {
             >
               {showStats ? 'Hide Stats' : 'Show Stats'}
             </button>
+            
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: showSettings ? '#0c4a6e' : 'white',
+                color: showSettings ? 'white' : '#0c4a6e',
+                border: '2px solid #0c4a6e',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 'bold'
+              }}
+            >
+              {showSettings ? 'Hide Settings' : 'Cloud Settings'}
+            </button>
             <button
               onClick={handleLogout}
               style={{
@@ -423,6 +441,19 @@ export default function SwimMeetFixed() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Cloud Storage Settings Panel */}
+        {showSettings && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '15px',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <CloudStorageSettings authToken={authToken} />
           </div>
         )}
 
