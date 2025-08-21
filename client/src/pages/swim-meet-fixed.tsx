@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
-import { ObjectUploader } from "@/components/ObjectUploader";
+import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { Download, FileText, Upload, Play, GitBranch, Users } from "lucide-react";
 
 // Types
@@ -498,16 +498,34 @@ export default function SwimMeetFixed() {
           </div>
           
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
-            <ObjectUploader
-              maxNumberOfFiles={5}
-              maxFileSize={50485760}
-              onGetUploadParameters={handleFileUpload}
-              onComplete={handleFileComplete}
-              buttonClassName="flex items-center gap-2"
+            <input
+              type="file"
+              multiple
+              accept="*/*"
+              onChange={handleFileSelect}
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              data-testid="input-file-upload"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                backgroundColor: '#0ea5e9',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+              data-testid="button-upload-files"
             >
               <Upload className="w-4 h-4" />
               Upload Files
-            </ObjectUploader>
+            </button>
             <span style={{ fontSize: '12px', color: '#6b7280' }}>
               Max 5 files, 50MB each
             </span>

@@ -7,8 +7,8 @@ import { credentialsSchema, insertConversationSchema, insertResponseSchema, inse
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
-import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { ObjectPermission } from "./objectAcl";
+import { fileStorage } from "./fileStorage";
+import multer from 'multer';
 
 // Extend session interface
 declare module 'express-session' {
@@ -696,58 +696,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // File upload endpoints
-  app.post("/api/objects/upload", authenticateToken, async (req: any, res) => {
+  // Standard file upload using multer - 100% portable
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { 
+      fileSize: 50 * 1024 * 1024 // 50MB limit
+    }
+  });
+
+  app.post("/api/files/upload", authenticateToken, upload.array('files', 5), async (req: any, res) => {
     try {
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL });
+      const userId = req.user.userId;
+      const files = req.files as Express.Multer.File[];
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: 'No files uploaded' });
+      }
+
+      const uploadedFiles = [];
+      
+      for (const file of files) {
+        const savedFile = await fileStorage.saveFile(file.buffer, file.originalname);
+        
+        // Store file metadata in database
+        const fileRecord = await storage.createFileAttachment({
+          id: randomUUID(),
+          userId: userId,
+          originalName: file.originalname,
+          filePath: savedFile.path,
+          fileSize: savedFile.size,
+          mimeType: file.mimetype
+        });
+        
+        uploadedFiles.push({
+          id: fileRecord.id,
+          name: file.originalname,
+          size: savedFile.size,
+          path: `/api/files/download/${fileRecord.id}`
+        });
+      }
+      
+      res.json({ files: uploadedFiles });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.put("/api/objects/attach", authenticateToken, async (req: any, res) => {
+  // Download files
+  app.get("/api/files/download/:fileId", authenticateToken, async (req: any, res) => {
     try {
-      const { fileURL, fileName } = req.body;
+      const { fileId } = req.params;
       const userId = req.user.userId;
       
-      const objectStorageService = new ObjectStorageService();
-      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-        fileURL,
-        {
-          owner: userId,
-          visibility: "private"
-        }
-      );
+      const fileRecord = await storage.getFileAttachment(fileId);
+      if (!fileRecord || fileRecord.userId !== userId) {
+        return res.status(404).json({ message: 'File not found' });
+      }
       
-      res.json({ objectPath, fileName });
+      const fileBuffer = await fileStorage.getFile(fileRecord.filePath);
+      
+      res.set({
+        'Content-Type': fileRecord.mimeType || 'application/octet-stream',
+        'Content-Length': fileRecord.fileSize.toString(),
+        'Content-Disposition': `attachment; filename="${fileRecord.originalName}"`
+      });
+      
+      res.send(fileBuffer);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Serve private objects
-  app.get("/objects/:objectPath(*)", authenticateToken, async (req: any, res) => {
-    const userId = req.user?.userId;
-    const objectStorageService = new ObjectStorageService();
-    try {
-      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
-      const canAccess = await objectStorageService.canAccessObjectEntity({
-        objectFile,
-        userId: userId,
-        requestedPermission: ObjectPermission.READ,
-      });
-      if (!canAccess) {
-        return res.sendStatus(401);
-      }
-      objectStorageService.downloadObject(objectFile, res);
-    } catch (error) {
-      console.error("Error checking object access:", error);
-      if (error instanceof ObjectNotFoundError) {
-        return res.sendStatus(404);
-      }
-      return res.sendStatus(500);
     }
   });
 

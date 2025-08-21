@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Conversation, type InsertConversation, type Response, type InsertResponse, type Credentials } from "@shared/schema";
+import { type User, type InsertUser, type Conversation, type InsertConversation, type Response, type InsertResponse, type Credentials, type FileAttachment, type InsertFileAttachment } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -21,17 +21,25 @@ export interface IStorage {
   updateResponseContent(id: string, content: string, status: string): Promise<void>;
   updateResponse(id: string, data: Partial<Response>): Promise<Response>;
   updateResponseMetadata(id: string, metadata: Record<string, any>): Promise<Response>;
+  
+  // File attachment methods
+  createFileAttachment(attachment: InsertFileAttachment): Promise<FileAttachment>;
+  getFileAttachment(fileId: string): Promise<FileAttachment | undefined>;
+  getUserFileAttachments(userId: string): Promise<FileAttachment[]>;
+  deleteFileAttachment(fileId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private conversations: Map<string, Conversation>;
   private responses: Map<string, Response>;
+  private fileAttachments: Map<string, FileAttachment>;
 
   constructor() {
     this.users = new Map();
     this.conversations = new Map();
     this.responses = new Map();
+    this.fileAttachments = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -216,6 +224,30 @@ export class MemStorage implements IStorage {
     });
 
     return stats;
+  }
+
+  // File attachment methods for standard file storage
+  async createFileAttachment(attachment: InsertFileAttachment): Promise<FileAttachment> {
+    const fileAttachment: FileAttachment = {
+      ...attachment,
+      createdAt: new Date()
+    };
+    this.fileAttachments.set(attachment.id, fileAttachment);
+    return fileAttachment;
+  }
+
+  async getFileAttachment(fileId: string): Promise<FileAttachment | undefined> {
+    return this.fileAttachments.get(fileId);
+  }
+
+  async getUserFileAttachments(userId: string): Promise<FileAttachment[]> {
+    return Array.from(this.fileAttachments.values())
+      .filter(file => file.userId === userId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async deleteFileAttachment(fileId: string): Promise<void> {
+    this.fileAttachments.delete(fileId);
   }
 }
 
