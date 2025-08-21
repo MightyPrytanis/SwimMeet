@@ -1,0 +1,232 @@
+# SwimMeet: Precision Glass & Steel Interface Specification
+
+## CORE VISUAL METAPHOR: NATATORIUM ARCHITECTURE
+
+Think Microsoft Metro/Modern Design Language, but instead of colorful ceramic tiles, you're building with:
+
+### Material Palette
+**Precision Tempered Glass Panels**:
+- Aquarium-grade transparency with subtle blue-green tints
+- Clean, sharp edges that fit together with zero gaps
+- Frosted/etched sections for privacy where needed
+
+**Structural Steel Framework**:
+- Gunmetal gray (#3a4451) for primary structure
+- Charcoal steel (#2a3441) for secondary supports
+- Precise geometric joints and connections
+
+**Vivid Photoplates** (Strategic Accents):
+- Pool wall bright light blue (#87CEEB)
+- Water blues and aquamarines (#4A8B8B, #1B4B73)
+- Lane marker white stripes (#F8FAFB)
+- These are photographic inserts, not decorative elements
+
+## LAYOUT ARCHITECTURE: INTRICATELY FITTED PUZZLE
+
+### Tetris/Aztec Tile System
+```
+┌─────────────┬──────┬─────────────────┐
+│  DIVE       │ STATS│  USER CONTROLS  │
+│  (Large     │ TILE │  (Photo accent) │
+│   Glass)    │      │                 │
+├─────────────┼──────┼─────────────────┤
+│  TURN       │ TURN │  WORK           │
+│  (Steel)    │ ICON │  (Glass/Steel)  │
+├─────────────┴──────┴─────────────────┤
+│  AI PROVIDER SELECTION GRID          │
+│  (Precision-fitted glass panels)     │
+└───────────────────────────────────────┘
+```
+
+**Key Principles**:
+- Different sized rectangles and squares
+- NO GAPS between panels (precision fitting)
+- NO ROUNDED CORNERS (sharp glass edges)
+- Panels lock together like engineered components
+
+### Panel Types & Materials
+
+**Large Primary Panels** (DIVE/TURN/WORK):
+```css
+.primary-panel {
+  background: rgba(248, 250, 251, 0.05); /* Tempered glass tint */
+  border: 1px solid #3a4451; /* Steel framework */
+  backdrop-filter: blur(1px); /* Glass effect */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1); /* Glass edge highlight */
+}
+```
+
+**Secondary Panels** (AI Provider Cards):
+```css
+.provider-panel {
+  background: rgba(74, 139, 139, 0.08); /* Aqua-tinted glass */
+  border: 1px solid #2a3441; /* Charcoal steel frame */
+  /* NO border-radius - sharp glass edges */
+}
+```
+
+**Accent Photoplates** (Status indicators, highlights):
+```css
+.photoplate-accent {
+  background-image: url('pool-wall-texture.jpg'); /* Actual pool photography */
+  border: 2px solid #3a4451; /* Steel mounting */
+  /* Used sparingly for visual anchors */
+}
+```
+
+## SPECIFIC IMPLEMENTATION INSTRUCTIONS
+
+### 1. Grid System = Steel Framework
+- 8px base grid (like steel beam spacing)
+- All panels must align to grid intersections
+- Panel edges meet at grid lines with steel borders
+
+### 2. Glass Panel Specifications
+```css
+/* Primary Glass Panels */
+.glass-panel-large {
+  background: linear-gradient(
+    135deg, 
+    rgba(248, 250, 251, 0.03) 0%,
+    rgba(74, 139, 139, 0.05) 100%
+  );
+  border: 1px solid #3a4451;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 2px 8px rgba(27, 75, 115, 0.05);
+  /* CRITICAL: NO border-radius */
+}
+
+/* Secondary Glass Panels */
+.glass-panel-medium {
+  background: rgba(74, 139, 139, 0.04);
+  border: 1px solid #2a3441;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+```
+
+### 3. Steel Framework Elements
+```css
+/* Main structural elements */
+.steel-frame {
+  background: #3a4451;
+  border: none; /* Steel doesn't need borders */
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Secondary support structure */
+.steel-support {
+  background: #2a3441;
+  border-left: 1px solid #3a4451; /* Beam joints */
+}
+```
+
+### 4. Photoplate Integration (Use Sparingly)
+```css
+/* Vivid photo accent panels */
+.photoplate {
+  background-image: url('underwater-lane-lines.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #3a4451; /* Steel mounting frame */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Mounted depth */
+}
+
+/* Only use for: Status indicators, mode highlights, key visual anchors */
+```
+
+## LAYOUT EXAMPLES
+
+### Workflow Mode Selection (Tetris-style)
+```
+┌─────────────────────┬───────────┬─────────────┐
+│     DIVE            │   Stats   │   Cloud     │
+│  (Aqua glass)       │ (Steel)   │ (Glass)     │  
+│  Multiple AIs       │  📊       │  ☁️         │
+│  respond together   │           │             │
+├─────────────────────┼───────────┴─────────────┤
+│     TURN            │        WORK             │
+│  (Steel frame)      │    (Glass/steel)        │
+│  AI fact-checking   │  Multi-step solving     │
+└─────────────────────┴─────────────────────────┘
+```
+
+### AI Provider Grid (Precision-fitted panels)
+```
+┌─────────────┬─────────────┬─────────────┐
+│  ChatGPT-4  │  Claude 4   │  Gemini Pro │
+│  (Glass)    │  (Glass)    │  (Glass)    │
+│  ✅ Ready   │  ✅ Ready   │  ✅ Ready   │
+├─────────────┼─────────────┼─────────────┤
+│  Perplexity │  DeepSeek   │    Grok     │
+│  (Glass)    │  (Glass)    │  (Glass)    │
+│  ✅ Ready   │  ⚠️ Setup   │  ⚠️ Setup   │
+└─────────────┴─────────────┴─────────────┘
+```
+
+## AQUATIC PHOTOPLATE USAGE GUIDELINES
+
+### Where to Use Photoplates (Sparingly):
+- **Active mode indicator**: Current workflow mode gets photoplate highlight
+- **Critical status**: Emergency alerts or important system states
+- **Success indicators**: Completed tasks or achievements
+- **User profile area**: Personal identification zone
+
+### Photoplate Content Sources:
+- Underwater lane line photography (geometric precision)
+- Pool wall textures (clean, institutional blue)
+- Water surface patterns (subtle movement, no distraction)
+- Starting block details (competition/precision theme)
+
+### Where NOT to Use Photoplates:
+- Background wallpapers (distracting)
+- Regular status indicators (too heavy)
+- Text input areas (readability issues)
+- Navigation elements (functionality first)
+
+## RESPONSIVE TETRIS BEHAVIOR
+
+### Desktop Layout:
+Large interlocking panels with complex geometric arrangements
+
+### Tablet Layout:
+Simplified panel arrangements, maintain steel/glass metaphor
+
+### Mobile Layout:
+Single-column panels, but keep material consistency
+
+```css
+/* Example responsive panel sizing */
+@media (min-width: 1024px) {
+  .dive-panel { grid-area: 1 / 1 / 3 / 4; } /* Large rectangle */
+  .stats-panel { grid-area: 1 / 4 / 2 / 5; } /* Small square */
+  .turn-panel { grid-area: 3 / 1 / 4 / 3; } /* Medium rectangle */
+}
+
+@media (max-width: 768px) {
+  .panel { width: 100%; margin-bottom: 8px; } /* Stack, maintain materials */
+}
+```
+
+## CRITICAL SUCCESS CRITERIA
+
+✅ **NO ROUNDED CORNERS** - Glass has sharp, precise edges
+✅ **Panels fit together perfectly** - Zero gaps, precise alignment
+✅ **Steel framework visible** - Border structure shows engineering
+✅ **Glass transparency effects** - Subtle layering and depth
+✅ **Photoplates used strategically** - Vivid accents, not overwhelming
+✅ **Tetris/Aztec arrangement** - Complex geometric fitting
+✅ **Professional natatorium feel** - Olympic facility precision
+
+## ANTI-PATTERNS TO AVOID
+
+❌ **Any rounded corners** - This breaks the glass metaphor entirely
+❌ **Gaps between panels** - Components must fit precisely
+❌ **Overuse of photoplates** - They're accents, not primary surfaces
+❌ **Soft gradients** - Use sharp material transitions
+❌ **Consumer app aesthetics** - This is precision engineering
+❌ **Decorative elements** - Structure creates all visual interest
+
+The result should feel like you're looking through the glass walls of an Olympic aquatic center - precision-engineered, professionally designed, with the clean geometry of competition-grade facilities.
