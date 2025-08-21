@@ -359,7 +359,7 @@ export default function SwimMeetFixed() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
             <img 
-              src="attached_assets/Screenshot 2025-08-21 at 9.08.49 AM_1755789687482.png"
+              src="/attached_assets/Screenshot 2025-08-21 at 9.08.49 AM_1755789687482.png"
               alt="Swim Meet Logo"
               style={{
                 height: '60px',
@@ -568,57 +568,60 @@ export default function SwimMeetFixed() {
           
           <div className="provider-grid">
             {providers.map((provider, index) => {
-            // Random panel type distribution
-            const panelTypes = ['glass-panel-large', 'provider-panel', 'photoplate-accent'];
-            const randomPanelType = panelTypes[index % panelTypes.length];
-            
-            // Random photoplate variant for selected providers
-            const photoplateVariants = ['', 'variant-2', 'variant-3', 'variant-4'];
-            const randomVariant = photoplateVariants[index % photoplateVariants.length];
-            
             const isSelected = selectedAIs.includes(provider.id);
-            let panelClass = randomPanelType;
-            
-            // Only apply special styling to actually selected providers
-            // Remove any persistent highlighting that's not tied to selection state
             
             return (
               <div
                 key={provider.id}
-                className={`${panelClass} ${isSelected ? 'provider-selected' : ''} hover-tooltip-trigger`}
+                className={`consistent-provider-card ${isSelected ? 'provider-selected' : ''}`}
                 onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
                 style={{
                   cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
                   opacity: provider.status === 'error' ? 0.5 : 1,
                   position: 'relative',
-                  transition: 'all 0.3s ease',
-                  border: isSelected ? '3px solid #007BFF' : '2px solid transparent',
-                  transform: isSelected ? 'scale(1.05)' : 'scale(1)'
+                  margin: '8px', // Add margin to prevent overlap
+                  padding: '16px',
+                  background: isSelected ? 'linear-gradient(135deg, #007BFF15 0%, #0056D615 100%)' : '#f8f9fa',
+                  border: isSelected ? '2px solid #007BFF' : '1px solid #e9ecef',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  boxShadow: isSelected ? '0 4px 12px rgba(0, 123, 255, 0.2)' : '0 2px 4px rgba(0,0,0,0.1)',
+                  transform: isSelected ? 'translateY(-2px)' : 'translateY(0)'
                 }}
                 data-testid={`provider-${provider.id}`}
                 title={`Click to ${isSelected ? 'deselect' : 'select'} ${provider.name}. Status: ${provider.status.replace('_', ' ')}`}
               >
-                <div className="swim-provider-header">
-                  <div>
-                    <div className="swim-provider-name">{provider.name}</div>
-                    <div className="swim-provider-company">{provider.company}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937' }}>
+                    {provider.name}
+                    {isSelected && <span style={{ marginLeft: '8px', color: '#007BFF', fontSize: '16px' }}>✓</span>}
                   </div>
-                  <div className={`swim-status swim-status--${provider.status}`}>
+                  <div 
+                    className={`swim-status swim-status--${provider.status}`}
+                    style={{ 
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      textTransform: 'uppercase'
+                    }}
+                  >
                     {provider.status.replace('_', ' ')}
-                    {isSelected && <span style={{ marginLeft: '8px', color: '#007BFF' }}>✓</span>}
                   </div>
                 </div>
                 
-                {/* Hover tooltip */}
-                <div className="hover-tooltip">
-                  <div className="tooltip-content">
-                    <strong>{provider.name}</strong><br/>
-                    Company: {provider.company}<br/>
-                    Status: {provider.status.replace('_', ' ')}<br/>
-                    {mode === 'dive' && 'Simultaneous competition mode'}
-                    {mode === 'turn' && 'Sequential verification mode'}
-                    {mode === 'work' && 'Collaborative workflow mode'}
-                  </div>
+                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '4px' }}>
+                  Company: {provider.company}
+                </div>
+                
+                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
+                  Status: {provider.status.replace('_', ' ')}
+                </div>
+                
+                <div style={{ fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>
+                  {mode === 'dive' && 'Simultaneous competition mode'}
+                  {mode === 'turn' && 'Sequential verification mode'}
+                  {mode === 'work' && 'Collaborative workflow mode'}
                 </div>
               </div>
             );

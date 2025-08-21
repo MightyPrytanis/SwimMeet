@@ -1012,23 +1012,22 @@ body {
 
 /* === ENHANCED INTERACTIVE ELEMENTS === */
 
-/* Provider Selection Enhancement */
-.provider-selected {
-  position: relative;
+/* Consistent Provider Cards */
+.consistent-provider-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.provider-selected::after {
-  content: '✓ SELECTED';
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #007BFF;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: bold;
-  z-index: 10;
+.consistent-provider-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
+}
+
+.provider-selected:hover {
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3) !important;
 }
 
 /* Hover Tooltip System */
