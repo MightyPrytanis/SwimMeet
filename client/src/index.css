@@ -5,17 +5,19 @@
 @tailwind utilities;
 
 :root {
-  --steel-gunmetal: #708090;
-  --steel-charcoal: #4A5568;
-  --glass-green: #00D4AA;
-  --pool-blue: #007BFF;
-  --water-blue: #0056D6;
-  --deep-blue: #003CB8;
+  --steel-gunmetal: #8A9BA8;
+  --steel-charcoal: #6B7280;
+  --glass-green: #10B981;
+  --pool-blue: #3B82F6;
+  --water-blue: #2563EB;
+  --deep-blue: #1D4ED8;
   --lane-white: #FFFFFF;
-  --bright-blue: #0080FF;
-  --crystal-blue: #F0F8FF;
-  --pristine-blue: #4A90E2;
-  --clear-blue: #6BB6FF;
+  --bright-blue: #60A5FA;
+  --crystal-blue: #F8FAFC;
+  --pristine-blue: #DBEAFE;
+  --clear-blue: #93C5FD;
+  --ice-white: #FEFEFE;
+  --crystal-clear: #F1F5F9;
 }
 
 /* Swimming theme animations */
