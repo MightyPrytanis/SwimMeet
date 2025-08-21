@@ -408,7 +408,7 @@ export default function SwimMeetFixed() {
                   border: '1px solid hsl(var(--steel-gunmetal) / 0.2)',
                   borderRadius: 'var(--border-radius)',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  zIndex: 1000,
+                  zIndex: 9999,
                   minWidth: '200px',
                   overflow: 'hidden'
                 }}>

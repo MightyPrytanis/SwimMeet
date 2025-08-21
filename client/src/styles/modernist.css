@@ -1176,3 +1176,21 @@ body {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
 }
+
+/* Fix menu dropdown z-index layering */
+[data-menu-dropdown] {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+/* Ensure tabs don't interfere with dropdown */
+.swim-mode-selector {
+  z-index: 1;
+  position: relative;
+}
+
+/* Ensure header container allows dropdown to show */
+.swim-panel--elevated {
+  z-index: 2;
+  position: relative;
+}
