@@ -224,6 +224,16 @@ body {
   -webkit-backdrop-filter: blur(1px);
 }
 
+/* === STEP 3: STEEL FRAMEWORK ELEMENT === */
+.steel-frame-divider {
+  background: hsl(var(--steel-gunmetal));
+  /* No border or outline */
+  /* No border-radius */
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+  height: 100%;
+  width: 8px;
+}
+
 .swim-grid--main {
   grid-template-columns: 1fr;
   max-width: 1200px;
