@@ -234,6 +234,33 @@ body {
   width: 8px;
 }
 
+/* === STEP 4: PROVIDER GRID LAYOUT (MOSAIC STRUCTURE) === */
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  /* No gaps, padding, or margin between panels */
+  gap: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.provider-panel {
+  /* All corners perfectly square */
+  /* No border-radius */
+  /* Flush fit - no gaps, padding, or margin */
+  margin: 0;
+  padding: 0;
+}
+
+/* Responsive: collapse to 1 column on screens under 700px */
+@media (max-width: 699px) {
+  .provider-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+}
+
 .swim-grid--main {
   grid-template-columns: 1fr;
   max-width: 1200px;
