@@ -4,7 +4,8 @@ import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
-import { Download, FileText, Upload, Play, GitBranch, Users } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings } from "lucide-react";
+import "../styles/modernist.css";
 
 // Types
 interface AIProvider {
@@ -65,6 +66,16 @@ export default function SwimMeetFixed() {
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
+
+  // Helper function for mode icons
+  const getModeIcon = () => {
+    switch (mode) {
+      case 'dive': return <Play size={20} />;
+      case 'turn': return <GitBranch size={20} />;
+      case 'work': return <Users size={20} />;
+      default: return <Play size={20} />;
+    }
+  };
 
   // File upload handler
   const handleFilesSelected = async (files: FileList) => {
@@ -272,14 +283,6 @@ export default function SwimMeetFixed() {
     link.click();
   };
 
-  const getModeIcon = () => {
-    switch (mode) {
-      case 'dive': return <Play className="w-5 h-5" />;
-      case 'turn': return <GitBranch className="w-5 h-5" />;
-      case 'work': return <Users className="w-5 h-5" />;
-    }
-  };
-
   const getModeColor = () => {
     switch (mode) {
       case 'dive': return '#0ea5e9'; // Sky blue
@@ -323,250 +326,166 @@ export default function SwimMeetFixed() {
   }
 
   if (!authToken || !user) {
-    return <AuthForm onAuth={handleAuth} />;
+    return (
+      <div className="swim-grid swim-grid--main" style={{ minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="swim-panel swim-panel--elevated" style={{ padding: 'calc(var(--grid-unit) * 4)', maxWidth: '400px', margin: '0 auto' }}>
+          <AuthForm onAuth={handleAuth} />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{
-      padding: '20px',
-      backgroundColor: '#f8fafc',
-      minHeight: '100vh'
-    }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-          padding: '20px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <h1 style={{
-            fontSize: '28px',
-            fontWeight: 'bold',
-            color: '#0c4a6e',
-            margin: 0
-          }}>
-            SWIM MEET
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <span style={{ color: '#374151' }}>Welcome, {user.username}</span>
+    <div className="swim-grid swim-grid--main">
+      {/* Modernist Header - Glass Panel Design */}
+      <header className="swim-panel swim-panel--elevated swim-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 className="swim-brand swim-title" style={{ margin: '0', fontSize: '2rem' }}>
+              SWIM MEET
+            </h1>
+            <p className="swim-caption" style={{ margin: '0' }}>
+              AI Orchestration Platform • User: {user?.username}
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--panel-gap)', alignItems: 'center' }}>
             <button
+              className={`swim-button ${showStats ? 'swim-button--primary' : 'swim-button--secondary'}`}
               onClick={() => setShowStats(!showStats)}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: showStats ? '#0c4a6e' : 'white',
-                color: showStats ? 'white' : '#0c4a6e',
-                border: '2px solid #0c4a6e',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
+              data-testid="button-toggle-stats"
             >
-              {showStats ? 'Hide Stats' : 'Show Stats'}
+              <BarChart3 size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
+              {showStats ? 'Hide Stats' : 'Stats'}
             </button>
-            
             <button
+              className={`swim-button ${showSettings ? 'swim-button--primary' : 'swim-button--secondary'}`}
               onClick={() => setShowSettings(!showSettings)}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: showSettings ? '#0c4a6e' : 'white',
-                color: showSettings ? 'white' : '#0c4a6e',
-                border: '2px solid #0c4a6e',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
+              data-testid="button-toggle-settings"
             >
-              {showSettings ? 'Hide Settings' : 'Cloud Settings'}
+              <Settings size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
+              {showSettings ? 'Hide Cloud' : 'Cloud'}
             </button>
             <button
+              className="swim-button swim-button--ghost"
               onClick={handleLogout}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#dc2626',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
+              data-testid="button-logout"
+              style={{ color: 'hsl(var(--poolside-red))' }}
             >
               Logout
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Statistics Panel */}
-        {showStats && (
-          <div style={{
-            marginBottom: '20px',
-            padding: '15px',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>AI Provider Statistics</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
-              {Object.entries(providerStats).map(([providerId, stats]: [string, any]) => (
-                <div key={providerId} style={{
-                  padding: '12px',
-                  backgroundColor: '#f9fafb',
-                  borderRadius: '6px',
-                  border: '1px solid #e5e7eb'
-                }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#374151' }}>
-                    {providerId.toUpperCase()}
+      {/* Modernist Statistics Panel */}
+      {showStats && (
+        <section className="swim-panel swim-section">
+          <h3 className="swim-subtitle">AI Provider Statistics</h3>
+          <div className="swim-grid swim-grid--three-col">
+            {Object.entries(providerStats).map(([providerId, stats]: [string, any]) => (
+              <div key={providerId} className="swim-panel" data-testid={`stats-${providerId}`}>
+                <div className="swim-provider-name" style={{ marginBottom: 'var(--panel-gap)' }}>
+                  {providerId.toUpperCase()}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(var(--grid-unit) / 2)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span className="swim-caption">Success Rate:</span>
+                    <span className={`swim-status ${stats.successRate >= 90 ? 'swim-status--connected' : 'swim-status--setup-required'}`}>
+                      {stats.successRate}%
+                    </span>
                   </div>
-                  <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#6b7280' }}>Success Rate:</span>
-                      <span style={{ fontWeight: 'bold', color: stats.successRate >= 90 ? '#16a34a' : '#eab308' }}>
-                        {stats.successRate}%
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#6b7280' }}>Awards:</span>
-                      <span style={{ fontWeight: 'bold', color: '#374151' }}>
-                        🏆 {stats.awards?.gold || 0}G {stats.awards?.silver || 0}S {stats.awards?.bronze || 0}B
-                      </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span className="swim-caption">Awards:</span>
+                    <div style={{ display: 'flex', gap: 'calc(var(--grid-unit) / 2)' }}>
+                      <span className="swim-award swim-award--gold" title="Gold Awards">{stats.awards?.gold || 0}</span>
+                      <span className="swim-award swim-award--silver" title="Silver Awards">{stats.awards?.silver || 0}</span>
+                      <span className="swim-award swim-award--bronze" title="Bronze Awards">{stats.awards?.bronze || 0}</span>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Cloud Storage Settings Panel */}
-        {showSettings && (
-          <div style={{
-            marginBottom: '20px',
-            padding: '15px',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            <CloudStorageSettings authToken={authToken} />
-          </div>
-        )}
-
-        {/* Mode Selection */}
-        <div style={{
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>Workflow Mode</h3>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            {[
-              { id: 'dive', name: 'DIVE (Competition)', desc: 'Multiple AIs respond simultaneously' },
-              { id: 'turn', name: 'TURN (Verification)', desc: 'AI fact-checking and critique' },
-              { id: 'work', name: 'WORK (Collaboration)', desc: 'Multi-step collaborative solving' }
-            ].map(m => (
-              <button
-                key={m.id}
-                onClick={() => setMode(m.id as any)}
-                style={{
-                  padding: '12px 16px',
-                  border: `2px solid ${mode === m.id ? '#0c4a6e' : '#e5e7eb'}`,
-                  backgroundColor: mode === m.id ? '#0c4a6e' : 'white',
-                  color: mode === m.id ? 'white' : '#374151',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  flex: '1',
-                  minWidth: '200px'
-                }}
-              >
-                <div>{m.name}</div>
-                <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>
-                  {m.desc}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* AI Provider Selection */}
-        <div style={{
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>Select AI Providers</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '10px' }}>
-            {providers.map(provider => (
-              <div
-                key={provider.id}
-                onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '12px',
-                  border: `2px solid ${selectedAIs.includes(provider.id) ? '#0c4a6e' : '#e5e7eb'}`,
-                  backgroundColor: selectedAIs.includes(provider.id) ? '#eff6ff' : 'white',
-                  borderRadius: '6px',
-                  cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
-                  opacity: provider.status === 'error' ? 0.5 : 1
-                }}
-              >
-                <div
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: getProviderStatusColor(provider.status),
-                    marginRight: '10px'
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 'bold', color: '#374151' }}>{provider.name}</div>
-                  <div style={{ fontSize: '12px', color: '#6b7280' }}>{provider.company}</div>
-                </div>
-                {selectedAIs.includes(provider.id) && (
-                  <div style={{ color: '#0c4a6e', fontWeight: 'bold' }}>✓</div>
-                )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
+      )}
 
-        {/* File Upload Interface */}
-        <div style={{
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-            <Upload className="w-5 h-5" />
-            <h3 style={{ margin: 0, color: '#374151' }}>File Attachments</h3>
-          </div>
+      {/* Modernist Cloud Storage Settings Panel */}
+      {showSettings && (
+        <section className="swim-panel swim-section">
+          <CloudStorageSettings authToken={authToken} />
+        </section>
+      )}
+
+      {/* Modernist Mode Selection - Interlocking Panels */}
+      <section className="swim-section">
+        <h3 className="swim-subtitle">Workflow Mode</h3>
+        <div className="swim-mode-selector">
+          {[
+            { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <Play size={20} /> },
+            { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <GitBranch size={20} /> },
+            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
+          ].map(m => (
+            <div
+              key={m.id}
+              className={`swim-mode-panel ${mode === m.id ? 'swim-mode-panel--active' : ''}`}
+              onClick={() => setMode(m.id as any)}
+              data-testid={`mode-${m.id}`}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'calc(var(--grid-unit) / 2)' }}>
+                {m.icon}
+              </div>
+              <div className="swim-mode-title">{m.name}</div>
+              <div className="swim-mode-description">{m.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Modernist AI Provider Selection */}
+      <section className="swim-section">
+        <h3 className="swim-subtitle">Select AI Providers</h3>
+        <div className="swim-providers">
+          {providers.map(provider => (
+            <div
+              key={provider.id}
+              className={`swim-panel swim-provider ${selectedAIs.includes(provider.id) ? 'swim-provider--selected' : ''}`}
+              onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
+              style={{
+                cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
+                opacity: provider.status === 'error' ? 0.5 : 1
+              }}
+              data-testid={`provider-${provider.id}`}
+            >
+              <div className="swim-provider-header">
+                <div>
+                  <div className="swim-provider-name">{provider.name}</div>
+                  <div className="swim-provider-company">{provider.company}</div>
+                </div>
+                <div className={`swim-status swim-status--${provider.status}`}>
+                  {provider.status.replace('_', ' ')}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Modernist File Upload Interface */}
+      <section className="swim-panel swim-section">
+        <div className="swim-feature-header">
+          <Upload size={20} />
+          <h3 className="swim-subtitle">File Attachments</h3>
+        </div>
           
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
-            <StandardFileUpload
-              onFilesSelected={handleFilesSelected}
-              maxFiles={5}
-              maxSizeBytes={50 * 1024 * 1024}
-              disabled={isQuerying}
-            />
-            <span style={{ fontSize: '12px', color: '#6b7280' }}>
-              Max 5 files, 50MB each
-            </span>
-          </div>
+        <div style={{ display: 'flex', gap: 'var(--panel-gap)', alignItems: 'center', marginBottom: 'var(--section-gap)' }}>
+          <StandardFileUpload
+            onFilesSelected={handleFilesSelected}
+            maxFiles={5}
+            maxSizeBytes={50 * 1024 * 1024}
+            disabled={isQuerying}
+          />
+          <span className="swim-caption">Max 5 files, 50MB each</span>
+        </div>
 
           {attachedFiles.length > 0 && (
             <div style={{ marginTop: '10px' }}>
@@ -628,52 +547,34 @@ export default function SwimMeetFixed() {
               </div>
             </div>
           )}
-        </div>
+      </section>
 
-        {/* Query Input */}
-        <div style={{
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <h3 style={{ margin: '0 0 15px 0', color: '#374151' }}>Query</h3>
+      {/* Modernist Query Input - Primary Action Panel */}
+      <section className="swim-panel swim-panel--primary swim-section">
+        <h3 className="swim-subtitle">Query Input</h3>
+        <div className="swim-query-container">
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Enter your query here..."
             data-testid="input-query"
-            style={{
-              width: '100%',
-              height: '120px',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px',
-              resize: 'vertical',
-              marginBottom: '15px'
-            }}
+            className="swim-textarea"
           />
           <button
             onClick={handleSubmitQuery}
             disabled={!query.trim() || selectedAIs.length === 0 || isQuerying}
             data-testid="button-submit-query"
-            style={{
-              padding: '12px 24px',
-              backgroundColor: isQuerying ? '#6b7280' : '#0c4a6e',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: isQuerying ? 'not-allowed' : 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
+            className={`swim-button swim-button--primary swim-button--large ${isQuerying ? 'swim-button--disabled' : ''}`}
           >
-            {isQuerying ? 'Processing...' : `Submit to ${selectedAIs.length} AI${selectedAIs.length !== 1 ? 's' : ''}`}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(var(--grid-unit) / 2)' }}>
+              {getModeIcon()}
+              <span>{isQuerying ? 'Processing...' : `Submit to ${selectedAIs.length} AI${selectedAIs.length !== 1 ? 's' : ''}`}</span>
+            </div>
           </button>
         </div>
+      </section>
 
+      <div>
         {/* WORK Mode Progress Monitor */}
         {mode === 'work' && workflowStatus?.status === 'active' && (
           <div style={{
@@ -852,7 +753,7 @@ export default function SwimMeetFixed() {
             </div>
           </div>
         )}
-      </div>
+      </div> {/* End of container div */}
     </div>
   );
 }

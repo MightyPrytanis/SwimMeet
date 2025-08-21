@@ -1,0 +1,640 @@
+/* SWIM MEET: Modernist Precision Design System */
+/* Luxurious functionality through geometric clarity */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap');
+
+/* === CORE MODERNIST VARIABLES === */
+:root {
+  /* Primary Aquatic Palette - Carefully Curated */
+  --deep-pool-blue: 210 63% 28%;           /* #1B4B73 - trust, depth, primary structure */
+  --chrome-silver: 200 15% 78%;            /* #C5D1D8 - precision, clarity, panel edges */
+  --lane-line-white: 200 40% 98%;          /* #F8FAFB - clean, professional background */
+  --competitive-gold: 43 85% 38%;          /* #B8860B - awards, excellence, achievements */
+  --underwater-teal: 180 31% 41%;          /* #4A8B8B - aquatic depth, primary actions */
+  --surface-blue: 197 71% 73%;             /* #87CEEB - interface highlights, selection */
+  --poolside-red: 0 69% 48%;               /* #C53030 - clear warnings, errors */
+  --caution-amber: 42 78% 51%;             /* #D69E2E - system status, attention */
+
+  /* Glass Panel System Variables */
+  --glass-light: rgba(248, 250, 251, 0.95);
+  --glass-medium: rgba(245, 247, 250, 0.9);
+  --glass-dark: rgba(27, 75, 115, 0.9);
+  --glass-border: rgba(197, 209, 216, 0.8);
+  --glass-shadow: 0 2px 8px hsla(var(--deep-pool-blue), 0.1);
+  --glass-shadow-active: 0 4px 16px hsla(var(--underwater-teal), 0.2);
+
+  /* Engineering Precision Grid */
+  --grid-unit: 8px;
+  --panel-gap: calc(var(--grid-unit) * 2);
+  --section-gap: calc(var(--grid-unit) * 4);
+  --page-margin: calc(var(--grid-unit) * 3);
+
+  /* Typography Scale - Sharp & Professional */
+  --font-primary: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  /* Motion System - Purposeful, Not Decorative */
+  --duration-instant: 0.1s;
+  --duration-fast: 0.2s;
+  --duration-medium: 0.3s;
+  --duration-slow: 0.5s;
+  --easing-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --easing-enter: cubic-bezier(0, 0, 0.2, 1);
+  --easing-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Dark Mode: Underwater Perspective */
+[data-theme="dark"] {
+  --glass-light: rgba(27, 75, 115, 0.95);
+  --glass-medium: rgba(15, 45, 75, 0.9);
+  --glass-border: rgba(74, 139, 139, 0.3);
+  --glass-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --glass-shadow-active: 0 4px 16px rgba(135, 206, 235, 0.15);
+}
+
+/* === FOUNDATIONAL RESETS === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
+  color: hsl(var(--deep-pool-blue));
+  background: linear-gradient(135deg, 
+    hsl(var(--lane-line-white)), 
+    hsl(200 25% 96%));
+  min-height: 100vh;
+  antialiased: true;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === GLASS/METAL PANEL SYSTEM === */
+.swim-panel {
+  background: var(--glass-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    var(--glass-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all var(--duration-fast) var(--easing-standard);
+  /* SHARP EDGES ONLY - No border radius */
+}
+
+.swim-panel:hover {
+  border-color: hsl(var(--underwater-teal));
+  box-shadow: 
+    var(--glass-shadow-active),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+.swim-panel--active {
+  border-color: hsl(var(--underwater-teal));
+  background: rgba(248, 250, 251, 0.98);
+  box-shadow: 
+    var(--glass-shadow-active),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 0 0 1px hsla(var(--underwater-teal), 0.1);
+}
+
+.swim-panel--elevated {
+  box-shadow: 
+    0 8px 24px hsla(var(--deep-pool-blue), 0.12),
+    0 2px 8px hsla(var(--deep-pool-blue), 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Dark mode panel adaptations */
+[data-theme="dark"] .swim-panel {
+  background: var(--glass-dark);
+  border-color: hsla(var(--chrome-silver), 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .swim-panel:hover {
+  border-color: hsl(var(--surface-blue));
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* === GEOMETRIC LAYOUT SYSTEM === */
+.swim-grid {
+  display: grid;
+  gap: var(--panel-gap);
+  padding: var(--page-margin);
+}
+
+.swim-grid--main {
+  grid-template-columns: 1fr;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.swim-grid--two-col {
+  grid-template-columns: 1fr 1fr;
+  gap: var(--section-gap);
+}
+
+.swim-grid--three-col {
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--panel-gap);
+}
+
+.swim-section {
+  margin-bottom: var(--section-gap);
+}
+
+.swim-section--compact {
+  margin-bottom: var(--panel-gap);
+}
+
+/* === MODERNIST TYPOGRAPHY === */
+.swim-title {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-black);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: hsl(var(--deep-pool-blue));
+  margin-bottom: calc(var(--grid-unit) * 3);
+}
+
+.swim-subtitle {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: hsl(var(--underwater-teal));
+  margin-bottom: var(--panel-gap);
+}
+
+.swim-body {
+  font-size: 1rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.6;
+  color: hsl(var(--deep-pool-blue));
+}
+
+.swim-caption {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: hsl(180 15% 55%);
+  letter-spacing: 0.01em;
+}
+
+/* === PRECISION UI COMPONENTS === */
+.swim-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--grid-unit) * 1.5) calc(var(--grid-unit) * 3);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  text-decoration: none;
+  /* SHARP EDGES - No border radius */
+}
+
+.swim-button--primary {
+  background: hsl(var(--underwater-teal));
+  color: white;
+  border-color: hsl(var(--underwater-teal));
+}
+
+.swim-button--primary:hover {
+  background: hsl(180 31% 35%);
+  border-color: hsl(180 31% 35%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsla(var(--underwater-teal), 0.3);
+}
+
+.swim-button--secondary {
+  background: transparent;
+  color: hsl(var(--underwater-teal));
+  border-color: hsl(var(--chrome-silver));
+}
+
+.swim-button--secondary:hover {
+  background: hsl(var(--surface-blue));
+  color: white;
+  border-color: hsl(var(--surface-blue));
+}
+
+.swim-button--ghost {
+  background: transparent;
+  color: hsl(var(--deep-pool-blue));
+  border-color: transparent;
+}
+
+.swim-button--ghost:hover {
+  background: hsla(var(--chrome-silver), 0.5);
+  border-color: hsl(var(--chrome-silver));
+}
+
+/* === STATUS INDICATORS === */
+.swim-status {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--grid-unit) / 2);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.swim-status--connected {
+  color: hsl(var(--underwater-teal));
+}
+
+.swim-status--connected::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: hsl(var(--underwater-teal));
+  display: block;
+}
+
+.swim-status--setup-required {
+  color: hsl(var(--caution-amber));
+}
+
+.swim-status--setup-required::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: hsl(var(--caution-amber));
+  display: block;
+}
+
+.swim-status--disabled {
+  color: hsl(200 10% 50%);
+}
+
+.swim-status--disabled::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: hsl(200 10% 50%);
+  display: block;
+}
+
+/* === AWARD SYSTEM - GEOMETRIC MEDALS === */
+.swim-award {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  /* Geometric shapes - squares for precision */
+}
+
+.swim-award--gold {
+  background: linear-gradient(135deg, hsl(var(--competitive-gold)), hsl(43 75% 45%));
+  color: white;
+  border: 1px solid hsl(43 75% 45%);
+}
+
+.swim-award--silver {
+  background: linear-gradient(135deg, hsl(var(--chrome-silver)), hsl(200 25% 70%));
+  color: hsl(var(--deep-pool-blue));
+  border: 1px solid hsl(200 25% 70%);
+}
+
+.swim-award--bronze {
+  background: linear-gradient(135deg, hsl(30 65% 55%), hsl(25 70% 50%));
+  color: white;
+  border: 1px solid hsl(25 70% 50%);
+}
+
+.swim-award:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px hsla(var(--deep-pool-blue), 0.2);
+}
+
+/* === MODE SELECTION - INTERLOCKING PANELS === */
+.swim-mode-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px; /* Minimal gap for interlocking effect */
+  margin-bottom: var(--section-gap);
+}
+
+.swim-mode-panel {
+  padding: calc(var(--grid-unit) * 3);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  border: 2px solid var(--glass-border);
+  background: var(--glass-light);
+}
+
+.swim-mode-panel:hover {
+  border-color: hsl(var(--underwater-teal));
+  background: rgba(248, 250, 251, 0.98);
+  transform: translateY(-2px);
+}
+
+.swim-mode-panel--active {
+  border-color: hsl(var(--underwater-teal));
+  background: hsl(var(--surface-blue));
+  color: white;
+  box-shadow: var(--glass-shadow-active);
+}
+
+.swim-mode-title {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  margin-bottom: calc(var(--grid-unit) / 2);
+}
+
+.swim-mode-description {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  opacity: 0.9;
+}
+
+/* === AI PROVIDER GRID === */
+.swim-providers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--panel-gap);
+  margin-bottom: var(--section-gap);
+}
+
+.swim-provider {
+  padding: calc(var(--grid-unit) * 2);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+}
+
+.swim-provider:hover {
+  transform: translateY(-1px);
+}
+
+.swim-provider--selected {
+  border-color: hsl(var(--underwater-teal));
+  background: rgba(135, 206, 235, 0.1);
+}
+
+.swim-provider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: calc(var(--grid-unit) * 1);
+}
+
+.swim-provider-name {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: hsl(var(--deep-pool-blue));
+}
+
+.swim-provider-company {
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  color: hsl(180 15% 55%);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* === RESPONSE CONTAINERS === */
+.swim-response {
+  padding: calc(var(--grid-unit) * 3);
+  margin-bottom: var(--panel-gap);
+}
+
+.swim-response-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--panel-gap);
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: var(--panel-gap);
+}
+
+.swim-response-content {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: hsl(var(--deep-pool-blue));
+  margin-bottom: var(--panel-gap);
+}
+
+.swim-response-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--grid-unit) * 1);
+  padding-top: var(--panel-gap);
+  border-top: 1px solid var(--glass-border);
+}
+
+/* === GRACEFUL DEGRADATION === */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .swim-panel:hover,
+  .swim-button:hover,
+  .swim-provider:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .swim-panel {
+    border-width: 2px;
+    box-shadow: none;
+  }
+  
+  .swim-button {
+    border-width: 2px;
+  }
+}
+
+/* === RESPONSIVE ADAPTATIONS === */
+@media (max-width: 768px) {
+  .swim-grid--two-col,
+  .swim-grid--three-col {
+    grid-template-columns: 1fr;
+  }
+  
+  .swim-mode-selector {
+    grid-template-columns: 1fr;
+    gap: var(--panel-gap);
+  }
+  
+  .swim-providers {
+    grid-template-columns: 1fr;
+  }
+  
+  .swim-title {
+    font-size: 2rem;
+  }
+  
+  .swim-grid {
+    padding: var(--panel-gap);
+  }
+}
+
+@media (max-width: 480px) {
+  .swim-title {
+    font-size: 1.75rem;
+  }
+  
+  .swim-mode-panel {
+    padding: var(--panel-gap);
+  }
+}
+
+/* === LOADING STATES === */
+.swim-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.swim-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsla(var(--surface-blue), 0.2),
+    transparent
+  );
+  animation: swim-shimmer 1.5s infinite;
+}
+
+@keyframes swim-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* === ERROR STATES === */
+.swim-error {
+  color: hsl(var(--poolside-red));
+  background: hsla(var(--poolside-red), 0.1);
+  border: 1px solid hsla(var(--poolside-red), 0.3);
+  padding: var(--panel-gap);
+}
+
+.swim-warning {
+  color: hsl(var(--caution-amber));
+  background: hsla(var(--caution-amber), 0.1);
+  border: 1px solid hsla(var(--caution-amber), 0.3);
+  padding: var(--panel-gap);
+}
+
+/* === ACCESSIBILITY ENHANCEMENTS === */
+.swim-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.swim-focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--underwater-teal));
+  outline-offset: 2px;
+}
+
+/* === BRAND PLACEHOLDER === */
+.swim-brand {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-black);
+  color: hsl(var(--deep-pool-blue));
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  /* Placeholder styling - will be replaced with wordmark */
+}
+
+/* === QUERY INPUT STYLING === */
+.swim-query-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+}
+
+.swim-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: var(--panel-padding);
+  background: rgba(248, 250, 251, 0.98);
+  border: 2px solid var(--glass-border);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: hsl(var(--deep-pool-blue));
+  resize: vertical;
+  transition: all var(--duration-fast) var(--easing-standard);
+  /* Sharp edges for modernist aesthetic */
+}
+
+.swim-textarea:focus {
+  outline: none;
+  border-color: hsl(var(--underwater-teal));
+  background: white;
+  box-shadow: 0 0 0 3px hsla(var(--underwater-teal), 0.1);
+}
+
+.swim-textarea::placeholder {
+  color: hsl(180 15% 55%);
+}
+
+/* Button size variants */
+.swim-button--large {
+  padding: calc(var(--grid-unit) * 2) calc(var(--grid-unit) * 4);
+  font-size: 1.125rem;
+}
+
+.swim-button--disabled {
+  background: hsl(200 10% 50%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.swim-button--disabled:hover {
+  background: hsl(200 10% 50%);
+  transform: none;
+  box-shadow: none;
+}
