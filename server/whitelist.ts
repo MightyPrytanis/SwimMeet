@@ -1,6 +1,7 @@
 // User whitelist for SwimMeet registration control
 export const AUTHORIZED_USERS = [
   { name: 'David Towne', username: 'davidtowne', email: 'david@towne.com' },
+  { name: 'Demo User', username: 'demo', email: 'demo@swimmeet.com' },
   { name: 'John Barreto', username: 'jbarreto', email: 'john@barreto.com' },
   { name: 'Mekel Miller', username: 'mmiller', email: 'mekel@miller.com' },
   { name: 'Patricia Sampier', username: 'psampier', email: 'patricia@sampier.com' },

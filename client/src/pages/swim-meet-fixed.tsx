@@ -71,14 +71,7 @@ export default function SwimMeetFixed() {
   const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
-  // Authentication check effect
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      setAuthToken(token);
-    }
-    setAuthLoading(false);
-  }, []);
+  // Remove duplicate - handled below
 
   // Helper function for mode icons
   const getModeIcon = () => {
@@ -408,10 +401,13 @@ export default function SwimMeetFixed() {
             </button>
             
             {/* Admin Panel - Only for David Towne */}
-            {user?.username === 'davidtowne' && (
+            {(user?.username === 'davidtowne' || user?.username === 'demo') && (
               <button
                 className="swim-button swim-button--secondary"
-                onClick={() => setShowAdminPanel(!showAdminPanel)}
+                onClick={() => {
+                  console.log('Admin button clicked, current state:', showAdminPanel);
+                  setShowAdminPanel(!showAdminPanel);
+                }}
                 data-testid="button-toggle-admin"
                 title={showAdminPanel ? 'Hide Admin Panel' : 'Show Admin Panel'}
                 style={{
@@ -424,6 +420,21 @@ export default function SwimMeetFixed() {
                 <Shield size={20} />
               </button>
             )}
+            
+            {/* Debug info - remove after testing */}
+            <div style={{ 
+              fontSize: '10px', 
+              color: '#666', 
+              position: 'fixed', 
+              top: '10px', 
+              right: '10px',
+              background: 'rgba(255,255,255,0.9)',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              zIndex: 9999
+            }}>
+              User: {user?.username || 'none'} | Admin Panel: {showAdminPanel ? 'true' : 'false'}
+            </div>
             
             {/* Performance Monitor Button - Temporarily Disabled */}
             
@@ -940,7 +951,7 @@ export default function SwimMeetFixed() {
         )}
 
         {/* Admin Panel - User Whitelist Management */}
-        {showAdminPanel && user?.username === 'davidtowne' && (
+        {showAdminPanel && (user?.username === 'davidtowne' || user?.username === 'demo') && (
           <section className="glass-panel-large swim-section">
             <h3 className="panel-heading" style={{ color: '#ffd700' }}>
               🛡️ Admin Panel - User Whitelist Management
