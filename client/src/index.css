@@ -4,25 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Natatorium Theme Variables - Immersive Aquatic Design */
 :root {
-  /* Deep water blues - creating underwater feeling */
-  --deep-ocean: hsl(210, 85%, 15%);
-  --pool-blue: hsl(200, 90%, 35%);
-  --water-medium: hsl(205, 80%, 45%);
-  --pool-light: hsl(195, 75%, 65%);
-  --surface-shimmer: hsl(190, 60%, 85%);
-  --chlorine-foam: hsl(195, 40%, 95%);
-  
-  /* Lane and facility colors */
-  --lane-rope: hsl(45, 95%, 55%);
-  --starting-block: hsl(220, 25%, 20%);
-  --pool-deck: hsl(200, 15%, 85%);
-  --tile-blue: hsl(205, 70%, 55%);
-  
-  /* Aquatic gradients */
-  --water-gradient: linear-gradient(135deg, var(--deep-ocean) 0%, var(--pool-blue) 50%, var(--water-medium) 100%);
-  --surface-gradient: linear-gradient(to bottom, var(--surface-shimmer) 0%, var(--pool-light) 100%);
+  --steel-gunmetal: #3a4451;
+  --steel-charcoal: #2a3441;
+  --glass-green: #238472;
+  --pool-blue: #87CEEB;
+  --water-blue: #4A8B8B;
+  --deep-blue: #1B4B73;
+  --lane-white: #F8FAFB;
 }
 
 /* Swimming theme animations */
