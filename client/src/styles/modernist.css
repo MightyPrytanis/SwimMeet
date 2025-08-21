@@ -298,14 +298,11 @@ body {
 /* === STEP 6: ACCENT PHOTOPLATE PANEL === */
 .photoplate-accent {
   background: 
-    linear-gradient(45deg, 
-      rgba(0, 51, 102, 0.9) 0%, 
-      rgba(74, 122, 154, 0.8) 25%,
-      rgba(0, 51, 102, 0.9) 50%,
-      rgba(74, 122, 154, 0.8) 75%,
-      rgba(0, 51, 102, 0.9) 100%),
-    radial-gradient(circle at 30% 70%, rgba(135, 206, 235, 0.3), transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.1), transparent 50%);
+    linear-gradient(rgba(0, 51, 102, 0.7), rgba(0, 51, 102, 0.7)),
+    url('@assets/image_1755777377873.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 3px solid var(--deep-blue);
   /* No border-radius */
   box-shadow: 
@@ -315,6 +312,25 @@ body {
   color: var(--lane-white) !important;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   transform: scale(1.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.photoplate-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, 
+      transparent 0%, 
+      rgba(135, 206, 235, 0.1) 25%,
+      transparent 50%,
+      rgba(135, 206, 235, 0.1) 75%,
+      transparent 100%);
+  pointer-events: none;
 }
 
 /* === STEP 7: RESPONSIVE BEHAVIOR (LAYOUT ADAPTATION) === */
