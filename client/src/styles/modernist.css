@@ -275,6 +275,16 @@ body {
   }
 }
 
+/* === STEP 6: ACCENT PHOTOPLATE PANEL === */
+.photoplate-accent {
+  background-image: url('pool-wall-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid hsl(var(--steel-gunmetal));
+  /* No border-radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .swim-grid--main {
   grid-template-columns: 1fr;
   max-width: 1200px;
