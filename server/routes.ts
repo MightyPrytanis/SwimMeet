@@ -411,6 +411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { id: 'perplexity', name: 'Perplexity', company: 'Perplexity AI', requiresApiKey: true },
       { id: 'deepseek', name: 'DeepSeek', company: 'DeepSeek AI', requiresApiKey: true },
       { id: 'grok', name: 'Grok', company: 'xAI', requiresApiKey: true },
+      { id: 'mistral', name: 'Mistral AI', company: 'Mistral AI', requiresApiKey: true },
     ];
 
 
@@ -442,6 +443,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             case 'deepseek':
               testResult = await aiService.queryDeepSeek("Test connection");
+              break;
+            case 'mistral':
+              testResult = { success: false, error: "Mistral API not configured" };
               break;
             default:
               testResult = { success: false, error: "Unknown provider" };
@@ -583,6 +587,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 break;
               case 'deepseek':
                 aiResult = await aiService.queryDeepSeek(actualQuery);
+                break;
+              case 'mistral':
+                aiResult = { success: false, error: "Mistral AI not yet implemented" };
                 break;
               default:
                 aiResult = { success: false, error: `Unknown provider: ${aiProvider}` };

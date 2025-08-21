@@ -27,6 +27,8 @@ export function AIProviderIcon({ provider, className = "w-10 h-10", status = 'se
         return { favicon: '/favicons/grok.ico', initial: 'X', color: 'bg-black' };
       case 'llama':
         return { favicon: '/favicons/llama.ico', initial: 'L', color: 'bg-blue-600' };
+      case 'mistral':
+        return { favicon: '/favicons/mistral.ico', initial: 'M', color: 'bg-red-600' };
       default:
         return { favicon: '', initial: '?', color: 'bg-gray-500' };
     }

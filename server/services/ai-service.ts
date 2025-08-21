@@ -304,6 +304,9 @@ export class AIService {
         case 'llama':
           result = await this.queryLlama(prompt);
           break;
+        case 'mistral':
+          result = { success: false, error: "Mistral AI not yet implemented" };
+          break;
         default:
           result = { success: false, error: `Unsupported provider: ${provider}` };
       }

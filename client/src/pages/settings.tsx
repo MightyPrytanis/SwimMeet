@@ -118,7 +118,8 @@ export default function Settings() {
       perplexity: '🔮',
       deepseek: '🔬',
       grok: '🚀',
-      llama: '🦙'
+      llama: '🦙',
+      mistral: '🌪️'
     };
     return icons[id] || '🤖';
   };
@@ -132,7 +133,8 @@ export default function Settings() {
       perplexity: 'bg-purple-500',
       deepseek: 'bg-indigo-500',
       grok: 'bg-red-500',
-      llama: 'bg-yellow-500'
+      llama: 'bg-yellow-500',
+      mistral: 'bg-red-600'
     };
     return colors[id] || 'bg-gray-500';
   };

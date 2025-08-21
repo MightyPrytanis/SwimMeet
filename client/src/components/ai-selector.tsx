@@ -48,7 +48,8 @@ export default function AISelector({ selectedAIs, onSelectionChange, onManageCre
       perplexity: '🔮',
       deepseek: '🔬',
       grok: '🚀',
-      llama: '🦙'
+      llama: '🦙',
+      mistral: '🌪️'
     };
     return icons[id] || '🤖';
   };
