@@ -23,13 +23,13 @@
   --work-primary: 43 85% 38%;              /* Competitive gold collaboration */
   --work-secondary: 43 70% 80%;             /* Light golden glow */
 
-  /* Glass Panel System Variables */
-  --glass-light: rgba(36, 43, 53, 0.95);
-  --glass-medium: rgba(27, 75, 115, 0.9);
-  --glass-dark: rgba(15, 23, 35, 0.95);
-  --glass-border: rgba(74, 139, 139, 0.3);
-  --glass-shadow: 0 2px 8px hsla(var(--deep-pool-blue), 0.1);
-  --glass-shadow-active: 0 4px 16px hsla(var(--underwater-teal), 0.2);
+  /* Glass Panel System Variables - Pool Immersion */
+  --glass-light: rgba(27, 75, 115, 0.15);      /* Shallow water transparency */
+  --glass-medium: rgba(27, 75, 115, 0.25);     /* Medium depth water */
+  --glass-dark: rgba(15, 35, 75, 0.3);         /* Deep water panels */
+  --glass-border: rgba(135, 206, 235, 0.4);    /* Surface blue ripples */
+  --glass-shadow: 0 4px 16px rgba(27, 75, 115, 0.4);         /* Underwater shadows */
+  --glass-shadow-active: 0 8px 24px rgba(74, 139, 139, 0.6); /* Active depth shadows */
 
   /* Engineering Precision Grid */
   --grid-unit: 8px;
@@ -82,36 +82,77 @@ html {
 body {
   font-family: var(--font-primary);
   font-weight: var(--font-weight-regular);
-  color: hsl(var(--deep-pool-blue));
-  background: linear-gradient(135deg, 
-    hsl(var(--lane-line-white)), 
-    hsl(200 25% 96%));
+  line-height: 1.6;
+  color: hsl(var(--chrome-silver));
+  background: 
+    radial-gradient(ellipse at 50% 10%, hsl(var(--surface-blue) / 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, hsl(var(--underwater-teal) / 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, hsl(var(--surface-blue) / 0.15) 0%, transparent 30%),
+    linear-gradient(180deg, 
+      hsl(var(--deep-pool-blue)) 0%, 
+      hsl(var(--underwater-teal) / 0.7) 40%, 
+      hsl(var(--lane-line-white)) 100%);
   min-height: 100vh;
-  antialiased: true;
+  position: relative;
+  animation: underwater-motion 20s ease-in-out infinite;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* === GLASS/METAL PANEL SYSTEM === */
+@keyframes underwater-motion {
+  0%, 100% { 
+    background-position: 0% 0%, 20% 80%, 80% 20%, 0% 0%; 
+  }
+  50% { 
+    background-position: 10% 5%, 25% 85%, 75% 15%, 0% 0%; 
+  }
+}
+
+/* === UNDERWATER GLASS PANEL SYSTEM === */
 .swim-panel {
   background: var(--glass-dark);
   border: 1px solid var(--glass-border);
   box-shadow: 
     var(--glass-shadow),
-    inset 0 1px 0 rgba(74, 139, 139, 0.2);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+    inset 0 1px 0 rgba(135, 206, 235, 0.3),
+    inset 0 -1px 0 rgba(27, 75, 115, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all var(--duration-fast) var(--easing-standard);
   color: hsl(var(--chrome-silver));
+  position: relative;
+  overflow: hidden;
   /* SHARP EDGES ONLY - No border radius */
 }
 
+.swim-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(135, 206, 235, 0.1) 50%, 
+    transparent 100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
 .swim-panel:hover {
-  border-color: hsl(var(--underwater-teal));
+  border-color: hsl(var(--surface-blue));
   box-shadow: 
     var(--glass-shadow-active),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
-  transform: translateY(-1px);
+    inset 0 1px 0 rgba(135, 206, 235, 0.5),
+    inset 0 -1px 0 rgba(74, 139, 139, 0.4),
+    0 0 20px rgba(135, 206, 235, 0.3);
+  transform: translateY(-2px);
 }
 
 .swim-panel--active {
@@ -119,8 +160,10 @@ body {
   background: var(--glass-medium);
   box-shadow: 
     var(--glass-shadow-active),
-    inset 0 1px 0 rgba(74, 139, 139, 0.3),
-    inset 0 0 0 1px hsla(var(--underwater-teal), 0.2);
+    inset 0 1px 0 rgba(135, 206, 235, 0.4),
+    inset 0 -1px 0 rgba(74, 139, 139, 0.4),
+    inset 0 0 0 1px hsla(var(--underwater-teal), 0.3),
+    0 0 25px rgba(74, 139, 139, 0.4);
 }
 
 .swim-panel--elevated {
