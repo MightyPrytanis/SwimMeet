@@ -408,18 +408,7 @@ export default function SwimMeetFixed() {
               <BarChart3 size={20} />
             </button>
             
-            <button
-              className="swim-button swim-button--secondary"
-              onClick={() => setShowPerformanceOverlay(!showPerformanceOverlay)}
-              data-testid="button-toggle-performance"
-              title={showPerformanceOverlay ? 'Hide Performance Monitor' : 'Show Performance Monitor'}
-              style={{
-                padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto'
-              }}
-            >
-              <Activity size={20} />
-            </button>
+            {/* Performance Monitor Button - Temporarily Disabled */}
             
             <button
               className="swim-button swim-button--secondary"
@@ -933,11 +922,13 @@ export default function SwimMeetFixed() {
           />
         )}
 
-        {/* Performance Monitoring Overlay */}
-        <PerformanceOverlay 
-          isVisible={showPerformanceOverlay}
-          onClose={() => setShowPerformanceOverlay(false)}
-        />
+        {/* Performance Monitoring Overlay - Temporarily Disabled */}
+        {false && (
+          <PerformanceOverlay 
+            isVisible={showPerformanceOverlay}
+            onClose={() => setShowPerformanceOverlay(false)}
+          />
+        )}
       </div> {/* End of container div */}
     </div>
   );
