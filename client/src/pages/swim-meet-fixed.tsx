@@ -498,34 +498,12 @@ export default function SwimMeetFixed() {
           </div>
           
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
-            <input
-              type="file"
-              multiple
-              accept="*/*"
-              onChange={handleFileSelect}
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              data-testid="input-file-upload"
+            <StandardFileUpload
+              onFilesSelected={handleFilesSelected}
+              maxFiles={5}
+              maxSizeBytes={50 * 1024 * 1024}
+              disabled={isQuerying}
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                backgroundColor: '#0ea5e9',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-              data-testid="button-upload-files"
-            >
-              <Upload className="w-4 h-4" />
-              Upload Files
-            </button>
             <span style={{ fontSize: '12px', color: '#6b7280' }}>
               Max 5 files, 50MB each
             </span>
