@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
-import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X } from "lucide-react";
 import "../styles/modernist.css";
 
 // Types
@@ -63,9 +63,26 @@ export default function SwimMeetFixed() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showStats, setShowStats] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
+
+  // Click outside to close menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMenu) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('[data-testid="button-hamburger-menu"]') && 
+            !target.closest('[data-menu-dropdown]')) {
+          setShowMenu(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
 
   // Helper function for mode icons
   const getModeIcon = () => {
@@ -348,31 +365,95 @@ export default function SwimMeetFixed() {
               User: {user?.username}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 'var(--panel-gap)', alignItems: 'center' }}>
+          <div style={{ position: 'relative' }}>
             <button
-              className={`swim-button ${showStats ? 'swim-button--primary' : 'swim-button--secondary'}`}
-              onClick={() => setShowStats(!showStats)}
-              data-testid="button-toggle-stats"
+              className="swim-button swim-button--secondary"
+              onClick={() => setShowMenu(!showMenu)}
+              data-testid="button-hamburger-menu"
+              style={{
+                padding: 'calc(var(--grid-unit) * 0.75)',
+                minWidth: 'auto'
+              }}
             >
-              <BarChart3 size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
-              {showStats ? 'Hide Stats' : 'Stats'}
+              {showMenu ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <button
-              className={`swim-button ${showSettings ? 'swim-button--primary' : 'swim-button--secondary'}`}
-              onClick={() => setShowSettings(!showSettings)}
-              data-testid="button-toggle-settings"
-            >
-              <Settings size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
-              {showSettings ? 'Hide Cloud' : 'Cloud'}
-            </button>
-            <button
-              className="swim-button swim-button--ghost"
-              onClick={handleLogout}
-              data-testid="button-logout"
-              style={{ color: 'hsl(var(--poolside-red))' }}
-            >
-              Logout
-            </button>
+            
+            {/* Hamburger Menu Dropdown */}
+            {showMenu && (
+              <div 
+                data-menu-dropdown
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: '0',
+                  marginTop: 'calc(var(--grid-unit) / 2)',
+                  backgroundColor: 'white',
+                  border: '1px solid hsl(var(--steel-gunmetal) / 0.2)',
+                  borderRadius: 'var(--border-radius)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  zIndex: 1000,
+                  minWidth: '200px',
+                  overflow: 'hidden'
+                }}>
+                <div style={{ padding: 'calc(var(--grid-unit) / 2)' }}>
+                  <button
+                    className="swim-button swim-button--ghost"
+                    onClick={() => {
+                      setShowStats(!showStats);
+                      setShowMenu(false);
+                    }}
+                    data-testid="button-toggle-stats"
+                    style={{
+                      width: '100%',
+                      justifyContent: 'flex-start',
+                      marginBottom: 'calc(var(--grid-unit) / 4)'
+                    }}
+                  >
+                    <BarChart3 size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
+                    {showStats ? 'Hide Statistics' : 'Show Statistics'}
+                  </button>
+                  
+                  <button
+                    className="swim-button swim-button--ghost"
+                    onClick={() => {
+                      setShowSettings(!showSettings);
+                      setShowMenu(false);
+                    }}
+                    data-testid="button-toggle-settings"
+                    style={{
+                      width: '100%',
+                      justifyContent: 'flex-start',
+                      marginBottom: 'calc(var(--grid-unit) / 4)'
+                    }}
+                  >
+                    <Settings size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
+                    {showSettings ? 'Hide Cloud Storage' : 'Cloud Storage'}
+                  </button>
+                  
+                  <hr style={{
+                    border: 'none',
+                    borderTop: '1px solid hsl(var(--steel-gunmetal) / 0.1)',
+                    margin: 'calc(var(--grid-unit) / 2) 0'
+                  }} />
+                  
+                  <button
+                    className="swim-button swim-button--ghost"
+                    onClick={() => {
+                      handleLogout();
+                      setShowMenu(false);
+                    }}
+                    data-testid="button-logout"
+                    style={{
+                      width: '100%',
+                      justifyContent: 'flex-start',
+                      color: 'hsl(var(--poolside-red))'
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
