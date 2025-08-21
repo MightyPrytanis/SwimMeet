@@ -1276,6 +1276,90 @@ Keep your response professional and constructive.`;
   });
 
   // File upload endpoints
+  // Cloud Storage Settings Routes
+  app.get("/api/cloud/providers", async (req, res) => {
+    try {
+      // Return cloud providers directly
+      const providers = [
+        {
+          id: 'google_drive',
+          name: 'Google Drive',
+          description: 'Use your Google Drive storage (15GB+ free)',
+          icon: 'google-drive',
+          requiresAuth: true,
+          maxFileSize: 5 * 1024 * 1024 * 1024, // 5GB
+          costModel: 'user_owned'
+        },
+        {
+          id: 'dropbox',
+          name: 'Dropbox',
+          description: 'Use your Dropbox storage (2GB+ free)',
+          icon: 'dropbox',
+          requiresAuth: true,
+          maxFileSize: 350 * 1024 * 1024, // 350MB per file
+          costModel: 'user_owned'
+        },
+        {
+          id: 'onedrive',
+          name: 'OneDrive',
+          description: 'Use your Microsoft OneDrive (5GB+ free)',
+          icon: 'microsoft',
+          requiresAuth: true,
+          maxFileSize: 250 * 1024 * 1024 * 1024, // 250GB
+          costModel: 'user_owned'
+        },
+        {
+          id: 'icloud',
+          name: 'iCloud Drive',
+          description: 'Use your iCloud storage (5GB+ free)',
+          icon: 'cloud',
+          requiresAuth: true,
+          maxFileSize: 50 * 1024 * 1024 * 1024, // 50GB
+          costModel: 'user_owned'
+        },
+        {
+          id: 'local_filesystem',
+          name: 'Local Storage',
+          description: 'Store files on server (fallback option)',
+          icon: 'hard-drive',
+          requiresAuth: false,
+          maxFileSize: 100 * 1024 * 1024, // 100MB
+          costModel: 'free'
+        }
+      ];
+      res.json(providers);
+    } catch (error) {
+      console.error("Error getting cloud providers:", error);
+      res.status(500).json({ error: "Failed to get cloud providers" });
+    }
+  });
+
+  app.get("/api/cloud/connections", async (req, res) => {
+    try {
+      // Return empty array for now - to be implemented with user authentication
+      res.json([]);
+    } catch (error) {
+      console.error("Error getting cloud connections:", error);
+      res.status(500).json({ error: "Failed to get cloud connections" });
+    }
+  });
+
+  app.get("/api/cloud/settings", async (req, res) => {
+    try {
+      // Return default settings for now
+      res.json({
+        preferredProvider: 'local_filesystem',
+        fallbackToLocal: true,
+        maxFileAge: 30,
+        compressionEnabled: false,
+        encryptionEnabled: true
+      });
+    } catch (error) {
+      console.error("Error getting cloud settings:", error);
+      res.status(500).json({ error: "Failed to get cloud settings" });
+    }
+  });
+
   app.post("/api/files/upload-url", async (req, res) => {
     try {
       const { ObjectStorageService } = await import("./objectStorage");
