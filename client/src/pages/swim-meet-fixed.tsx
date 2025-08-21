@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
+import { AdminPanel } from "@/components/AdminPanel";
 import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield } from "lucide-react";
 import "../styles/modernist.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
@@ -950,47 +951,9 @@ export default function SwimMeetFixed() {
           />
         )}
 
-        {/* Admin Panel - User Whitelist Management */}
+        {/* Enhanced Admin Panel - Full User Management */}
         {showAdminPanel && (user?.username === 'davidtowne' || user?.username === 'demo') && (
-          <section className="glass-panel-large swim-section">
-            <h3 className="panel-heading" style={{ color: '#ffd700' }}>
-              🛡️ Admin Panel - User Whitelist Management
-            </h3>
-            <div className="swim-panel" style={{ background: 'linear-gradient(135deg, #ffd700 5%, #ffffff 100%)' }}>
-              <div style={{ marginBottom: 'var(--panel-gap)' }}>
-                <strong>Authorized Users:</strong>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'calc(var(--grid-unit) / 2)' }}>
-                {[
-                  'David Towne (davidtowne)',
-                  'John Barreto (jbarreto)',
-                  'Mekel Miller (mmiller)',
-                  'Patricia Sampier (psampier)',
-                  'Heather Reilly (hreilly)',
-                  'Joseph Reilly (jreilly)',
-                  'Grace Reilly (greilly)',
-                  'Brian Reilly (breilly)',
-                  'Patrick Wehner (pwehner)',
-                  'Brandon Tally (btally)'
-                ].map(user => (
-                  <div key={user} style={{ 
-                    padding: 'calc(var(--grid-unit) / 2)', 
-                    background: '#f0f8ff',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    border: '1px solid #007BFF'
-                  }}>
-                    {user}
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop: 'var(--panel-gap)', padding: 'var(--panel-gap)', background: '#f0f8ff', borderRadius: '8px' }}>
-                <p style={{ margin: 0, fontSize: '14px', color: '#555' }}>
-                  Only these users can create accounts in SwimMeet. Registration is restricted to this whitelist for security and controlled access during testing.
-                </p>
-              </div>
-            </div>
-          </section>
+          <AdminPanel authToken={authToken} />
         )}
 
         {/* Performance Monitoring Overlay - Temporarily Disabled */}

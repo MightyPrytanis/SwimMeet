@@ -10,6 +10,7 @@ import session from 'express-session';
 import { localStorage } from './local-storage';
 import multer from 'multer';
 import { isUserWhitelisted } from './whitelist';
+import { adminService } from './admin';
 import { randomUUID } from 'crypto';
 
 // Extend session interface
@@ -278,6 +279,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: 'Logout successful' });
     });
+  });
+
+  // Admin routes - only for authorized admin users
+  const isAdmin = (req: any, res: any, next: any) => {
+    if (!req.user || (req.user.username !== 'davidtowne' && req.user.username !== 'demo')) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+  };
+
+  app.get('/api/admin/users', authenticateToken, isAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const adminUsers = users.map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email || '',
+        name: user.name || user.username,
+        status: user.status || 'active',
+        createdAt: user.createdAt || new Date(),
+        lastLogin: user.lastLogin
+      }));
+      res.json(adminUsers);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/admin/users', authenticateToken, isAdmin, async (req, res) => {
+    try {
+      const { username, email, name, password } = req.body;
+      
+      // Check if user is whitelisted
+      if (!isUserWhitelisted(username)) {
+        return res.status(403).json({ error: 'Username not in authorized list' });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+
+      const existingEmail = await storage.getUserByEmail(email);
+      if (existingEmail) {
+        return res.status(400).json({ error: 'Email already registered' });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      const newUser = await storage.createUser({
+        username,
+        password: hashedPassword,
+        email,
+        name,
+        status: 'active'
+      });
+
+      res.status(201).json({
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email || '',
+        name: newUser.name || newUser.username,
+        status: newUser.status || 'active',
+        createdAt: newUser.createdAt || new Date()
+      });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/admin/users/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+      const updatedUser = await storage.updateUser(req.params.id, req.body);
+      res.json({
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email || '',
+        name: updatedUser.name || updatedUser.username,
+        status: updatedUser.status || 'active',
+        createdAt: updatedUser.createdAt || new Date(),
+        lastLogin: updatedUser.lastLogin
+      });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete('/api/admin/users/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Don't allow deleting admin users
+      if (user.username === 'davidtowne' || user.username === 'demo') {
+        return res.status(403).json({ error: 'Cannot delete admin users' });
+      }
+
+      await storage.deleteUser(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/admin/users/:id/reset-password', authenticateToken, isAdmin, async (req, res) => {
+    try {
+      const { newPassword } = req.body;
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUser(req.params.id, { password: hashedPassword });
+      res.json({ message: 'Password reset successfully' });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/admin/authorized-emails', authenticateToken, isAdmin, async (req, res) => {
+    try {
+      const { AUTHORIZED_USERS } = await import('./whitelist');
+      const emails = AUTHORIZED_USERS.map(user => user.email);
+      res.json(emails);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   app.get('/api/auth/me', authenticateToken, async (req: any, res) => {
