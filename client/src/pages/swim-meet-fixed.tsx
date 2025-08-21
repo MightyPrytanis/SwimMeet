@@ -345,7 +345,7 @@ export default function SwimMeetFixed() {
               SWIM MEET
             </h1>
             <p className="swim-caption" style={{ margin: '0' }}>
-              AI Orchestration Platform • User: {user?.username}
+              User: {user?.username}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 'var(--panel-gap)', alignItems: 'center' }}>
@@ -416,7 +416,7 @@ export default function SwimMeetFixed() {
         </section>
       )}
 
-      {/* Modernist Mode Selection - Interlocking Panels */}
+      {/* Modernist Mode Selection - Distinctly Styled Panels */}
       <section className="swim-section">
         <h3 className="swim-subtitle">Workflow Mode</h3>
         <div className="swim-mode-selector">
@@ -424,20 +424,69 @@ export default function SwimMeetFixed() {
             { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <Play size={20} /> },
             { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <GitBranch size={20} /> },
             { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
-          ].map(m => (
-            <div
-              key={m.id}
-              className={`swim-mode-panel ${mode === m.id ? 'swim-mode-panel--active' : ''}`}
-              onClick={() => setMode(m.id as any)}
-              data-testid={`mode-${m.id}`}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'calc(var(--grid-unit) / 2)' }}>
-                {m.icon}
+          ].map(m => {
+            const isActive = mode === m.id;
+            
+            // Get mode-specific styling
+            let modeColor, modeGradient, modeBorder;
+            if (m.id === 'dive') {
+              modeColor = 'hsl(var(--dive-primary))';
+              modeGradient = isActive 
+                ? 'linear-gradient(135deg, hsl(var(--dive-primary)) 0%, hsl(var(--dive-secondary)) 100%)' 
+                : 'linear-gradient(135deg, hsl(var(--dive-primary) / 0.15) 0%, hsl(var(--dive-secondary) / 0.1) 100%)';
+              modeBorder = isActive ? 'hsl(var(--dive-primary))' : 'hsl(var(--dive-primary) / 0.4)';
+            } else if (m.id === 'turn') {
+              modeColor = 'hsl(var(--turn-primary))';
+              modeGradient = isActive 
+                ? 'linear-gradient(135deg, hsl(var(--turn-primary)) 0%, hsl(var(--turn-secondary)) 100%)' 
+                : 'linear-gradient(135deg, hsl(var(--turn-primary) / 0.15) 0%, hsl(var(--turn-secondary) / 0.1) 100%)';
+              modeBorder = isActive ? 'hsl(var(--turn-primary))' : 'hsl(var(--turn-primary) / 0.4)';
+            } else {
+              modeColor = 'hsl(var(--work-primary))';
+              modeGradient = isActive 
+                ? 'linear-gradient(135deg, hsl(var(--work-primary)) 0%, hsl(var(--work-secondary)) 100%)' 
+                : 'linear-gradient(135deg, hsl(var(--work-primary) / 0.15) 0%, hsl(var(--work-secondary) / 0.1) 100%)';
+              modeBorder = isActive ? 'hsl(var(--work-primary))' : 'hsl(var(--work-primary) / 0.4)';
+            }
+            
+            return (
+              <div
+                key={m.id}
+                className={`swim-mode-panel ${isActive ? 'swim-mode-panel--active' : ''}`}
+                onClick={() => setMode(m.id as any)}
+                data-testid={`mode-${m.id}`}
+                style={{
+                  background: modeGradient,
+                  border: `2px solid ${modeBorder}`,
+                  transform: isActive ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
+                  boxShadow: isActive ? '0 8px 32px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s cubic-bezier(0.2, 0, 0.2, 1)'
+                }}
+              >
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  marginBottom: 'calc(var(--grid-unit) / 2)',
+                  color: isActive ? 'white' : modeColor
+                }}>
+                  {m.icon}
+                </div>
+                <div className="swim-mode-title" style={{ 
+                  color: isActive ? 'white' : modeColor,
+                  textShadow: isActive ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+                }}>
+                  {m.name}
+                </div>
+                <div className="swim-mode-description" style={{ 
+                  color: isActive ? 'rgba(255,255,255,0.9)' : `${modeColor}aa`,
+                  textShadow: isActive ? '0 1px 2px rgba(0,0,0,0.2)' : 'none'
+                }}>
+                  {m.desc}
+                </div>
               </div>
-              <div className="swim-mode-title">{m.name}</div>
-              <div className="swim-mode-description">{m.desc}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

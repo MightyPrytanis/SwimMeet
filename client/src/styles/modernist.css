@@ -8,18 +8,26 @@
   /* Primary Aquatic Palette - Carefully Curated */
   --deep-pool-blue: 210 63% 28%;           /* #1B4B73 - trust, depth, primary structure */
   --chrome-silver: 200 15% 78%;            /* #C5D1D8 - precision, clarity, panel edges */
-  --lane-line-white: 200 40% 98%;          /* #F8FAFB - clean, professional background */
+  --lane-line-white: 210 25% 18%;          /* #242B35 - dark, professional background */
   --competitive-gold: 43 85% 38%;          /* #B8860B - awards, excellence, achievements */
   --underwater-teal: 180 31% 41%;          /* #4A8B8B - aquatic depth, primary actions */
   --surface-blue: 197 71% 73%;             /* #87CEEB - interface highlights, selection */
   --poolside-red: 0 69% 48%;               /* #C53030 - clear warnings, errors */
   --caution-amber: 42 78% 51%;             /* #D69E2E - system status, attention */
 
+  /* Mode-Specific Colors */
+  --dive-primary: 195 85% 35%;             /* Electric dive blue */
+  --dive-secondary: 195 70% 85%;            /* Light dive splash */
+  --turn-primary: 280 65% 45%;             /* Purple turn pivot */
+  --turn-secondary: 280 45% 85%;            /* Light purple mist */
+  --work-primary: 35 75% 50%;              /* Warm collaboration gold */
+  --work-secondary: 35 60% 90%;             /* Light golden glow */
+
   /* Glass Panel System Variables */
-  --glass-light: rgba(248, 250, 251, 0.95);
-  --glass-medium: rgba(245, 247, 250, 0.9);
-  --glass-dark: rgba(27, 75, 115, 0.9);
-  --glass-border: rgba(197, 209, 216, 0.8);
+  --glass-light: rgba(36, 43, 53, 0.95);
+  --glass-medium: rgba(27, 75, 115, 0.9);
+  --glass-dark: rgba(15, 23, 35, 0.95);
+  --glass-border: rgba(74, 139, 139, 0.3);
   --glass-shadow: 0 2px 8px hsla(var(--deep-pool-blue), 0.1);
   --glass-shadow-active: 0 4px 16px hsla(var(--underwater-teal), 0.2);
 
