@@ -216,7 +216,7 @@ body {
 .glass-panel-large {
   background: linear-gradient(135deg, 
     rgba(255, 255, 255, 0.08) 0%, 
-    rgba(74, 139, 139, 0.05) 100%);
+    rgba(74, 122, 154, 0.05) 100%);
   border: 1px solid var(--steel-gunmetal);
   /* NO border-radius - sharp corners only */
   box-shadow: inset 0 1px 2px rgba(248, 248, 251, 0.15);
@@ -255,7 +255,7 @@ body {
   padding: 16px;
   /* STEP 5: Provider Panel Card Component */
   background: linear-gradient(135deg, 
-    rgba(74, 139, 139, 0.12) 0%, 
+    rgba(74, 122, 154, 0.12) 0%, 
     transparent 100%);
   border: 1px solid var(--steel-charcoal);
   /* No border-radius */
@@ -283,7 +283,7 @@ body {
 .photoplate-accent {
   background: linear-gradient(135deg, 
     rgba(135, 206, 235, 0.25) 0%, 
-    rgba(74, 139, 139, 0.35) 100%);
+    rgba(74, 122, 154, 0.35) 100%);
   border: 2px solid var(--steel-gunmetal);
   /* No border-radius */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
