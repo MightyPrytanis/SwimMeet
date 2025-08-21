@@ -359,24 +359,31 @@ export default function SwimMeetFixed() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
             <div style={{
-              height: '60px',
-              width: '200px',
-              background: 'linear-gradient(135deg, #007BFF 0%, #0056D6 100%)',
+              height: '80px',
+              width: '220px',
+              background: 'linear-gradient(135deg, #C0C0C0 0%, #E5E5E5 25%, #B8B8B8 50%, #D3D3D3 75%, #A8A8A8 100%)',
+              border: '3px solid #909090',
               borderRadius: '8px',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
+              color: '#4A4A4A',
               fontWeight: 'bold',
               fontSize: '24px',
-              letterSpacing: '2px'
+              letterSpacing: '2px',
+              textShadow: '1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(0,0,0,0.3)',
+              boxShadow: 'inset 2px 2px 5px rgba(255,255,255,0.7), inset -2px -2px 5px rgba(0,0,0,0.3)'
             }}>
-              SWIM MEET
+              <div>SWIM MEET</div>
+              <div style={{
+                fontSize: '12px',
+                letterSpacing: '3px',
+                fontWeight: '600',
+                marginTop: '2px'
+              }}>P R E M I U M</div>
             </div>
             <div>
-              <h1 className="swim-brand swim-title" style={{ margin: '0', fontSize: '2rem' }}>
-                SWIM MEET
-              </h1>
               <p className="swim-caption" style={{ margin: '0' }}>
                 User: {user?.username}
               </p>
@@ -400,15 +407,14 @@ export default function SwimMeetFixed() {
               <div 
                 data-menu-dropdown
                 style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: '0',
-                  marginTop: 'calc(var(--grid-unit) / 2)',
+                  position: 'fixed',
+                  top: '100px',
+                  right: '20px',
                   backgroundColor: 'white',
                   border: '1px solid hsl(var(--steel-gunmetal) / 0.2)',
                   borderRadius: 'var(--border-radius)',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  zIndex: 9999,
+                  zIndex: 999999,
                   minWidth: '200px',
                   overflow: 'hidden'
                 }}>

@@ -7,8 +7,9 @@ import { credentialsSchema, insertConversationSchema, insertResponseSchema, inse
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
-import { fileStorage } from "./fileStorage";
+import { localStorage } from './local-storage';
 import multer from 'multer';
+import { randomUUID } from 'crypto';
 
 // Extend session interface
 declare module 'express-session' {
@@ -723,23 +724,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const uploadedFiles = [];
       
       for (const file of files) {
-        const savedFile = await fileStorage.saveFile(file.buffer, file.originalname);
-        
-        // Store file metadata in database
-        const fileRecord = await storage.createFileAttachment({
-          id: randomUUID(),
-          userId: userId,
-          originalName: file.originalname,
-          filePath: savedFile.path,
-          fileSize: savedFile.size,
-          mimeType: file.mimetype
-        });
+        const filename = await localStorage.saveFile(file);
         
         uploadedFiles.push({
-          id: fileRecord.id,
+          id: filename,
           name: file.originalname,
-          size: savedFile.size,
-          path: `/api/files/download/${fileRecord.id}`
+          size: file.size,
+          path: `/api/files/download/${filename}`
         });
       }
       
@@ -750,22 +741,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Download files
-  app.get("/api/files/download/:fileId", authenticateToken, async (req: any, res) => {
+  app.get("/api/files/download/:filename", authenticateToken, async (req: any, res) => {
     try {
-      const { fileId } = req.params;
-      const userId = req.user.userId;
+      const { filename } = req.params;
       
-      const fileRecord = await storage.getFileAttachment(fileId);
-      if (!fileRecord || fileRecord.userId !== userId) {
+      const fileBuffer = await localStorage.getFile(filename);
+      if (!fileBuffer) {
         return res.status(404).json({ message: 'File not found' });
       }
       
-      const fileBuffer = await fileStorage.getFile(fileRecord.filePath);
-      
       res.set({
-        'Content-Type': fileRecord.mimeType || 'application/octet-stream',
-        'Content-Length': fileRecord.fileSize.toString(),
-        'Content-Disposition': `attachment; filename="${fileRecord.originalName}"`
+        'Content-Type': 'application/octet-stream',
+        'Content-Length': fileBuffer.length.toString(),
+        'Content-Disposition': `attachment; filename="${filename}"`
       });
       
       res.send(fileBuffer);
@@ -921,7 +909,7 @@ Provide only the reply text, no explanations.`;
       const providerStats: Record<string, any> = {};
       
       for (const row of statsResult.rows) {
-        const provider = row.ai_provider;
+        const provider = String(row.ai_provider);
         providerStats[provider] = {
           totalResponses: parseInt(row.total_responses as string),
           completeResponses: parseInt(row.successful_responses as string), 
