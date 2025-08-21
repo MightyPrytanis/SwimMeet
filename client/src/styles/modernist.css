@@ -201,22 +201,29 @@ body {
 
 /* === STEP 2: GLASS PANEL COMPONENT === */
 .glass-panel-large {
-  background: #FFFFFF;
-  border: 2px solid #3B82F6;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--clear-blue);
   /* NO border-radius - sharp corners only */
   box-shadow: 
-    0 8px 25px rgba(59, 130, 246, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 1);
+    0 8px 25px rgba(0, 123, 255, 0.12),
+    inset 0 3px 6px rgba(240, 248, 255, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 24px;
 }
 
 /* === STEP 3: STEEL FRAMEWORK DIVIDER === */
 .steel-frame-divider {
-  background: #3B82F6;
-  border-top: 1px solid #93C5FD;
-  border-bottom: 1px solid #1D4ED8;
+  background: linear-gradient(90deg, 
+    var(--steel-charcoal) 0%, 
+    var(--steel-gunmetal) 50%, 
+    var(--steel-charcoal) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   /* No border-radius */
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
   height: 8px;
   width: 100%;
   margin: 24px 0;
@@ -240,11 +247,11 @@ body {
   margin: 0;
   padding: 16px;
   /* STEP 5: Provider Panel Card Component */
-  background: #FFFFFF;
-  border: 2px solid #3B82F6;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid var(--clear-blue);
   box-shadow: 
-    0 8px 20px rgba(59, 130, 246, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 1);
+    0 6px 16px rgba(0, 128, 255, 0.1),
+    inset 0 2px 4px rgba(240, 248, 255, 0.6);
   /* No border-radius */
   font-family: sans-serif;
   font-size: 1.125rem;
@@ -639,8 +646,8 @@ body {
   text-align: center;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
-  border: 2px solid #3B82F6;
-  background: #FFFFFF;
+  border: 2px solid var(--clear-blue);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .swim-mode-panel:hover {
@@ -650,10 +657,10 @@ body {
 }
 
 .swim-mode-panel--active {
-  border-color: #3B82F6;
-  background: #3B82F6;
+  border-color: var(--pool-blue);
+  background: var(--pool-blue);
   color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
 }
 
 .swim-mode-title {
