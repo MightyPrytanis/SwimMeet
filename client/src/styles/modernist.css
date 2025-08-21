@@ -83,18 +83,10 @@ body {
   font-family: var(--font-primary);
   font-weight: var(--font-weight-regular);
   line-height: 1.6;
-  color: hsl(var(--chrome-silver));
-  background: 
-    radial-gradient(ellipse at 50% 10%, hsl(var(--surface-blue) / 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, hsl(var(--underwater-teal) / 0.2) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, hsl(var(--surface-blue) / 0.15) 0%, transparent 30%),
-    linear-gradient(180deg, 
-      hsl(var(--deep-pool-blue)) 0%, 
-      hsl(var(--underwater-teal) / 0.7) 40%, 
-      hsl(var(--lane-line-white)) 100%);
+  color: #1D4ED8;
+  background: #FFFFFF;
   min-height: 100vh;
   position: relative;
-  animation: underwater-motion 20s ease-in-out infinite;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -110,16 +102,11 @@ body {
 
 /* === UNDERWATER GLASS PANEL SYSTEM === */
 .swim-panel {
-  background: var(--glass-dark);
-  border: 1px solid var(--glass-border);
-  box-shadow: 
-    var(--glass-shadow),
-    inset 0 1px 0 rgba(135, 206, 235, 0.3),
-    inset 0 -1px 0 rgba(27, 75, 115, 0.3);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #FFFFFF;
+  border: 1px solid #3B82F6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
   transition: all var(--duration-fast) var(--easing-standard);
-  color: hsl(var(--chrome-silver));
+  color: #1D4ED8;
   position: relative;
   overflow: hidden;
   /* SHARP EDGES ONLY - No border radius */
@@ -214,34 +201,22 @@ body {
 
 /* === STEP 2: GLASS PANEL COMPONENT === */
 .glass-panel-large {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.65) 0%, 
-    rgba(248, 250, 252, 0.45) 50%,
-    rgba(241, 245, 249, 0.55) 100%);
-  border: 2px solid rgba(147, 197, 253, 0.4);
+  background: #FFFFFF;
+  border: 2px solid #3B82F6;
   /* NO border-radius - sharp corners only */
   box-shadow: 
-    0 8px 25px rgba(59, 130, 246, 0.08),
-    inset 0 4px 8px rgba(255, 255, 255, 0.7),
-    inset 0 -4px 8px rgba(241, 245, 249, 0.3);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    0 8px 25px rgba(59, 130, 246, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 1);
   padding: 24px;
 }
 
 /* === STEP 3: STEEL FRAMEWORK DIVIDER === */
 .steel-frame-divider {
-  background: linear-gradient(90deg, 
-    var(--steel-charcoal) 0%, 
-    var(--steel-gunmetal) 50%, 
-    var(--steel-charcoal) 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  background: #3B82F6;
+  border-top: 1px solid #93C5FD;
+  border-bottom: 1px solid #1D4ED8;
   /* No border-radius */
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
   height: 8px;
   width: 100%;
   margin: 24px 0;
@@ -265,15 +240,11 @@ body {
   margin: 0;
   padding: 16px;
   /* STEP 5: Provider Panel Card Component */
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.85) 0%, 
-    rgba(248, 250, 252, 0.75) 30%,
-    rgba(219, 234, 254, 0.25) 70%,
-    rgba(241, 245, 249, 0.65) 100%);
-  border: 2px solid var(--clear-blue);
+  background: #FFFFFF;
+  border: 2px solid #3B82F6;
   box-shadow: 
-    0 8px 20px rgba(59, 130, 246, 0.06),
-    inset 0 4px 8px rgba(255, 255, 255, 0.8);
+    0 8px 20px rgba(59, 130, 246, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 1);
   /* No border-radius */
   font-family: sans-serif;
   font-size: 1.125rem;
@@ -668,21 +639,21 @@ body {
   text-align: center;
   cursor: pointer;
   transition: all var(--duration-fast) var(--easing-standard);
-  border: 2px solid var(--glass-border);
-  background: var(--glass-light);
+  border: 2px solid #3B82F6;
+  background: #FFFFFF;
 }
 
 .swim-mode-panel:hover {
-  border-color: hsl(var(--underwater-teal));
-  background: rgba(248, 250, 251, 0.98);
+  border-color: #3B82F6;
+  background: #FFFFFF;
   transform: translateY(-2px);
 }
 
 .swim-mode-panel--active {
-  border-color: hsl(var(--underwater-teal));
-  background: hsl(var(--surface-blue));
+  border-color: #3B82F6;
+  background: #3B82F6;
   color: white;
-  box-shadow: var(--glass-shadow-active);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .swim-mode-title {
@@ -717,8 +688,8 @@ body {
 }
 
 .swim-provider--selected {
-  border-color: hsl(var(--underwater-teal));
-  background: rgba(135, 206, 235, 0.1);
+  border-color: #3B82F6;
+  background: #FFFFFF;
 }
 
 .swim-provider-header {
@@ -914,12 +885,12 @@ body {
   width: 100%;
   min-height: 120px;
   padding: var(--panel-padding);
-  background: rgba(248, 250, 251, 0.98);
-  border: 2px solid var(--glass-border);
+  background: #FFFFFF;
+  border: 2px solid #3B82F6;
   font-family: inherit;
   font-size: 1rem;
   line-height: 1.5;
-  color: hsl(var(--deep-pool-blue));
+  color: #1D4ED8;
   resize: vertical;
   transition: all var(--duration-fast) var(--easing-standard);
   /* Sharp edges for modernist aesthetic */
