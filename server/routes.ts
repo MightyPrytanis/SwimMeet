@@ -889,8 +889,51 @@ Provide only the reply text, no explanations.`;
 
   // Get AI provider statistics
   app.get("/api/stats", async (req, res) => {
-    const stats = await storage.getProviderStats();
-    res.json(stats);
+    try {
+      // Get real stats from database using SQL
+      const { db } = await import("./db");
+      const { responses } = await import("@shared/schema");
+      const { sql } = await import("drizzle-orm");
+      
+      const statsResult = await db.execute(sql`
+        SELECT 
+          ai_provider,
+          COUNT(*) as total_responses,
+          SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) as successful_responses,
+          ROUND(
+            (SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 1
+          ) as success_rate,
+          SUM(CASE WHEN award = 'gold' THEN 1 ELSE 0 END) as gold_awards,
+          SUM(CASE WHEN award = 'silver' THEN 1 ELSE 0 END) as silver_awards,
+          SUM(CASE WHEN award = 'bronze' THEN 1 ELSE 0 END) as bronze_awards
+        FROM responses 
+        GROUP BY ai_provider
+      `);
+
+      // Format the stats into the expected structure
+      const providerStats: Record<string, any> = {};
+      
+      for (const row of statsResult.rows) {
+        const provider = row.ai_provider;
+        providerStats[provider] = {
+          totalResponses: parseInt(row.total_responses as string),
+          completeResponses: parseInt(row.successful_responses as string), 
+          successRate: parseFloat(row.success_rate as string),
+          awards: {
+            gold: parseInt(row.gold_awards as string),
+            silver: parseInt(row.silver_awards as string), 
+            bronze: parseInt(row.bronze_awards as string)
+          },
+          avgResponseTimeMs: null, // Would need additional calculation
+          verificationRate: 0 // Would need additional calculation
+        };
+      }
+
+      res.json(providerStats);
+    } catch (error: any) {
+      console.error('Error getting stats:', error);
+      res.status(500).json({ error: 'Failed to get stats' });
+    }
   });
 
   // TURN Mode verification - AI-to-AI fact-checking
