@@ -361,26 +361,35 @@ export default function SwimMeetFixed() {
             <div style={{
               height: '80px',
               width: '220px',
-              background: 'linear-gradient(135deg, #C0C0C0 0%, #E5E5E5 25%, #B8B8B8 50%, #D3D3D3 75%, #A8A8A8 100%)',
-              border: '3px solid #909090',
+              background: 'linear-gradient(135deg, #007BFF 0%, #0056D6 50%, #00A3E0 100%)',
+              border: '3px solid #C0C0C0',
               borderRadius: '8px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#4A4A4A',
+              color: '#C0C0C0',
               fontWeight: 'bold',
               fontSize: '24px',
               letterSpacing: '2px',
-              textShadow: '1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(0,0,0,0.3)',
-              boxShadow: 'inset 2px 2px 5px rgba(255,255,255,0.7), inset -2px -2px 5px rgba(0,0,0,0.3)'
+              textShadow: '2px 2px 4px rgba(255,255,255,0.9), -1px -1px 3px rgba(0,0,0,0.4)',
+              boxShadow: 'inset 1px 1px 3px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.2)'
             }}>
-              <div>SWIM MEET</div>
+              <div style={{
+                background: 'linear-gradient(135deg, #E5E5E5 0%, #C0C0C0 50%, #A8A8A8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>SWIM MEET</div>
               <div style={{
                 fontSize: '12px',
                 letterSpacing: '3px',
                 fontWeight: '600',
-                marginTop: '2px'
+                marginTop: '2px',
+                background: 'linear-gradient(135deg, #E5E5E5 0%, #C0C0C0 50%, #A8A8A8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
               }}>P R E M I U M</div>
             </div>
             <div>
@@ -389,94 +398,46 @@ export default function SwimMeetFixed() {
               </p>
             </div>
           </div>
-          <div style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', gap: 'calc(var(--grid-unit) / 2)' }}>
             <button
               className="swim-button swim-button--secondary"
-              onClick={() => setShowMenu(!showMenu)}
-              data-testid="button-hamburger-menu"
+              onClick={() => setShowStats(!showStats)}
+              data-testid="button-toggle-stats"
+              title={showStats ? 'Hide Statistics' : 'Show Statistics'}
               style={{
                 padding: 'calc(var(--grid-unit) * 0.75)',
                 minWidth: 'auto'
               }}
             >
-              {showMenu ? <X size={20} /> : <Menu size={20} />}
+              <BarChart3 size={20} />
             </button>
             
-            {/* Hamburger Menu Dropdown */}
-            {showMenu && (
-              <div 
-                data-menu-dropdown
-                style={{
-                  position: 'fixed',
-                  top: '100px',
-                  right: '20px',
-                  backgroundColor: 'white',
-                  border: '1px solid hsl(var(--steel-gunmetal) / 0.2)',
-                  borderRadius: 'var(--border-radius)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  zIndex: 999999,
-                  minWidth: '200px',
-                  overflow: 'hidden'
-                }}>
-                <div style={{ padding: 'calc(var(--grid-unit) / 2)' }}>
-                  <button
-                    className="swim-button swim-button--ghost"
-                    onClick={() => {
-                      setShowStats(!showStats);
-                      setShowMenu(false);
-                    }}
-                    data-testid="button-toggle-stats"
-                    style={{
-                      width: '100%',
-                      justifyContent: 'flex-start',
-                      marginBottom: 'calc(var(--grid-unit) / 4)'
-                    }}
-                  >
-                    <BarChart3 size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
-                    {showStats ? 'Hide Statistics' : 'Show Statistics'}
-                  </button>
-                  
-                  <button
-                    className="swim-button swim-button--ghost"
-                    onClick={() => {
-                      setShowSettings(!showSettings);
-                      setShowMenu(false);
-                    }}
-                    data-testid="button-toggle-settings"
-                    style={{
-                      width: '100%',
-                      justifyContent: 'flex-start',
-                      marginBottom: 'calc(var(--grid-unit) / 4)'
-                    }}
-                  >
-                    <Settings size={16} style={{ marginRight: 'calc(var(--grid-unit) / 2)' }} />
-                    {showSettings ? 'Hide Cloud Storage' : 'Cloud Storage'}
-                  </button>
-                  
-                  <hr style={{
-                    border: 'none',
-                    borderTop: '1px solid hsl(var(--steel-gunmetal) / 0.1)',
-                    margin: 'calc(var(--grid-unit) / 2) 0'
-                  }} />
-                  
-                  <button
-                    className="swim-button swim-button--ghost"
-                    onClick={() => {
-                      handleLogout();
-                      setShowMenu(false);
-                    }}
-                    data-testid="button-logout"
-                    style={{
-                      width: '100%',
-                      justifyContent: 'flex-start',
-                      color: 'hsl(var(--poolside-red))'
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            )}
+            <button
+              className="swim-button swim-button--secondary"
+              onClick={() => setShowSettings(!showSettings)}
+              data-testid="button-toggle-settings"
+              title={showSettings ? 'Hide Cloud Storage' : 'Show Cloud Storage'}
+              style={{
+                padding: 'calc(var(--grid-unit) * 0.75)',
+                minWidth: 'auto'
+              }}
+            >
+              <Settings size={20} />
+            </button>
+            
+            <button
+              className="swim-button swim-button--ghost"
+              onClick={handleLogout}
+              data-testid="button-logout"
+              title="Logout"
+              style={{
+                padding: 'calc(var(--grid-unit) * 0.75)',
+                minWidth: 'auto',
+                color: 'hsl(var(--poolside-red))'
+              }}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </header>
