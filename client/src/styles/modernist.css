@@ -297,6 +297,15 @@ body {
   }
 }
 
+/* === STEP 8: GLASS EFFECT TYPOGRAPHY === */
+.panel-heading {
+  font-family: system-ui, Inter, "Segoe UI", sans-serif;
+  color: hsl(var(--deep-blue));
+  font-weight: 600;
+  font-size: 1.3rem;
+  text-shadow: 0 1px 1px hsl(var(--lane-white));
+}
+
 .swim-grid--main {
   grid-template-columns: 1fr;
   max-width: 1200px;
