@@ -378,20 +378,21 @@ export default function SwimMeetFixed() {
               boxShadow: 'inset 1px 1px 3px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.2)'
             }}>
               <div style={{
-                background: 'linear-gradient(135deg, #E5E5E5 0%, #C0C0C0 50%, #A8A8A8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                color: '#FFFFFF',
+                textStroke: '1px #808080',
+                WebkitTextStroke: '1px #808080',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))',
+                fontWeight: '800'
               }}>SWIM MEET</div>
               <div style={{
                 fontSize: '12px',
                 letterSpacing: '3px',
-                fontWeight: '600',
+                fontWeight: '700',
                 marginTop: '2px',
-                background: 'linear-gradient(135deg, #E5E5E5 0%, #C0C0C0 50%, #A8A8A8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                color: '#FFFFFF',
+                textStroke: '0.5px #808080',
+                WebkitTextStroke: '0.5px #808080',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'
               }}>P R E M I U M</div>
             </div>
             <div>
