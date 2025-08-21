@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
-import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield } from "lucide-react";
 import "../styles/modernist.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
@@ -69,6 +69,7 @@ export default function SwimMeetFixed() {
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
   const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Authentication check effect
   useEffect(() => {
@@ -372,18 +373,16 @@ export default function SwimMeetFixed() {
             }}>
               <div style={{
                 color: '#FFFFFF',
-                textStroke: '1px #808080',
                 WebkitTextStroke: '1px #808080',
                 filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))',
                 fontWeight: '800'
-              }}>SWIM MEET</div>
+              }}>SwimMeet</div>
               <div style={{
                 fontSize: '12px',
                 letterSpacing: '3px',
                 fontWeight: '700',
                 marginTop: '2px',
                 color: '#FFFFFF',
-                textStroke: '0.5px #808080',
                 WebkitTextStroke: '0.5px #808080',
                 filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'
               }}>P R E M I U M</div>
@@ -407,6 +406,24 @@ export default function SwimMeetFixed() {
             >
               <BarChart3 size={20} />
             </button>
+            
+            {/* Admin Panel - Only for David Towne */}
+            {user?.username === 'dtowne' && (
+              <button
+                className="swim-button swim-button--secondary"
+                onClick={() => setShowAdminPanel(!showAdminPanel)}
+                data-testid="button-toggle-admin"
+                title={showAdminPanel ? 'Hide Admin Panel' : 'Show Admin Panel'}
+                style={{
+                  padding: 'calc(var(--grid-unit) * 0.75)',
+                  minWidth: 'auto',
+                  background: 'linear-gradient(135deg, #ffd700 0%, #ffed4a 100%)',
+                  color: '#000'
+                }}
+              >
+                <Shield size={20} />
+              </button>
+            )}
             
             {/* Performance Monitor Button - Temporarily Disabled */}
             
@@ -908,18 +925,61 @@ export default function SwimMeetFixed() {
           </div>
         )}
 
-        {/* File Upload */}
-        <StandardFileUpload
-          isVisible={showSettings}
-          onFilesUploaded={handleFilesUploaded}
-        />
+        {/* File Upload - Only show when settings are visible */}
+        {showSettings && (
+          <StandardFileUpload
+            onFilesUploaded={handleFilesSelected}
+          />
+        )}
 
         {/* Cloud Storage Settings Panel */}
         {showSettings && (
           <CloudStorageSettings 
-            isVisible={showSettings}
-            onClose={() => setShowSettings(false)}
+            authToken={authToken}
           />
+        )}
+
+        {/* Admin Panel - User Whitelist Management */}
+        {showAdminPanel && user?.username === 'dtowne' && (
+          <section className="glass-panel-large swim-section">
+            <h3 className="panel-heading" style={{ color: '#ffd700' }}>
+              🛡️ Admin Panel - User Whitelist Management
+            </h3>
+            <div className="swim-panel" style={{ background: 'linear-gradient(135deg, #ffd700 5%, #ffffff 100%)' }}>
+              <div style={{ marginBottom: 'var(--panel-gap)' }}>
+                <strong>Authorized Users:</strong>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'calc(var(--grid-unit) / 2)' }}>
+                {[
+                  'David Towne (dtowne)',
+                  'John Barreto (jbarreto)',
+                  'Mekel Miller (mmiller)',
+                  'Patricia Sampier (psampier)',
+                  'Heather Reilly (hreilly)',
+                  'Joseph Reilly (jreilly)',
+                  'Grace Reilly (greilly)',
+                  'Brian Reilly (breilly)',
+                  'Patrick Wehner (pwehner)',
+                  'Brandon Tally (btally)'
+                ].map(user => (
+                  <div key={user} style={{ 
+                    padding: 'calc(var(--grid-unit) / 2)', 
+                    background: '#f0f8ff',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    border: '1px solid #007BFF'
+                  }}>
+                    {user}
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 'var(--panel-gap)', padding: 'var(--panel-gap)', background: '#f0f8ff', borderRadius: '8px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#555' }}>
+                  Only these users can create accounts in SwimMeet. Registration is restricted to this whitelist for security and controlled access during testing.
+                </p>
+              </div>
+            </div>
+          </section>
         )}
 
         {/* Performance Monitoring Overlay - Temporarily Disabled */}

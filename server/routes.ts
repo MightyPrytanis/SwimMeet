@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import session from 'express-session';
 import { localStorage } from './local-storage';
 import multer from 'multer';
+import { isUserWhitelisted } from './whitelist';
 import { randomUUID } from 'crypto';
 
 // Extend session interface
@@ -194,6 +195,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/register', async (req, res) => {
     try {
       const { username, password } = insertUserSchema.parse(req.body);
+      
+      // Check if user is whitelisted
+      if (!isUserWhitelisted(username)) {
+        return res.status(403).json({ error: 'Registration is restricted to authorized users only' });
+      }
       
       // Check if user exists
       const existingUser = await storage.getUserByUsername(username);
