@@ -285,6 +285,18 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* === STEP 7: RESPONSIVE BEHAVIOR (LAYOUT ADAPTATION) === */
+@media (max-width: 699px) {
+  .glass-panel-large,
+  .provider-grid,
+  .steel-frame-divider {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    gap: 0;
+  }
+}
+
 .swim-grid--main {
   grid-template-columns: 1fr;
   max-width: 1200px;
