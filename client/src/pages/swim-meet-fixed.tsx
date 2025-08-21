@@ -4,8 +4,9 @@ import { queryClient } from "@/lib/queryClient";
 import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
-import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity } from "lucide-react";
 import "../styles/modernist.css";
+import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
 // Types
 interface AIProvider {
@@ -67,6 +68,7 @@ export default function SwimMeetFixed() {
   const [selectedVerifier, setSelectedVerifier] = useState<string>("anthropic");
   const [attachedFiles, setAttachedFiles] = useState<any[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
+  const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
 
   // Click outside to close menu
   useEffect(() => {
@@ -410,6 +412,19 @@ export default function SwimMeetFixed() {
               }}
             >
               <BarChart3 size={20} />
+            </button>
+            
+            <button
+              className="swim-button swim-button--secondary"
+              onClick={() => setShowPerformanceOverlay(!showPerformanceOverlay)}
+              data-testid="button-toggle-performance"
+              title={showPerformanceOverlay ? 'Hide Performance Monitor' : 'Show Performance Monitor'}
+              style={{
+                padding: 'calc(var(--grid-unit) * 0.75)',
+                minWidth: 'auto'
+              }}
+            >
+              <Activity size={20} />
             </button>
             
             <button
@@ -909,6 +924,26 @@ export default function SwimMeetFixed() {
             </div>
           </div>
         )}
+
+        {/* File Upload */}
+        <StandardFileUpload
+          isVisible={showSettings}
+          onFilesUploaded={handleFilesUploaded}
+        />
+
+        {/* Cloud Storage Settings Panel */}
+        {showSettings && (
+          <CloudStorageSettings 
+            isVisible={showSettings}
+            onClose={() => setShowSettings(false)}
+          />
+        )}
+
+        {/* Performance Monitoring Overlay */}
+        <PerformanceOverlay 
+          isVisible={showPerformanceOverlay}
+          onClose={() => setShowPerformanceOverlay(false)}
+        />
       </div> {/* End of container div */}
     </div>
   );
