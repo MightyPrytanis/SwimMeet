@@ -460,8 +460,8 @@ export default function SwimMeetFixed() {
 
       {/* Modernist Statistics Panel */}
       {showStats && (
-        <section className="swim-panel swim-section">
-          <h3 className="swim-subtitle">AI Provider Statistics</h3>
+        <section className="glass-panel-large swim-section">
+          <h3 className="panel-heading">AI Provider Statistics</h3>
           <div className="swim-grid swim-grid--three-col">
             {Object.entries(providerStats).map(([providerId, stats]: [string, any]) => (
               <div key={providerId} className="swim-panel" data-testid={`stats-${providerId}`}>
@@ -492,7 +492,7 @@ export default function SwimMeetFixed() {
 
       {/* Modernist Cloud Storage Settings Panel */}
       {showSettings && (
-        <section className="swim-panel swim-section">
+        <section className="glass-panel-large swim-section">
           <CloudStorageSettings authToken={authToken} />
         </section>
       )}
@@ -571,14 +571,16 @@ export default function SwimMeetFixed() {
         </div>
       </section>
 
+      <div className="steel-frame-divider"></div>
+
       {/* Modernist AI Provider Selection */}
       <section className="swim-section">
-        <h3 className="swim-subtitle">Select AI Providers</h3>
-        <div className="swim-providers">
+        <h3 className="panel-heading">Select AI Providers</h3>
+        <div className="provider-grid">
           {providers.map(provider => (
             <div
               key={provider.id}
-              className={`swim-panel swim-provider ${selectedAIs.includes(provider.id) ? 'swim-provider--selected' : ''}`}
+              className={`provider-panel ${selectedAIs.includes(provider.id) ? 'photoplate-accent' : ''}`}
               onClick={() => provider.status !== 'error' && toggleAISelection(provider.id)}
               style={{
                 cursor: provider.status === 'error' ? 'not-allowed' : 'pointer',
@@ -600,11 +602,13 @@ export default function SwimMeetFixed() {
         </div>
       </section>
 
+      <div className="steel-frame-divider"></div>
+
       {/* Modernist File Upload Interface */}
-      <section className="swim-panel swim-section">
+      <section className="glass-panel-large swim-section">
         <div className="swim-feature-header">
           <Upload size={20} />
-          <h3 className="swim-subtitle">File Attachments</h3>
+          <h3 className="panel-heading">File Attachments</h3>
         </div>
           
         <div style={{ display: 'flex', gap: 'var(--panel-gap)', alignItems: 'center', marginBottom: 'var(--section-gap)' }}>
@@ -666,9 +670,11 @@ export default function SwimMeetFixed() {
           )}
       </section>
 
+      <div className="steel-frame-divider"></div>
+
       {/* Modernist Query Input - Primary Action Panel */}
-      <section className="swim-panel swim-panel--primary swim-section">
-        <h3 className="swim-subtitle">Query Input</h3>
+      <section className="glass-panel-large swim-section">
+        <h3 className="panel-heading">Query Input</h3>
         <div className="swim-query-container">
           <textarea
             value={query}
@@ -794,9 +800,9 @@ export default function SwimMeetFixed() {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {responses.map(response => (
-                <div key={response.id} className="swim-response-card">
+                <div key={response.id} className="glass-panel-large swim-response-card">
                   <div className="swim-response-header">
-                    <div className="swim-subtitle" style={{ margin: 0 }}>
+                    <div className="panel-heading" style={{ margin: 0 }}>
                       {response.aiProvider.toUpperCase()}
                       {mode === 'work' && responses.indexOf(response) >= 0 && (
                         <span className="swim-caption" style={{ 
