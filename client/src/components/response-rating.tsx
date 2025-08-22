@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, Award, Medal, CheckCircle, XCircle, Anchor } from "lucide-react";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface ResponseRatingProps {
   responseId: string;
@@ -13,12 +13,8 @@ export function ResponseRating({ responseId, currentRating, onRatingChange }: Re
   const [rating, setRating] = useState(currentRating || '');
 
   const ratings = [
-    { id: 'gold', label: 'Gold Medal', icon: Crown, color: 'bg-yellow-500', textColor: 'text-yellow-800' },
-    { id: 'silver', label: 'Silver Medal', icon: Award, color: 'bg-gray-400', textColor: 'text-gray-800' },
-    { id: 'bronze', label: 'Bronze Medal', icon: Medal, color: 'bg-amber-600', textColor: 'text-amber-800' },
-    { id: 'finished', label: 'Finished', icon: CheckCircle, color: 'bg-green-500', textColor: 'text-green-800' },
-    { id: 'quit', label: 'Quit', icon: XCircle, color: 'bg-red-500', textColor: 'text-red-800' },
-    { id: 'titanic', label: 'Titanic', icon: Anchor, color: 'bg-slate-800', textColor: 'text-slate-100' }
+    { id: 'positive', label: 'Thumbs Up', icon: ThumbsUp, color: 'bg-green-500', textColor: 'text-green-800' },
+    { id: 'negative', label: 'Thumbs Down', icon: ThumbsDown, color: 'bg-red-500', textColor: 'text-red-800' }
   ];
 
   const handleRatingClick = (ratingId: string) => {

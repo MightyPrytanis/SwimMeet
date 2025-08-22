@@ -361,7 +361,7 @@ export default function SwimMeetFixed() {
               fontWeight: 'bold',
               fontSize: '36px',
               letterSpacing: '2px',
-              fontFamily: 'Georgia, "Times New Roman", serif'
+              fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
             }}>
               <div style={{
                 color: '#FFFFFF',
@@ -474,11 +474,16 @@ export default function SwimMeetFixed() {
                     </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span className="swim-caption">Awards:</span>
-                    <div style={{ display: 'flex', gap: 'calc(var(--grid-unit) / 2)' }}>
-                      <span className="swim-award swim-award--gold" title="Gold Awards">{stats.awards?.gold || 0}</span>
-                      <span className="swim-award swim-award--silver" title="Silver Awards">{stats.awards?.silver || 0}</span>
-                      <span className="swim-award swim-award--bronze" title="Bronze Awards">{stats.awards?.bronze || 0}</span>
+                    <span className="swim-caption">User Rating:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(var(--grid-unit) / 2)' }}>
+                      <span style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '600',
+                        color: stats.positiveRating >= 75 ? '#16a34a' : 
+                               stats.positiveRating >= 50 ? '#1f2937' : '#dc2626'
+                      }}>
+                        {stats.positiveRating || 0}% Positive
+                      </span>
                     </div>
                   </div>
                 </div>

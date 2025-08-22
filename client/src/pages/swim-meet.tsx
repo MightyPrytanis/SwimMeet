@@ -18,7 +18,7 @@ interface AIResponse {
   status: 'pending' | 'complete' | 'error';
   timestamp: string;
   metadata?: Record<string, any>;
-  award?: 'gold' | 'silver' | 'bronze' | 'finished' | 'quit' | 'titanic';
+  rating?: 'positive' | 'negative';
   awardSaved?: boolean;
 }
 
@@ -395,16 +395,16 @@ export default function SwimMeet() {
     setAttachedFiles(prev => prev.filter(f => f.id !== fileId));
   };
 
-  const handleAwardResponse = (responseId: string, award: string) => {
-    console.log(`Awarding ${award} to response ${responseId} at ${new Date().toLocaleTimeString()}`);
+  const handleRateResponse = (responseId: string, rating: string) => {
+    console.log(`Rating ${rating} for response ${responseId} at ${new Date().toLocaleTimeString()}`);
     
     // Optimistically update UI
     setResponses(prev => 
-      prev.map(r => r.id === responseId ? { ...r, award: award as any, awardSaved: false } : r)
+      prev.map(r => r.id === responseId ? { ...r, rating: rating as any, awardSaved: false } : r)
     );
     
     // Save to backend
-    awardMutation.mutate({ responseId, award }, {
+    awardMutation.mutate({ responseId, rating }, {
       onSuccess: () => {
         setResponses(prev => 
           prev.map(r => r.id === responseId ? { ...r, awardSaved: true } : r)
@@ -1179,8 +1179,8 @@ export default function SwimMeet() {
             ))}
           </div>
           
-          {/* Award Summary */}
-          {responses.some(r => r.award) && (
+          {/* Rating Summary */}
+          {responses.some(r => r.rating) && (
             <div style={{
               marginTop: '20px',
               padding: '15px',
@@ -1188,8 +1188,8 @@ export default function SwimMeet() {
               border: '1px solid #0ea5e9',
               borderRadius: '8px'
             }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#0c4a6e' }}>Award Summary</h4>
-              {responses.filter(r => r.award).map(response => (
+              <h4 style={{ margin: '0 0 10px 0', color: '#0c4a6e' }}>User Ratings</h4>
+              {responses.filter(r => r.rating).map(response => (
                 <div key={response.id} style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -1200,14 +1200,14 @@ export default function SwimMeet() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{
                       padding: '2px 8px',
-                      backgroundColor: getAwardColor(response.award),
-                      color: ['gold', 'bronze', 'titanic'].includes(response.award!) ? 'white' : 'black',
+                      backgroundColor: response.rating === 'positive' ? '#16a34a' : '#dc2626',
+                      color: 'white',
                       borderRadius: '12px',
                       fontSize: '11px',
                       fontWeight: 'bold',
                       textTransform: 'uppercase'
                     }}>
-                      {response.award}
+                      {response.rating === 'positive' ? '👍 Positive' : '👎 Negative'}
                     </span>
                     <span style={{
                       fontSize: '12px',
