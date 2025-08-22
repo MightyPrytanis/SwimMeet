@@ -496,21 +496,21 @@ export default function SwimMeetFixed() {
     switch (provider) {
       case 'google':
         return {
-          name: 'Google Gemini',
+          name: 'Gemini Pro',
           process: 'Report through Gemini Apps (apps.google.com)',
           url: 'https://support.google.com/gemini/answer/13278668',
           steps: '1. Visit Gemini Apps\n2. Find the problematic response\n3. Use "Report" option\n4. Select "Incorrect information"'
         };
       case 'openai':
         return {
-          name: 'OpenAI GPT-4',
+          name: 'ChatGPT-4',
           process: 'Report through OpenAI feedback system',
           url: 'https://help.openai.com/en/articles/6826213',
           steps: '1. Visit platform.openai.com\n2. Use feedback mechanism\n3. Report factual inaccuracies'
         };
       case 'anthropic':
         return {
-          name: 'Anthropic Claude',
+          name: 'Claude 4',
           process: 'Report through Anthropic support',
           url: 'https://support.anthropic.com',
           steps: '1. Contact Anthropic support\n2. Describe the fabrication\n3. Provide conversation context'
@@ -607,12 +607,22 @@ export default function SwimMeetFixed() {
               <img 
                 src={logoImage} 
                 alt="SwimMeet Logo" 
-                style={{ height: '192px', width: 'auto', maxWidth: '720px' }}
+                style={{ height: '192px', width: 'auto', maxWidth: '900px', transform: 'scaleX(1.25)' }}
                 onError={(e) => {
                   console.error('Logo failed to load, trying fallback');
                   e.currentTarget.src = '/swimlogo.png';
                 }}
               />
+              <div style={{ 
+                color: '#DAA520', 
+                fontSize: '32px', 
+                fontWeight: 'bold', 
+                marginTop: '8px',
+                fontFamily: 'system-ui',
+                letterSpacing: '2px'
+              }}>
+                SwimMeet
+              </div>
             </div>
             {user && <span className="user-info">Welcome, {user.username}</span>}
           </div>

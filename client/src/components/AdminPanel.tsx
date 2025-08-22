@@ -378,9 +378,9 @@ export function AdminPanel({ authToken }: AdminPanelProps) {
               {Array.isArray(users) ? users.map((user) => (
                 <tr key={user.id} style={{ borderBottom: '1px solid #eee' }}>
                   <td style={{ padding: '12px' }}>
-                    <strong>{user.username}</strong>
+                    <strong style={{ color: '#333' }}>{user.username}</strong>
                   </td>
-                  <td style={{ padding: '12px' }}>{user.name}</td>
+                  <td style={{ padding: '12px', color: '#333' }}>{user.name}</td>
                   <td style={{ padding: '12px' }}>{user.email}</td>
                   <td style={{ padding: '12px' }}>
                     <span style={{ 
