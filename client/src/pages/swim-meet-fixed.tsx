@@ -350,36 +350,23 @@ export default function SwimMeetFixed() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
             <div style={{
               height: '80px',
-              width: '220px',
-              background: 'linear-gradient(135deg, #007BFF 0%, #0056D6 50%, #00A3E0 100%)',
-              border: '3px solid #C0C0C0',
+              width: '260px',
+              background: 'linear-gradient(to right, #001f3f 0%, #007BFF 50%, #40E0D0 100%)',
+              border: '4px solid #C0C0C0',
               borderRadius: '8px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#C0C0C0',
+              color: '#FFFFFF',
               fontWeight: 'bold',
-              fontSize: '24px',
+              fontSize: '36px',
               letterSpacing: '2px',
-              textShadow: '2px 2px 4px rgba(255,255,255,0.9), -1px -1px 3px rgba(0,0,0,0.4)',
-              boxShadow: 'inset 1px 1px 3px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.2)'
+              fontFamily: 'Georgia, "Times New Roman", serif'
             }}>
               <div style={{
                 color: '#FFFFFF',
-                WebkitTextStroke: '1px #808080',
-                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))',
                 fontWeight: '800'
               }}>SwimMeet</div>
-              <div style={{
-                fontSize: '12px',
-                letterSpacing: '3px',
-                fontWeight: '700',
-                marginTop: '2px',
-                color: '#FFFFFF',
-                WebkitTextStroke: '0.5px #808080',
-                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'
-              }}>P R E M I U M</div>
             </div>
             <div>
               <p className="swim-caption" style={{ margin: '0' }}>
@@ -610,18 +597,32 @@ export default function SwimMeetFixed() {
                   </div>
                 </div>
                 
-                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '4px' }}>
-                  Company: {provider.company}
+                <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>{provider.company}</span>
+                  {provider.id === 'microsoft' && (
+                    <span style={{ fontSize: '10px', color: '#f59e0b', fontStyle: 'italic' }}>
+                      *API Preview
+                    </span>
+                  )}
                 </div>
                 
-                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
-                  Status: {provider.status.replace('_', ' ')}
-                </div>
+                {/* User Favorability Rating */}
+                {(providerStats as any)?.[provider.id]?.userRating && (
+                  <div style={{ 
+                    fontSize: '11px', 
+                    marginBottom: '6px',
+                    color: (providerStats as any)[provider.id].userRating >= 75 ? '#16a34a' : 
+                           (providerStats as any)[provider.id].userRating >= 50 ? '#1f2937' : '#dc2626',
+                    fontWeight: '500'
+                  }}>
+                    👥 {(providerStats as any)[provider.id].userRating}% user approval
+                  </div>
+                )}
                 
-                <div style={{ fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>
-                  {mode === 'dive' && 'Simultaneous competition mode'}
-                  {mode === 'turn' && 'Sequential verification mode'}
-                  {mode === 'work' && 'Collaborative workflow mode'}
+                <div style={{ fontSize: '11px', color: '#9ca3af', fontStyle: 'italic' }}>
+                  {mode === 'dive' && '⚡ Simultaneous multi-AI analysis'}
+                  {mode === 'turn' && '🔄 AI-to-AI fact verification'}
+                  {mode === 'work' && '🤝 Sequential team collaboration'}
                 </div>
               </div>
             );
