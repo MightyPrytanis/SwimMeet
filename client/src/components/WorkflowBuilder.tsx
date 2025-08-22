@@ -62,12 +62,22 @@ export function WorkflowBuilder({ onExecute }: WorkflowBuilderProps = {}) {
   }, []);
 
   const addNode = (type: Node['type'], provider?: string) => {
+    const getProviderName = (provider?: string) => {
+      switch (provider) {
+        case 'openai': return 'ChatGPT-4';
+        case 'anthropic': return 'Claude 4';
+        case 'google': return 'Gemini Pro';
+        case 'perplexity': return 'Perplexity';
+        default: return 'AI';
+      }
+    };
+
     const newNode: Node = {
       id: `node_${Date.now()}`,
       type,
       x: 300 + Math.random() * 200,
       y: 150 + Math.random() * 100,
-      title: type === 'ai' ? `${provider || 'AI'} Node` : `${type.charAt(0).toUpperCase() + type.slice(1)} Node`,
+      title: type === 'ai' ? getProviderName(provider) : `${type.charAt(0).toUpperCase() + type.slice(1)} Node`,
       provider,
       config: type === 'ai' ? { 
         prompt: 'Analyze the input and provide insights',
@@ -309,6 +319,12 @@ export function WorkflowBuilder({ onExecute }: WorkflowBuilderProps = {}) {
                 className="block w-full text-left px-3 py-2 hover:bg-red-50 rounded text-sm"
               >
                 + Google Node
+              </button>
+              <button
+                onClick={() => addNode('ai', 'perplexity')}
+                className="block w-full text-left px-3 py-2 hover:bg-purple-50 rounded text-sm"
+              >
+                + Perplexity Node
               </button>
               <button
                 onClick={() => addNode('decision')}
