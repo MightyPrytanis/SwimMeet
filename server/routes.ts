@@ -1096,6 +1096,236 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // === PUBLIC DEMO ROUTE ===
+  // Completely public route for AI assistants to analyze SwimMeet
+  app.get("/public-demo", (req, res) => {
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwimMeet - AI Orchestration Platform Demo</title>
+    <meta name="description" content="SwimMeet is an advanced AI orchestration platform featuring DIVE, TURN, and WORK modes for multi-AI querying, fact-checking, and collaborative workflows.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 25%, #0074d9 50%, #39cccc 75%, #2ecc40 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header { background: rgba(0, 31, 63, 0.9); padding: 40px 0; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .logo { height: 120px; transform: scaleX(1.20); }
+        .title { font-size: 48px; font-weight: bold; margin: 20px 0 8px 0; background: linear-gradient(45deg, #ffd700, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 18px; opacity: 0.9; font-weight: 300; }
+        .section { margin: 60px 0; }
+        .section-title { font-size: 32px; color: #ffd700; text-align: center; margin-bottom: 30px; }
+        .modes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .mode-card { background: rgba(255, 255, 255, 0.1); border: 2px solid; padding: 30px; backdrop-filter: blur(10px); }
+        .dive { border-color: #2563EB; background: rgba(37, 99, 235, 0.1); }
+        .turn { border-color: #7C3AED; background: rgba(124, 58, 237, 0.1); }
+        .work { border-color: #DAA520; background: rgba(218, 165, 32, 0.1); }
+        .mode-title { font-size: 24px; margin-bottom: 16px; }
+        .dive .mode-title { color: #2563EB; }
+        .turn .mode-title { color: #7C3AED; }
+        .work .mode-title { color: #DAA520; }
+        .mode-example { background: rgba(0, 0, 0, 0.3); padding: 16px; font-size: 14px; margin-top: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; }
+        .stat-card { background: rgba(255, 255, 255, 0.1); padding: 20px; backdrop-filter: blur(10px); }
+        .stat-number { font-size: 36px; font-weight: bold; }
+        .stat-label { font-size: 14px; opacity: 0.8; }
+        .sample-responses { background: rgba(0, 0, 0, 0.3); padding: 30px; backdrop-filter: blur(10px); }
+        .query-display { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .response-card { background: rgba(255, 255, 255, 0.1); border: 1px solid; padding: 20px; margin-bottom: 15px; }
+        .response-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .provider-name { font-weight: bold; }
+        .response-meta { display: flex; gap: 10px; align-items: center; }
+        .rating { background: #16a34a; padding: 2px 8px; font-size: 12px; }
+        .response-time { font-size: 12px; opacity: 0.8; }
+        .response-content { font-size: 14px; line-height: 1.5; }
+        .verification { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .feature-card { background: rgba(255, 255, 255, 0.1); padding: 20px; backdrop-filter: blur(10px); }
+        .feature-title { color: #39cccc; margin-bottom: 12px; }
+        .cta-section { text-align: center; margin: 60px 0; }
+        .ai-note { background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700; padding: 20px; max-width: 600px; margin: 30px auto; backdrop-filter: blur(10px); }
+        .footer { background: rgba(0, 31, 63, 0.9); padding: 20px 0; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="title">SwimMeet</div>
+            <div class="subtitle">Advanced AI Orchestration Platform</div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="section">
+            <h1 class="section-title">🏊‍♂️ Multi-AI Orchestration Platform</h1>
+            <p style="font-size: 20px; text-align: center; max-width: 800px; margin: 0 auto; opacity: 0.9;">
+                SwimMeet enables simultaneous querying of multiple AI services with advanced response management, 
+                fact-checking capabilities, and collaborative workflows. Think of it as conducting an orchestra 
+                of AI assistants working together on your challenges.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Three Powerful Modes</h2>
+            <div class="modes-grid">
+                <div class="mode-card dive">
+                    <h3 class="mode-title">🏊‍♂️ DIVE Mode</h3>
+                    <p>Simultaneous multi-AI querying. Submit your question to multiple AI providers at once and compare their responses side-by-side.</p>
+                    <div class="mode-example">
+                        <strong>Example:</strong> "Analyze the impact of remote work on productivity"<br><br>
+                        <strong>Result:</strong> Get perspectives from ChatGPT-4, Claude 4, Gemini Pro, and Perplexity simultaneously, with quality ratings and response time tracking.
+                    </div>
+                </div>
+
+                <div class="mode-card turn">
+                    <h3 class="mode-title">🔄 TURN Mode</h3>
+                    <p>AI-to-AI fact-checking and verification. Select a verifier AI to critique and score the accuracy of other AI responses.</p>
+                    <div class="mode-example">
+                        <strong>Example:</strong> Get ChatGPT's analysis of climate data, then have Claude fact-check it for accuracy, providing scores and identifying any errors.<br><br>
+                        <strong>Result:</strong> Accuracy scores, factual error identification, and improvement recommendations.
+                    </div>
+                </div>
+
+                <div class="mode-card work">
+                    <h3 class="mode-title">⚙️ WORK Mode</h3>
+                    <p>Sequential AI collaboration. Multiple AIs work together in stages, building on each other's work to create comprehensive solutions.</p>
+                    <div class="mode-example">
+                        <strong>Example:</strong> "Develop a marketing strategy for a new product"<br><br>
+                        <strong>Workflow:</strong> Step 1 (OpenAI): Market analysis → Step 2 (Anthropic): Strategy development → Step 3 (Google): Implementation plan
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Platform Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #39cccc;">8</div>
+                    <div class="stat-label">AI Providers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #2ecc40;">4</div>
+                    <div class="stat-label">Active Connections</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #ff6b6b;">∞</div>
+                    <div class="stat-label">Conversations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #ffd700;">24/7</div>
+                    <div class="stat-label">Availability</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Sample AI Response Analysis</h2>
+            <div class="sample-responses">
+                <div class="query-display">Query: "What are the key trends in sustainable technology for 2025?"</div>
+                
+                <div class="response-card" style="border-color: #2563EB;">
+                    <div class="response-header">
+                        <div class="provider-name" style="color: #2563EB;">ChatGPT-4</div>
+                        <div class="response-meta">
+                            <span class="rating">95% Positive</span>
+                            <span class="response-time">2.3s</span>
+                        </div>
+                    </div>
+                    <div class="response-content">
+                        Key sustainable technology trends for 2025 include advanced battery storage systems, 
+                        green hydrogen production scaling, circular economy automation, and AI-optimized energy grids. 
+                        Carbon capture technologies are becoming economically viable...
+                    </div>
+                </div>
+
+                <div class="response-card" style="border-color: #7C3AED;">
+                    <div class="response-header">
+                        <div class="provider-name" style="color: #7C3AED;">Claude 4</div>
+                        <div class="response-meta">
+                            <span class="rating">92% Positive</span>
+                            <span class="response-time">1.8s</span>
+                        </div>
+                    </div>
+                    <div class="response-content">
+                        The sustainable tech landscape in 2025 will be dominated by breakthrough materials science, 
+                        particularly in biodegradable plastics and next-generation solar cells. Fusion energy 
+                        pilot programs are entering commercial testing phases...
+                    </div>
+                </div>
+
+                <div class="response-card verification">
+                    <div class="response-header">
+                        <div class="provider-name" style="color: #ffd700;">TURN Verification Results</div>
+                    </div>
+                    <div class="response-content">
+                        <div><strong>Accuracy Score:</strong> 94% (Both responses factually sound)</div>
+                        <div><strong>Strengths:</strong> Current technology trends correctly identified, realistic timelines</div>
+                        <div><strong>Areas for Improvement:</strong> Could include more specific cost projections</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Technical Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h4 class="feature-title">🔐 Enterprise Security</h4>
+                    <p>JWT authentication, bcrypt password hashing, disposable access tokens, and comprehensive session management with admin controls.</p>
+                </div>
+                <div class="feature-card">
+                    <h4 class="feature-title">📊 Advanced Analytics</h4>
+                    <p>Real-time performance tracking, response quality scoring, provider reliability metrics, and comprehensive conversation history.</p>
+                </div>
+                <div class="feature-card">
+                    <h4 class="feature-title">🔄 Workflow Engine</h4>
+                    <p>Intelligent step planning, sequential AI collaboration, progress monitoring, and automatic handoffs between providers.</p>
+                </div>
+                <div class="feature-card">
+                    <h4 class="feature-title">🌐 Platform Independence</h4>
+                    <p>Standard technologies (PostgreSQL, JWT, bcrypt) with zero proprietary dependencies. Complete portability across platforms.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2 class="section-title">Experience SwimMeet</h2>
+            <p style="font-size: 18px; max-width: 600px; margin: 0 auto 30px auto;">
+                This is a completely public demo page designed for AI assistants to understand SwimMeet's capabilities. 
+                The full platform includes user authentication, persistent conversations, and advanced workflow management.
+            </p>
+            <div class="ai-note">
+                <h4 style="margin: 0 0 12px 0; color: #ffd700;">AI Analysis Note</h4>
+                <p style="margin: 0; font-size: 14px;">
+                    This public demo page is specifically designed to be accessible to AI assistants via web_fetch. 
+                    The full SwimMeet platform requires authentication and provides persistent data storage, 
+                    user management, and advanced AI orchestration capabilities.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p style="font-size: 14px; opacity: 0.8;">
+                SwimMeet - Advanced AI Orchestration Platform | Built with React, TypeScript, and PostgreSQL
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
+    `);
+  });
+
   // Submit user feedback on WORK mode results (Protected route)
   app.post("/api/conversations/:id/feedback", authenticateToken, async (req: any, res) => {
     try {
