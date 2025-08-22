@@ -6,7 +6,7 @@ import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
 import { AdminPanel } from "@/components/AdminPanel";
 import { WorkflowBuilder } from "@/components/WorkflowBuilder";
-import { Download, FileText, Upload, Play, GitBranch, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 import "../styles/glass-ocean.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
@@ -77,7 +77,16 @@ export default function SwimMeetFixed() {
 
   // Remove duplicate - handled below
 
-  // Custom flip-turn icon for WORK mode
+  // Custom icons for different modes
+  const ShallowDiveIcon = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 18c0-4 3-8 6-8s6 4 6 8" />
+      <path d="M8 14l4-4 4 4" />
+      <circle cx="12" cy="8" r="2" fill="currentColor" />
+      <path d="M6 20h12" strokeWidth="1" opacity="0.5" />
+    </svg>
+  );
+
   const FlipTurnIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9" />
@@ -90,10 +99,10 @@ export default function SwimMeetFixed() {
   // Helper function for mode icons
   const getModeIcon = () => {
     switch (mode) {
-      case 'dive': return <Play size={20} />;
-      case 'turn': return <GitBranch size={20} />;
-      case 'work': return <FlipTurnIcon size={20} />;
-      default: return <Play size={20} />;
+      case 'dive': return <ShallowDiveIcon size={20} />;
+      case 'turn': return <FlipTurnIcon size={20} />;
+      case 'work': return <Users size={20} />;
+      default: return <ShallowDiveIcon size={20} />;
     }
   };
 
@@ -361,27 +370,54 @@ export default function SwimMeetFixed() {
     }).catch(console.error);
   };
 
-  const handleTurnValidation = (responseId: string) => {
-    console.log(`Starting TURN validation for response ${responseId}`);
-    
-    // Find the response to validate
-    const response = responses.find(r => r.id === responseId);
-    if (!response) return;
-    
-    // Use Anthropic as default verifier for TURN validation
-    fetch(`/api/responses/${responseId}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ verifierAI: 'anthropic' })
-    }).then(res => res.json()).then(data => {
-      console.log('✓ TURN validation completed:', data);
-      // Update response with validation results
-      setResponses(prev => prev.map(r => 
-        r.id === responseId 
-          ? { ...r, metadata: { ...r.metadata, turnValidation: data } }
-          : r
-      ));
-    }).catch(console.error);
+  // TURN validation handler - enhanced for all modes
+  const handleTurnValidation = async (responseId: string) => {
+    try {
+      // Find the response to validate
+      const targetResponse = responses.find(r => r.id === responseId);
+      if (!targetResponse) {
+        alert('Response not found for validation');
+        return;
+      }
+
+      console.log(`Starting TURN validation for response ${responseId} from ${targetResponse.aiProvider} in ${mode} mode`);
+
+      const response = await fetch(`/api/turn-validate/${responseId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          verifierAI: selectedVerifier || 'anthropic',
+          conversationId: conversationId,
+          sourceMode: mode,
+          attachedFiles: attachedFiles // Include file context for validation
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('TURN validation response:', result);
+        
+        // Show success message with better context
+        alert(`TURN validation started for ${targetResponse.aiProvider} response! The verifier AI (${selectedVerifier || 'anthropic'}) will fact-check this content. Results will appear in your responses.`);
+        
+        // Refresh responses to see validation after a moment
+        setTimeout(() => {
+          if (conversationId) {
+            refetchResponses();
+          }
+        }, 3000);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('TURN validation failed:', errorData);
+        alert(`TURN validation failed: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('TURN validation error:', error);
+      alert('TURN validation failed due to network error');
+    }
   };
 
   // Handle custom workflow execution
@@ -553,46 +589,11 @@ export default function SwimMeetFixed() {
         <div className="header-content">
           <div className="logo-section">
             <div className="logo-container">
-              <div className="logo-mark">
-                <svg viewBox="0 0 40 40" fill="none">
-                  <path d="M20 2 L38 10 L38 30 L20 38 L2 30 L2 10 Z" stroke="currentColor" strokeWidth="1.5" fill="rgba(96, 165, 250, 0.1)"/>
-                  <circle cx="20" cy="20" r="8" stroke="currentColor" strokeWidth="1" fill="rgba(255, 255, 255, 0.1)"/>
-                  <path d="M16 20 L20 24 L24 16" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                </svg>
-              </div>
-              <div className="logo-text">
-                <svg width="180" height="40" viewBox="0 0 180 40" fill="none">
-                  {/* Retro Euro Style SwimMeet Logo */}
-                  <defs>
-                    <linearGradient id="swimGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style={{stopColor: "#1e3a8a", stopOpacity: 1}} />
-                      <stop offset="25%" style={{stopColor: "#3b82f6", stopOpacity: 1}} />
-                      <stop offset="50%" style={{stopColor: "#06b6d4", stopOpacity: 1}} />
-                      <stop offset="75%" style={{stopColor: "#8b5cf6", stopOpacity: 1}} />
-                      <stop offset="100%" style={{stopColor: "#f59e0b", stopOpacity: 1}} />
-                    </linearGradient>
-                  </defs>
-                  
-                  {/* Integrated swimmer silhouette */}
-                  <path d="M8 20 Q15 10, 25 20 Q35 25, 45 20 Q50 18, 55 20" 
-                        stroke="url(#swimGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                  <circle cx="12" cy="18" r="2" fill="url(#swimGradient)"/>
-                  
-                  {/* SwimMeet text */}
-                  <text x="65" y="16" fontFamily="SF Pro Display, -apple-system, sans-serif" 
-                        fontSize="14" fontWeight="300" fill="var(--crystal-white)" letterSpacing="1px">
-                    Swim
-                  </text>
-                  <text x="105" y="16" fontFamily="SF Pro Display, -apple-system, sans-serif" 
-                        fontSize="14" fontWeight="500" fill="url(#swimGradient)" letterSpacing="1px">
-                    Meet
-                  </text>
-                  
-                  {/* Subtle wave pattern */}
-                  <path d="M65 25 Q85 22, 105 25 Q125 28, 145 25" 
-                        stroke="rgba(96, 165, 250, 0.3)" strokeWidth="1" fill="none"/>
-                </svg>
-              </div>
+              <img 
+                src="/attached_assets/Sleek Lettermark SwimMeet Logo for Sports_1755887370233.png" 
+                alt="SwimMeet Logo" 
+                style={{ height: '60px', width: 'auto' }}
+              />
             </div>
             {user && <span className="user-info">Welcome, {user.username}</span>}
           </div>
@@ -697,9 +698,9 @@ export default function SwimMeetFixed() {
         <h3 className="swim-subtitle">Workflow Mode</h3>
         <div className="swim-mode-selector">
           {[
-            { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <Play size={20} /> },
-            { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <GitBranch size={20} /> },
-            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <FlipTurnIcon size={20} /> }
+            { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <ShallowDiveIcon size={20} /> },
+            { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <FlipTurnIcon size={20} /> },
+            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
           ].map(m => {
             const isActive = mode === m.id;
             const panelClass = `swim-mode-panel ${m.id}-panel ${isActive ? 'swim-mode-panel--active' : ''}`;
@@ -741,7 +742,7 @@ export default function SwimMeetFixed() {
                 data-testid="workflow-preset"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <FlipTurnIcon size={20} />
+                  <Users size={20} style={{ color: 'hsl(var(--work-primary))' }} />
                   <span style={{ fontWeight: '600', fontSize: '16px' }}>AI-Structured Workflow</span>
                 </div>
                 <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
