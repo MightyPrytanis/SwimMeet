@@ -41,14 +41,14 @@
   text-shadow: none !important; /* No text shadows */
 }
 
-/* Clean system typography - readable and modern */
+/* Modern readable typography */
 body, .swim-button, button, input, textarea, select {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-weight: 400 !important; /* Normal readable weight */
-  color: #171717 !important; /* High contrast dark text */
-  letter-spacing: normal !important; /* Natural spacing */
-  font-size: 16px !important; /* Good base size for readability */
-  line-height: 1.5 !important; /* Better line spacing */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  font-weight: 400 !important;
+  color: #171717 !important;
+  letter-spacing: normal !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
 }
 
 /* Enhanced text contrast and size for better legibility */
@@ -59,12 +59,12 @@ body, .swim-button, button, input, textarea, select {
   line-height: 1.4 !important;
 }
 
-/* Headings with clarity and readability */
+/* Modern heading typography */
 h1, h2, h3, h4, h5, h6, .panel-heading, .swim-subtitle {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-weight: 600 !important; /* Strong but readable headings */
-  color: #0A0A0A !important; /* Maximum contrast */
-  letter-spacing: normal !important; /* Natural spacing */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  font-weight: 600 !important;
+  color: #0A0A0A !important;
+  letter-spacing: normal !important;
   line-height: 1.3 !important;
 }
 
@@ -211,12 +211,12 @@ button:hover {
   transform: translateY(-0.5px) !important; /* Minimal lift */
 }
 
-/* Clean button typography with better readability */
+/* Modern button typography */
 .swim-button,
 button {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 16px !important; /* Clear button text */
-  font-weight: 500 !important; /* Medium weight for buttons */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
   line-height: 1.2 !important;
 }
 
