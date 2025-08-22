@@ -26,6 +26,38 @@
   --work-gold-light: #FFF8DC;
 }
 
+/* Water-inspired background - subtle and memory efficient */
+body {
+  background: linear-gradient(135deg, 
+    #f8fafc 0%,
+    #e2e8f0 20%,
+    #cbd5e1 35%,
+    #e2e8f0 50%,
+    #f1f5f9 65%,
+    #e2e8f0 80%,
+    #f8fafc 100%
+  );
+  background-size: 400% 400%;
+  animation: waterFlow 25s ease-in-out infinite;
+  min-height: 100vh;
+}
+
+/* Subtle water flow animation - very gentle */
+@keyframes waterFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 30%;
+  }
+  50% {
+    background-position: 100% 70%;
+  }
+  75% {
+    background-position: 0% 30%;
+  }
+}
+
 /* Swimming theme animations */
 @keyframes wave {
   0%, 100% { transform: translateY(0px); }

@@ -5,6 +5,7 @@ import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
 import { AdminPanel } from "@/components/AdminPanel";
+import { WorkflowBuilder } from "@/components/WorkflowBuilder";
 import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 import "../styles/modernist.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
@@ -71,6 +72,7 @@ export default function SwimMeetFixed() {
   const [isQuerying, setIsQuerying] = useState(false);
   const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
 
   // Remove duplicate - handled below
 
@@ -520,6 +522,22 @@ export default function SwimMeetFixed() {
               <BarChart3 size={20} />
             </button>
             
+            {/* Workflow Builder */}
+            <button
+              className="swim-button swim-button--secondary"
+              onClick={() => setShowWorkflowBuilder(!showWorkflowBuilder)}
+              data-testid="button-toggle-workflow"
+              title={showWorkflowBuilder ? 'Hide Workflow Builder' : 'Show Workflow Builder'}
+              style={{
+                padding: 'calc(var(--grid-unit) * 0.75)',
+                minWidth: 'auto',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                color: '#fff'
+              }}
+            >
+              <GitBranch size={20} />
+            </button>
+
             {/* Admin Panel - Only for David Towne */}
             {(user?.username === 'davidtowne' || user?.username === 'demo') && (
               <button
@@ -1226,6 +1244,13 @@ export default function SwimMeetFixed() {
           <CloudStorageSettings 
             authToken={authToken}
           />
+        )}
+
+        {/* Workflow Builder Demo */}
+        {showWorkflowBuilder && (
+          <div style={{ marginBottom: '20px' }}>
+            <WorkflowBuilder />
+          </div>
         )}
 
         {/* Enhanced Admin Panel - Full User Management */}
