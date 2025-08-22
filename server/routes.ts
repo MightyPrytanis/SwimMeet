@@ -679,7 +679,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Add grayed-out disabled providers (API issues on their end)
     const disabledProviders = [
-      { id: 'microsoft', name: 'Copilot', company: 'Microsoft', status: 'disabled' as const, requiresApiKey: false },
+      { id: 'microsoft', name: 'Copilot', company: 'Microsoft', status: 'setup_required' as const, requiresApiKey: false, statusMessage: 'API Not Yet Available' },
       { id: 'llama', name: 'Llama 3.2', company: 'Meta', status: 'disabled' as const, requiresApiKey: false },
     ];
 

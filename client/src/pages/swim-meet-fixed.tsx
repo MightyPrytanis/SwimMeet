@@ -371,9 +371,51 @@ export default function SwimMeetFixed() {
     }).catch(console.error);
   };
 
+  const getProviderFeedbackInfo = (provider: string) => {
+    switch (provider) {
+      case 'google':
+        return {
+          name: 'Google Gemini',
+          process: 'Report through Gemini Apps (apps.google.com)',
+          url: 'https://support.google.com/gemini/answer/13278668',
+          steps: '1. Visit Gemini Apps\n2. Find the problematic response\n3. Use "Report" option\n4. Select "Incorrect information"'
+        };
+      case 'openai':
+        return {
+          name: 'OpenAI GPT-4',
+          process: 'Report through OpenAI feedback system',
+          url: 'https://help.openai.com/en/articles/6826213',
+          steps: '1. Visit platform.openai.com\n2. Use feedback mechanism\n3. Report factual inaccuracies'
+        };
+      case 'anthropic':
+        return {
+          name: 'Anthropic Claude',
+          process: 'Report through Anthropic support',
+          url: 'https://support.anthropic.com',
+          steps: '1. Contact Anthropic support\n2. Describe the fabrication\n3. Provide conversation context'
+        };
+      case 'perplexity':
+        return {
+          name: 'Perplexity AI',
+          process: 'Report through Perplexity support',
+          url: 'https://www.perplexity.ai/support',
+          steps: '1. Contact Perplexity support\n2. Report incorrect information\n3. Include response details'
+        };
+      default:
+        return {
+          name: provider.toUpperCase(),
+          process: 'Contact provider support directly',
+          url: 'Provider support website',
+          steps: '1. Visit provider website\n2. Find support/feedback option\n3. Report fabrication'
+        };
+    }
+  };
+
   const handleReportFabrication = (responseId: string, aiProvider: string) => {
+    const providerInfo = getProviderFeedbackInfo(aiProvider);
+    
     const confirmed = confirm(
-      `Report ${aiProvider.toUpperCase()} for fabricating facts or lying?\n\nThis will:\n• Flag the response as containing false information\n• Submit feedback to improve AI accuracy\n• Help track fabrication patterns\n• Log the report to the database for analysis`
+      `Report ${providerInfo.name} for fabricating facts or lying?\n\nThis will:\n• Log the fabrication to our database\n• Track patterns for analysis\n• Provide guidance for official reporting\n\nTo report directly to ${providerInfo.name}:\n${providerInfo.steps}\n\nContinue with internal report?`
     );
     
     if (confirmed) {
@@ -385,13 +427,14 @@ export default function SwimMeetFixed() {
         body: JSON.stringify({ 
           aiProvider,
           reportType: 'fabrication',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          providerFeedbackUrl: providerInfo.url
         })
       }).then(res => res.json()).then(data => {
-        alert(`✓ Fabrication report submitted for ${aiProvider.toUpperCase()}!\n\nReport ID: ${data.reportId}\nStatus: ${data.status}\n\nThis report has been logged to the database for analysis.\nThank you for helping enforce truth and accuracy!`);
+        alert(`✓ Fabrication report logged for ${providerInfo.name}!\n\nInternal Report ID: ${data.reportId}\n\nNEXT STEP - Official Provider Reporting:\n${providerInfo.steps}\n\nFeedback URL: ${providerInfo.url}\n\nYour report helps improve AI accuracy across the ecosystem!`);
       }).catch(error => {
         console.error('Error submitting fabrication report:', error);
-        alert(`❌ Failed to submit fabrication report for ${aiProvider.toUpperCase()}.\nPlease try again or contact support.`);
+        alert(`❌ Failed to log fabrication report.\nYou can still report directly to ${providerInfo.name}:\n${providerInfo.url}`);
       });
     }
   };
@@ -1075,31 +1118,11 @@ export default function SwimMeetFixed() {
                       borderRadius: '6px',
                       border: '1px solid #e2e8f0'
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: '600', color: '#374151' }}>Rate Response:</span>
-                        
-                        {/* TURN Validation Button */}
-                        {(mode === 'dive' || mode === 'work') && (
-                          <button
-                            onClick={() => handleTurnValidation(response.id)}
-                            className="swim-button swim-button--secondary"
-                            style={{
-                              padding: '4px 8px',
-                              fontSize: '11px',
-                              minWidth: 'auto',
-                              backgroundColor: '#0ea5e9',
-                              color: 'white'
-                            }}
-                            data-testid={`button-turn-validate-${response.id}`}
-                            title="Fact-check this response with AI verification"
-                          >
-                            <CheckCircle size={12} style={{ marginRight: '4px' }} />
-                            TURN Validate
-                          </button>
-                        )}
+                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '600', color: '#374151', marginRight: '15px' }}>Rate Response:</span>
                       </div>
                       
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                         {/* Thumbs Up */}
                         <button
                           onClick={() => handleRateResponse(response.id, 'positive')}
@@ -1151,6 +1174,26 @@ export default function SwimMeetFixed() {
                           <AlertTriangle size={14} style={{ marginRight: '4px' }} />
                           Report Fabrication
                         </button>
+                        
+                        {/* TURN Validation Button - properly aligned */}
+                        {(mode === 'dive' || mode === 'work') && (
+                          <button
+                            onClick={() => handleTurnValidation(response.id)}
+                            className="swim-button swim-button--secondary"
+                            style={{
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              minWidth: 'auto',
+                              backgroundColor: '#8b5cf6',
+                              color: 'white'
+                            }}
+                            data-testid={`button-turn-validate-${response.id}`}
+                            title="Fact-check this response with AI verification"
+                          >
+                            <CheckCircle size={14} style={{ marginRight: '4px' }} />
+                            TURN Validate
+                          </button>
+                        )}
                         
                         {/* Rating Status */}
                         {response.rating && (
