@@ -1109,64 +1109,397 @@ export async function registerRoutes(app: Express): Promise<Server> {
     <meta name="description" content="SwimMeet is an advanced AI orchestration platform featuring DIVE, TURN, and WORK modes for multi-AI querying, fact-checking, and collaborative workflows.">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Authentic SwimMeet Design System */
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #001f3f 0%, #003d7a 25%, #0074d9 50%, #39cccc 75%, #2ecc40 100%);
-            color: white;
+            font-family: system-ui, -apple-system, "SF Pro Display", sans-serif;
+            background: radial-gradient(ellipse at center, #003d7a 0%, #001f3f 70%);
+            color: #171717;
             line-height: 1.6;
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .header { background: rgba(0, 31, 63, 0.9); padding: 40px 0; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .logo { height: 120px; transform: scaleX(1.20); }
-        .title { font-size: 48px; font-weight: bold; margin: 20px 0 8px 0; background: linear-gradient(45deg, #ffd700, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { font-size: 18px; opacity: 0.9; font-weight: 300; }
-        .section { margin: 60px 0; }
-        .section-title { font-size: 32px; color: #ffd700; text-align: center; margin-bottom: 30px; }
-        .modes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .mode-card { background: rgba(255, 255, 255, 0.1); border: 2px solid; padding: 30px; backdrop-filter: blur(10px); }
-        .dive { border-color: #2563EB; background: rgba(37, 99, 235, 0.1); }
-        .turn { border-color: #7C3AED; background: rgba(124, 58, 237, 0.1); }
-        .work { border-color: #DAA520; background: rgba(218, 165, 32, 0.1); }
-        .mode-title { font-size: 24px; margin-bottom: 16px; }
-        .dive .mode-title { color: #2563EB; }
-        .turn .mode-title { color: #7C3AED; }
-        .work .mode-title { color: #DAA520; }
-        .mode-example { background: rgba(0, 0, 0, 0.3); padding: 16px; font-size: 14px; margin-top: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; }
-        .stat-card { background: rgba(255, 255, 255, 0.1); padding: 20px; backdrop-filter: blur(10px); }
-        .stat-number { font-size: 36px; font-weight: bold; }
-        .stat-label { font-size: 14px; opacity: 0.8; }
-        .sample-responses { background: rgba(0, 0, 0, 0.3); padding: 30px; backdrop-filter: blur(10px); }
-        .query-display { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
-        .response-card { background: rgba(255, 255, 255, 0.1); border: 1px solid; padding: 20px; margin-bottom: 15px; }
-        .response-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .provider-name { font-weight: bold; }
-        .response-meta { display: flex; gap: 10px; align-items: center; }
-        .rating { background: #16a34a; padding: 2px 8px; font-size: 12px; }
-        .response-time { font-size: 12px; opacity: 0.8; }
-        .response-content { font-size: 14px; line-height: 1.5; }
-        .verification { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .feature-card { background: rgba(255, 255, 255, 0.1); padding: 20px; backdrop-filter: blur(10px); }
-        .feature-title { color: #39cccc; margin-bottom: 12px; }
-        .cta-section { text-align: center; margin: 60px 0; }
-        .ai-note { background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700; padding: 20px; max-width: 600px; margin: 30px auto; backdrop-filter: blur(10px); }
-        .footer { background: rgba(0, 31, 63, 0.9); padding: 20px 0; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* Underwater caustic light effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 30%, rgba(64, 224, 208, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 600px 300px at 80% 70%, rgba(0, 123, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 400px 200px at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: caustics 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes caustics {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.8; }
+        }
+        
+        /* Glass panel system */
+        .glass-panel {
+            background: rgba(212, 212, 212, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 0 24px; 
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Header with steel finish */
+        .header { 
+            background: linear-gradient(135deg, 
+                rgba(115, 115, 115, 0.95) 0%, 
+                rgba(212, 212, 212, 0.95) 50%, 
+                rgba(115, 115, 115, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            padding: 32px 0; 
+            text-align: center; 
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        
+        .title { 
+            font-size: 64px; 
+            font-weight: 700; 
+            margin: 20px 0 12px 0; 
+            color: #171717;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle { 
+            font-size: 20px; 
+            color: #525252; 
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+        
+        .section { 
+            margin: 48px 0; 
+        }
+        
+        .section-title { 
+            font-size: 36px; 
+            color: #171717; 
+            text-align: center; 
+            margin-bottom: 32px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        
+        /* Mode cards with authentic design */
+        .modes-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+            gap: 24px; 
+        }
+        
+        .mode-card { 
+            background: rgba(212, 212, 212, 0.95);
+            backdrop-filter: blur(12px);
+            border: 2px solid;
+            padding: 32px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .dive { 
+            border-color: #2563EB;
+            border-top: 4px solid #2563EB;
+        }
+        .turn { 
+            border-color: #7C3AED;
+            border-top: 4px solid #7C3AED;
+        }
+        .work { 
+            border-color: #DAA520;
+            border-top: 4px solid #DAA520;
+        }
+        
+        .mode-title { 
+            font-size: 28px; 
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #171717;
+        }
+        
+        .mode-description {
+            font-size: 16px;
+            color: #404040;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .mode-example { 
+            background: rgba(64, 64, 64, 0.9);
+            backdrop-filter: blur(8px);
+            padding: 20px; 
+            font-size: 14px; 
+            color: #e5e5e5;
+            border-left: 4px solid;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .dive .mode-example { border-left-color: #2563EB; }
+        .turn .mode-example { border-left-color: #7C3AED; }
+        .work .mode-example { border-left-color: #DAA520; }
+        
+        /* Statistics grid */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 20px; 
+            text-align: center; 
+        }
+        
+        .stat-card { 
+            background: rgba(212, 212, 212, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-number { 
+            font-size: 48px; 
+            font-weight: 700;
+            color: #171717;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-label { 
+            font-size: 14px; 
+            color: #525252;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Sample responses section */
+        .sample-responses { 
+            background: rgba(64, 64, 64, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 32px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .query-display { 
+            font-size: 20px; 
+            font-weight: 600; 
+            margin-bottom: 24px;
+            color: #fafafa;
+        }
+        
+        .response-card { 
+            background: rgba(212, 212, 212, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid;
+            padding: 20px; 
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .response-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 12px; 
+        }
+        
+        .provider-name { 
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .response-meta { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+        }
+        
+        .rating { 
+            background: #16a34a; 
+            color: white;
+            padding: 4px 8px; 
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        
+        .response-time { 
+            font-size: 12px; 
+            color: #525252;
+            font-weight: 500;
+        }
+        
+        .response-content { 
+            font-size: 14px; 
+            line-height: 1.6;
+            color: #171717;
+        }
+        
+        .verification { 
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+            border-color: #ffd700;
+            border-top: 4px solid #ffd700;
+        }
+        
+        /* Features grid */
+        .features-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 24px; 
+        }
+        
+        .feature-card { 
+            background: rgba(212, 212, 212, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .feature-title { 
+            color: #171717; 
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .feature-description {
+            color: #404040;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Call to action */
+        .cta-section { 
+            text-align: center; 
+            margin: 60px 0; 
+        }
+        
+        .ai-note { 
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+            backdrop-filter: blur(12px);
+            border: 2px solid #ffd700; 
+            padding: 24px; 
+            max-width: 700px; 
+            margin: 32px auto;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .ai-note h4 {
+            margin: 0 0 12px 0; 
+            color: #92400e;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .ai-note p {
+            margin: 0; 
+            font-size: 14px;
+            color: #451a03;
+            line-height: 1.5;
+        }
+        
+        /* Footer */
+        .footer { 
+            background: linear-gradient(135deg, 
+                rgba(115, 115, 115, 0.95) 0%, 
+                rgba(64, 64, 64, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            padding: 24px 0; 
+            text-align: center; 
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 -4px 20px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer p {
+            color: #e5e5e5;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .title { font-size: 48px; }
+            .modes-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .features-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <header class="header">
         <div class="container">
+            <div class="logo-container">
+                <!-- Note: Logo would be displayed here in the full app -->
+            </div>
             <div class="title">SwimMeet</div>
             <div class="subtitle">Advanced AI Orchestration Platform</div>
         </div>
     </header>
 
     <main class="container">
-        <section class="section">
+        <section class="section glass-panel" style="padding: 48px; margin: 32px 0;">
             <h1 class="section-title">🏊‍♂️ Multi-AI Orchestration Platform</h1>
-            <p style="font-size: 20px; text-align: center; max-width: 800px; margin: 0 auto; opacity: 0.9;">
+            <p style="font-size: 18px; text-align: center; max-width: 900px; margin: 0 auto; color: #404040; line-height: 1.7;">
                 SwimMeet enables simultaneous querying of multiple AI services with advanced response management, 
                 fact-checking capabilities, and collaborative workflows. Think of it as conducting an orchestra 
                 of AI assistants working together on your challenges.
@@ -1178,7 +1511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             <div class="modes-grid">
                 <div class="mode-card dive">
                     <h3 class="mode-title">🏊‍♂️ DIVE Mode</h3>
-                    <p>Simultaneous multi-AI querying. Submit your question to multiple AI providers at once and compare their responses side-by-side.</p>
+                    <p class="mode-description">Simultaneous multi-AI querying. Submit your question to multiple AI providers at once and compare their responses side-by-side.</p>
                     <div class="mode-example">
                         <strong>Example:</strong> "Analyze the impact of remote work on productivity"<br><br>
                         <strong>Result:</strong> Get perspectives from ChatGPT-4, Claude 4, Gemini Pro, and Perplexity simultaneously, with quality ratings and response time tracking.
@@ -1187,7 +1520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
                 <div class="mode-card turn">
                     <h3 class="mode-title">🔄 TURN Mode</h3>
-                    <p>AI-to-AI fact-checking and verification. Select a verifier AI to critique and score the accuracy of other AI responses.</p>
+                    <p class="mode-description">AI-to-AI fact-checking and verification. Select a verifier AI to critique and score the accuracy of other AI responses.</p>
                     <div class="mode-example">
                         <strong>Example:</strong> Get ChatGPT's analysis of climate data, then have Claude fact-check it for accuracy, providing scores and identifying any errors.<br><br>
                         <strong>Result:</strong> Accuracy scores, factual error identification, and improvement recommendations.
@@ -1196,7 +1529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
                 <div class="mode-card work">
                     <h3 class="mode-title">⚙️ WORK Mode</h3>
-                    <p>Sequential AI collaboration. Multiple AIs work together in stages, building on each other's work to create comprehensive solutions.</p>
+                    <p class="mode-description">Sequential AI collaboration. Multiple AIs work together in stages, building on each other's work to create comprehensive solutions.</p>
                     <div class="mode-example">
                         <strong>Example:</strong> "Develop a marketing strategy for a new product"<br><br>
                         <strong>Workflow:</strong> Step 1 (OpenAI): Market analysis → Step 2 (Anthropic): Strategy development → Step 3 (Google): Implementation plan
@@ -1280,36 +1613,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             <div class="features-grid">
                 <div class="feature-card">
                     <h4 class="feature-title">🔐 Enterprise Security</h4>
-                    <p>JWT authentication, bcrypt password hashing, disposable access tokens, and comprehensive session management with admin controls.</p>
+                    <p class="feature-description">JWT authentication, bcrypt password hashing, disposable access tokens, and comprehensive session management with admin controls.</p>
                 </div>
                 <div class="feature-card">
                     <h4 class="feature-title">📊 Advanced Analytics</h4>
-                    <p>Real-time performance tracking, response quality scoring, provider reliability metrics, and comprehensive conversation history.</p>
+                    <p class="feature-description">Real-time performance tracking, response quality scoring, provider reliability metrics, and comprehensive conversation history.</p>
                 </div>
                 <div class="feature-card">
                     <h4 class="feature-title">🔄 Workflow Engine</h4>
-                    <p>Intelligent step planning, sequential AI collaboration, progress monitoring, and automatic handoffs between providers.</p>
+                    <p class="feature-description">Intelligent step planning, sequential AI collaboration, progress monitoring, and automatic handoffs between providers.</p>
                 </div>
                 <div class="feature-card">
                     <h4 class="feature-title">🌐 Platform Independence</h4>
-                    <p>Standard technologies (PostgreSQL, JWT, bcrypt) with zero proprietary dependencies. Complete portability across platforms.</p>
+                    <p class="feature-description">Standard technologies (PostgreSQL, JWT, bcrypt) with zero proprietary dependencies. Complete portability across platforms.</p>
                 </div>
             </div>
         </section>
 
         <section class="cta-section">
-            <h2 class="section-title">Experience SwimMeet</h2>
-            <p style="font-size: 18px; max-width: 600px; margin: 0 auto 30px auto;">
-                This is a completely public demo page designed for AI assistants to understand SwimMeet's capabilities. 
-                The full platform includes user authentication, persistent conversations, and advanced workflow management.
-            </p>
-            <div class="ai-note">
-                <h4 style="margin: 0 0 12px 0; color: #ffd700;">AI Analysis Note</h4>
-                <p style="margin: 0; font-size: 14px;">
-                    This public demo page is specifically designed to be accessible to AI assistants via web_fetch. 
-                    The full SwimMeet platform requires authentication and provides persistent data storage, 
-                    user management, and advanced AI orchestration capabilities.
+            <div class="glass-panel" style="padding: 48px; margin: 32px 0;">
+                <h2 class="section-title">Experience SwimMeet</h2>
+                <p style="font-size: 18px; max-width: 700px; margin: 0 auto 30px auto; color: #404040; line-height: 1.6;">
+                    This is a completely public demo page designed for AI assistants to understand SwimMeet's capabilities. 
+                    The full platform includes user authentication, persistent conversations, and advanced workflow management.
                 </p>
+                <div class="ai-note">
+                    <h4>AI Analysis Note</h4>
+                    <p>
+                        This public demo page is specifically designed to be accessible to AI assistants via web_fetch. 
+                        The full SwimMeet platform requires authentication and provides persistent data storage, 
+                        user management, and advanced AI orchestration capabilities including sophisticated disposable token systems for secure AI access.
+                    </p>
+                </div>
             </div>
         </section>
     </main>
