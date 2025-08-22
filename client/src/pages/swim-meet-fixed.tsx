@@ -373,24 +373,26 @@ export default function SwimMeetFixed() {
 
   const handleReportFabrication = (responseId: string, aiProvider: string) => {
     const confirmed = confirm(
-      `Report ${aiProvider.toUpperCase()} for fabricating facts or lying?\n\nThis will:\n• Flag the response as containing false information\n• Submit feedback to improve AI accuracy\n• Help track fabrication patterns`
+      `Report ${aiProvider.toUpperCase()} for fabricating facts or lying?\n\nThis will:\n• Flag the response as containing false information\n• Submit feedback to improve AI accuracy\n• Help track fabrication patterns\n• Log the report to the database for analysis`
     );
     
     if (confirmed) {
       console.log(`🚨 FABRICATION REPORTED: ${aiProvider} response ${responseId}`);
       
-      // Submit fabrication report
-      fetch(`/api/responses/${responseId}/fabrication-report`, {
+      // Submit fabrication report to real backend endpoint
+      makeAuthenticatedRequest(`/api/responses/${responseId}/fabrication-report`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           aiProvider,
           reportType: 'fabrication',
           timestamp: new Date().toISOString()
         })
-      }).then(() => {
-        alert(`✓ Fabrication report submitted for ${aiProvider.toUpperCase()}.\n\nThank you for helping improve AI accuracy!`);
-      }).catch(console.error);
+      }).then(res => res.json()).then(data => {
+        alert(`✓ Fabrication report submitted for ${aiProvider.toUpperCase()}!\n\nReport ID: ${data.reportId}\nStatus: ${data.status}\n\nThis report has been logged to the database for analysis.\nThank you for helping enforce truth and accuracy!`);
+      }).catch(error => {
+        console.error('Error submitting fabrication report:', error);
+        alert(`❌ Failed to submit fabrication report for ${aiProvider.toUpperCase()}.\nPlease try again or contact support.`);
+      });
     }
   };
 

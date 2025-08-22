@@ -1183,6 +1183,83 @@ Truth, Accuracy, and User Sovereignty`;
     }
   });
 
+  // Report AI Fabrication - Truth enforcement mechanism
+  app.post("/api/responses/:id/fabrication-report", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { aiProvider, reportType, timestamp } = req.body;
+      const userId = req.user.userId;
+      
+      // Get the response being reported
+      const response = await storage.getResponse(id);
+      if (!response) {
+        return res.status(404).json({ message: "Response not found" });
+      }
+      
+      // Log fabrication report for tracking
+      const fabricationReport = {
+        id: randomUUID(),
+        responseId: id,
+        aiProvider,
+        reportType: reportType || 'fabrication',
+        reportedBy: userId,
+        timestamp: timestamp || new Date().toISOString(),
+        responseContent: response.content.substring(0, 500), // First 500 chars for context
+        status: 'reported'
+      };
+      
+      // Store fabrication report (you could add this to your schema if needed)
+      console.log('🚨 FABRICATION REPORT LOGGED:', {
+        provider: aiProvider,
+        responseId: id,
+        reportedBy: userId,
+        timestamp: fabricationReport.timestamp,
+        contentPreview: fabricationReport.responseContent.substring(0, 100) + '...'
+      });
+      
+      // For now, store in response metadata until we add a dedicated table
+      await storage.updateResponse(id, {
+        metadata: {
+          ...response.metadata,
+          fabricationReport: fabricationReport
+        }
+      });
+      
+      res.json({
+        message: `Fabrication report submitted for ${aiProvider}`,
+        reportId: fabricationReport.id,
+        status: 'logged'
+      });
+      
+    } catch (error: any) {
+      console.error('Error processing fabrication report:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get fabrication reports for analysis (admin only)
+  app.get("/api/fabrication-reports", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      const user = await storage.getUser(userId);
+      
+      // Only allow admin users to view fabrication reports
+      if (user?.username !== 'davidtowne' && user?.username !== 'demo') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      
+      // In a full implementation, you'd query a dedicated fabrication_reports table
+      // For now, return summary from response metadata
+      res.json({
+        message: "Fabrication reports are being logged to response metadata",
+        note: "Check server logs for detailed fabrication report entries"
+      });
+      
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Humanize response
   app.post("/api/humanize", async (req, res) => {
     try {

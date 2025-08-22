@@ -21,6 +21,7 @@ export interface IStorage {
   
   // Response methods
   createResponse(response: InsertResponse): Promise<Response>;
+  getResponse(id: string): Promise<Response | undefined>;
   getConversationResponses(conversationId: string): Promise<Response[]>;
   updateResponseContent(id: string, content: string, status: string): Promise<void>;
   updateResponse(id: string, data: Partial<Response>): Promise<Response>;
