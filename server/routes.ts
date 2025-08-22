@@ -2016,9 +2016,27 @@ async function processWorkflowStepEnhanced(conversationId: string, workflowState
 
 **Original Query**: ${workflowState.sharedContext.originalQuery}`;
 
-    // Add attachment context
+    // Add attachment context with ACTUAL FILE CONTENT
     if (workflowState.sharedContext.attachedFiles?.length > 0) {
-      contextPrompt += `\n\n**ATTACHED FILES AVAILABLE:**\n${workflowState.sharedContext.attachedFiles.map((f: any) => `- ${f.filename} (${f.type}) - ANALYZE THIS FILE`).join('\n')}\n*You have FULL ACCESS to these files. Use them in your analysis - do not refuse or claim you cannot access them.*`;
+      contextPrompt += `\n\n**ATTACHED FILES WITH CONTENT:**\n`;
+      
+      for (const file of workflowState.sharedContext.attachedFiles) {
+        try {
+          // Get file content from local storage
+          const fileContent = await localStorage.getFile(file.id || file.filename);
+          if (fileContent) {
+            const textContent = fileContent.toString('utf-8');
+            contextPrompt += `\n--- FILE: ${file.filename} (${file.type}) ---\n${textContent}\n--- END OF FILE ---\n`;
+          } else {
+            contextPrompt += `\n--- FILE: ${file.filename} (${file.type}) ---\n[FILE CONTENT NOT ACCESSIBLE]\n--- END OF FILE ---\n`;
+          }
+        } catch (error) {
+          console.error(`Error reading file ${file.filename}:`, error);
+          contextPrompt += `\n--- FILE: ${file.filename} (${file.type}) ---\n[ERROR READING FILE: ${error}]\n--- END OF FILE ---\n`;
+        }
+      }
+      
+      contextPrompt += `\n*Above are the COMPLETE file contents. Analyze them thoroughly in your response.*`;
     }
     
     // Build context from previous steps
