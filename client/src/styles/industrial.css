@@ -60,21 +60,42 @@ body, .swim-button, button, input, textarea, select {
   letter-spacing: -0.005em !important; /* Subtle refinement */
 }
 
-/* Contemporary heading typography */
-h1, h2, h3, h4, h5, h6, .panel-heading, .swim-subtitle {
+/* Aggressive modern typography targeting */
+h1, h2, h3, h4, h5, h6, 
+.panel-heading, .swim-subtitle, .swim-mode-title,
+.swim-section h3,
+/* Target specific classes used in the component */
+.bg-blue-600, .bg-purple-600, .bg-teal-600,
+.dive-panel, .turn-panel, .work-panel,
+.mode-explanation strong,
+/* All text elements */
+span, div, p, strong, b {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
-  font-weight: 500 !important; /* Lighter weight for modern look */
-  color: #0A0A0A !important;
-  letter-spacing: -0.015em !important; /* Subtle tightening */
-  line-height: 1.2 !important; /* Tighter line height */
+  font-weight: 300 !important; /* Ultra-light */
+  letter-spacing: -0.025em !important; /* Significant tightening */
+  line-height: 1.1 !important;
 }
 
-h1 { font-size: 28px !important; font-weight: 400 !important; } /* Ultra-light for big headings */
-h2 { font-size: 24px !important; font-weight: 450 !important; }
-h3 { font-size: 20px !important; font-weight: 500 !important; }
-h4 { font-size: 18px !important; font-weight: 500 !important; }
-.panel-heading { font-size: 18px !important; font-weight: 500 !important; }
-.swim-subtitle { font-size: 16px !important; font-weight: 450 !important; }
+/* Specific targeting for mode titles */
+.swim-mode-title,
+.swim-mode-title div,
+.dive-panel .swim-mode-title,
+.turn-panel .swim-mode-title, 
+.work-panel .swim-mode-title {
+  font-weight: 300 !important;
+  font-size: 20px !important;
+  letter-spacing: -0.03em !important;
+}
+
+/* Section headings */
+.panel-heading,
+.swim-subtitle,
+h3.panel-heading,
+h3.swim-subtitle {
+  font-weight: 300 !important;
+  font-size: 22px !important;
+  letter-spacing: -0.025em !important;
+}
 
 /* Mode tab styling with distinctive colors */
 .dive-panel {
