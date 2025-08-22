@@ -7,8 +7,7 @@ import { CloudStorageSettings } from "@/components/CloudStorageSettings";
 import { AdminPanel } from "@/components/AdminPanel";
 import { WorkflowBuilder } from "@/components/WorkflowBuilder";
 import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
-import "../styles/modernist.css";
-import "../styles/industrial.css";
+import "../styles/glass-ocean.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
 // Types
@@ -536,135 +535,72 @@ export default function SwimMeetFixed() {
   }
 
   return (
-    <div className="swim-grid swim-grid--main">
-      {/* Modernist Header - Glass Panel Design */}
-      <header className="swim-panel swim-panel--elevated swim-section">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--panel-gap)' }}>
-            <div style={{
-              height: '80px',
-              width: '260px',
-              background: 'linear-gradient(to right, #001f3f 0%, #007BFF 50%, #40E0D0 100%)',
-              border: '4px solid #C0C0C0',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#FFFFFF',
-              fontWeight: 'bold',
-              fontSize: '36px',
-              letterSpacing: '2px',
-              fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
-            }}>
-              <div style={{
-                color: '#FFFFFF',
-                fontWeight: '800'
-              }}>SwimMeet</div>
+    <div className="main-container">
+      {/* Underwater caustics effect */}
+      <div className="caustics-layer"></div>
+      {/* Glass header */}
+      <header className="header">
+        <div className="header-content">
+          <div className="logo-section">
+            <div className="logo-container">
+              <div className="logo-mark">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <path d="M20 2 L38 10 L38 30 L20 38 L2 30 L2 10 Z" stroke="currentColor" strokeWidth="1.5" fill="rgba(96, 165, 250, 0.1)"/>
+                  <circle cx="20" cy="20" r="8" stroke="currentColor" strokeWidth="1" fill="rgba(255, 255, 255, 0.1)"/>
+                  <path d="M16 20 L20 24 L24 16" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                </svg>
+              </div>
+              <div className="logo-text">SwimMeet</div>
             </div>
-            <div>
-              <p className="swim-caption" style={{ margin: '0' }}>
-                User: {user?.username}
-              </p>
-            </div>
+            {user && <span className="user-info">Welcome, {user.username}</span>}
           </div>
-          <div style={{ display: 'flex', gap: 'calc(var(--grid-unit) / 2)' }}>
+          
+          <div className="toolbar">
             <button
-              className="swim-button swim-button--secondary"
+              className="toolbar-btn"
               onClick={() => setShowStats(!showStats)}
               data-testid="button-toggle-stats"
               title={showStats ? 'Hide Statistics' : 'Show Statistics'}
-              style={{
-                padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto',
-                background: 'var(--stats-orange)',
-                color: 'white'
-              }}
             >
-              <BarChart3 size={20} />
+              <BarChart3 size={16} />
             </button>
             
-            {/* Workflow Builder */}
             <button
-              className="swim-button swim-button--secondary"
+              className="toolbar-btn"
               onClick={() => setShowWorkflowBuilder(!showWorkflowBuilder)}
               data-testid="button-toggle-workflow"
               title={showWorkflowBuilder ? 'Hide Workflow Builder' : 'Show Workflow Builder'}
-              style={{
-                padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-                color: '#fff'
-              }}
             >
-              <GitBranch size={20} />
+              <GitBranch size={16} />
             </button>
 
-            {/* Admin Panel - Only for David Towne */}
             {(user?.username === 'davidtowne' || user?.username === 'demo') && (
               <button
-                className="swim-button swim-button--secondary"
-                onClick={() => {
-                  console.log('Admin button clicked, current state:', showAdminPanel);
-                  setShowAdminPanel(!showAdminPanel);
-                }}
+                className="toolbar-btn"
+                onClick={() => setShowAdminPanel(!showAdminPanel)}
                 data-testid="button-toggle-admin"
                 title={showAdminPanel ? 'Hide Admin Panel' : 'Show Admin Panel'}
-                style={{
-                  padding: 'calc(var(--grid-unit) * 0.75)',
-                  minWidth: 'auto',
-                  background: 'var(--admin-indigo)',
-                  color: 'white'
-                }}
               >
-                <Shield size={20} />
+                <Shield size={16} />
               </button>
             )}
             
-            {/* Debug info - remove after testing */}
-            <div style={{ 
-              fontSize: '10px', 
-              color: '#666', 
-              position: 'fixed', 
-              top: '10px', 
-              right: '10px',
-              background: 'rgba(255,255,255,0.9)',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              zIndex: 9999
-            }}>
-              User: {user?.username || 'none'} | Admin Panel: {showAdminPanel ? 'true' : 'false'}
-            </div>
-            
-            {/* Performance Monitor Button - Temporarily Disabled */}
-            
             <button
-              className="swim-button swim-button--secondary"
+              className="toolbar-btn"
               onClick={() => setShowSettings(!showSettings)}
               data-testid="button-toggle-settings"
               title={showSettings ? 'Hide Cloud Storage' : 'Show Cloud Storage'}
-              style={{
-                padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto',
-                background: 'var(--settings-amber)',
-                color: 'white'
-              }}
             >
-              <Settings size={20} />
+              <Settings size={16} />
             </button>
             
             <button
-              className="swim-button swim-button--ghost"
+              className="toolbar-btn"
               onClick={handleLogout}
               data-testid="button-logout"
               title="Logout"
-              style={{
-                padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto',
-                background: 'var(--logout-red)',
-                color: 'white'
-              }}
             >
-              Logout
+              <X size={16} />
             </button>
           </div>
         </div>
