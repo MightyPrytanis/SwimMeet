@@ -13,6 +13,7 @@ import multer from 'multer';
 import { isUserWhitelisted } from './whitelist';
 import { adminService } from './admin';
 import { randomUUID } from 'crypto';
+import { DisposableTokenService } from './services/disposable-tokens';
 
 // Extend session interface
 declare module 'express-session' {
@@ -970,6 +971,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
       })));
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // === DISPOSABLE TOKEN SYSTEM ===
+
+  // Create disposable access token (Protected route)
+  app.post("/api/disposable-tokens", authenticateToken, async (req: any, res) => {
+    try {
+      const { description, expirationHours = 24 } = req.body;
+      const userId = req.user.userId;
+
+      if (!description || description.trim().length === 0) {
+        return res.status(400).json({ error: "Description is required" });
+      }
+
+      const token = await DisposableTokenService.createToken({
+        createdBy: userId,
+        description: description.trim(),
+        expirationHours: Math.min(Math.max(1, expirationHours), 168) // 1 hour to 1 week max
+      });
+
+      res.json(token);
+    } catch (error: any) {
+      console.error('Error creating disposable token:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get user's disposable tokens (Protected route)
+  app.get("/api/disposable-tokens", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      const tokens = await DisposableTokenService.getUserTokens(userId);
+      
+      res.json(tokens.map(token => ({
+        id: token.id,
+        description: token.description,
+        createdAt: token.createdAt,
+        expiresAt: token.expiresAt,
+        usedAt: token.usedAt,
+        ipAddress: token.ipAddress,
+        isExpired: new Date() > token.expiresAt,
+        isUsed: token.usedAt !== null
+      })));
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Revoke disposable token (Protected route)
+  app.delete("/api/disposable-tokens/:tokenId", authenticateToken, async (req: any, res) => {
+    try {
+      const { tokenId } = req.params;
+      const userId = req.user.userId;
+
+      await DisposableTokenService.revokeToken(tokenId, userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // AI access page via disposable token (Public - no auth needed)
+  app.get("/ai-access/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+
+      const validation = await DisposableTokenService.validateAndUseToken(token, ipAddress, userAgent);
+
+      if (!validation.valid) {
+        return res.status(401).send(`
+          <html>
+            <head><title>Invalid Access Token</title></head>
+            <body style="font-family: system-ui; text-align: center; padding: 50px;">
+              <h1>🚫 Access Denied</h1>
+              <p>This access link is invalid, expired, or has already been used.</p>
+              <p>Reason: ${validation.reason}</p>
+              <p>Contact the SwimMeet user who shared this link for a new one.</p>
+            </body>
+          </html>
+        `);
+      }
+
+      // Create temporary session for this AI access
+      req.session.aiAccess = {
+        tokenId: validation.tokenId,
+        description: validation.description,
+        createdBy: validation.createdBy,
+        creatorName: validation.creatorName,
+        enteredAt: new Date().toISOString()
+      };
+
+      // Redirect to main SwimMeet interface with AI access mode
+      res.redirect('/?aiAccess=true');
+    } catch (error: any) {
+      console.error('Error processing AI access token:', error);
+      res.status(500).send(`
+        <html>
+          <head><title>Access Error</title></head>
+          <body style="font-family: system-ui; text-align: center; padding: 50px;">
+            <h1>⚠️ System Error</h1>
+            <p>Unable to process access token. Please try again later.</p>
+          </body>
+        </html>
+      `);
+    }
+  });
+
+  // Check AI access status (for frontend)
+  app.get("/api/ai-access/status", (req: any, res) => {
+    if (req.session.aiAccess) {
+      res.json({
+        hasAccess: true,
+        description: req.session.aiAccess.description,
+        createdBy: req.session.aiAccess.createdBy,
+        creatorName: req.session.aiAccess.creatorName,
+        enteredAt: req.session.aiAccess.enteredAt
+      });
+    } else {
+      res.json({ hasAccess: false });
     }
   });
 

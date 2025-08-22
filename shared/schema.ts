@@ -182,3 +182,19 @@ export interface AIResponse {
     [key: string]: any;
   };
 }
+
+// Disposable access tokens for temporary AI entry
+export const disposableTokens = pgTable("disposable_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  description: varchar("description"), // e.g., "AI access for ChatGPT analysis"
+  ipAddress: varchar("ip_address"),
+  userAgent: varchar("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type DisposableToken = typeof disposableTokens.$inferSelect;
+export type InsertDisposableToken = typeof disposableTokens.$inferInsert;
