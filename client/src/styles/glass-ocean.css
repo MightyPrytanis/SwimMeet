@@ -287,8 +287,26 @@ textarea::placeholder {
     font-family: 'Helvetica Neue', Arial, sans-serif !important;
 }
 
-/* Override any existing styles that conflict */
-.swim-meet-container * {
+/* Override any existing styles that conflict - NO ROUNDED CORNERS */
+.swim-meet-container *,
+.main-container *,
+.swim-panel,
+.swim-button,
+.consistent-provider-card,
+.provider-grid > *,
+.ai-response-container,
+.toolbar-btn,
+.analyze-btn,
+input,
+textarea,
+button,
+.glass-panel,
+.glass-panel-large,
+.swim-mode-panel,
+.mode-explanation,
+.status-indicator,
+.document-textarea,
+.onboarding-tooltip::after {
     border-radius: 0 !important;
     box-shadow: none !important;
 }
