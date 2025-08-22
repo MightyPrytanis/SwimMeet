@@ -716,14 +716,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!convId) {
         console.log(`Creating ${mode || 'DIVE'} conversation with query:`, actualQuery);
         
+        const { attachedFiles = [] } = req.body;
         const conversation = await storage.createConversation(userId, {
           title: actualQuery.substring(0, 50) + (actualQuery.length > 50 ? "..." : ""),
           query: actualQuery,
-          mode: mode || 'dive'
+          mode: mode || 'dive',
+          attachedFiles: attachedFiles.map((file: any) => ({
+            id: file.id || file.name,
+            filename: file.name,
+            size: file.size || 0,
+            type: file.type || 'unknown',
+            objectPath: file.path || '',
+            uploadedAt: new Date().toISOString()
+          }))
         });
         convId = conversation.id;
         console.log("Created conversation with ID:", convId);
-        
+        console.log(`📎 Attachments stored: ${attachedFiles.length} files`);
       }
 
       // Get user credentials
@@ -804,25 +813,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`🤖 Starting AI query for ${aiProvider}...`);
             let aiResult;
             
-            // Call individual AI methods directly instead of queryMultiple
+            // Build query with attachment content (same as WORK mode)
+            let queryWithAttachments = actualQuery;
+            const { attachedFiles = [] } = req.body;
+            
+            if (attachedFiles.length > 0) {
+              queryWithAttachments += `\n\n**ATTACHED FILES WITH COMPLETE CONTENT:**\n`;
+              
+              for (const file of attachedFiles) {
+                try {
+                  const fileContent = await localStorage.getFile(file.id || file.name);
+                  if (fileContent) {
+                    const textContent = fileContent.toString('utf-8');
+                    queryWithAttachments += `\n--- FILE: ${file.name} (${file.type || 'unknown'}) ---\n${textContent}\n--- END OF FILE ---\n`;
+                  } else {
+                    queryWithAttachments += `\n--- FILE: ${file.name} ---\n[FILE CONTENT NOT ACCESSIBLE]\n--- END OF FILE ---\n`;
+                  }
+                } catch (error) {
+                  console.error(`Error reading file ${file.name}:`, error);
+                  queryWithAttachments += `\n--- FILE: ${file.name} ---\n[ERROR READING FILE]\n--- END OF FILE ---\n`;
+                }
+              }
+              
+              queryWithAttachments += `\n*Above are the COMPLETE file contents. Analyze them thoroughly in your response.*`;
+            }
+            
+            // Call individual AI methods with complete query including attachments
             switch (aiProvider) {
               case 'openai':
-                aiResult = await aiService.queryOpenAI(actualQuery);
+                aiResult = await aiService.queryOpenAI(queryWithAttachments);
                 break;
               case 'anthropic':
-                aiResult = await aiService.queryAnthropic(actualQuery);
+                aiResult = await aiService.queryAnthropic(queryWithAttachments);
                 break;
               case 'google':
-                aiResult = await aiService.queryGemini(actualQuery);
+                aiResult = await aiService.queryGemini(queryWithAttachments);
                 break;
               case 'perplexity':
-                aiResult = await aiService.queryPerplexity(actualQuery);
+                aiResult = await aiService.queryPerplexity(queryWithAttachments);
                 break;
               case 'grok':
-                aiResult = await aiService.queryGrok(actualQuery);
+                aiResult = await aiService.queryGrok(queryWithAttachments);
                 break;
               case 'deepseek':
-                aiResult = await aiService.queryDeepSeek(actualQuery);
+                aiResult = await aiService.queryDeepSeek(queryWithAttachments);
                 break;
               case 'mistral':
                 aiResult = { success: false, error: "Mistral AI not yet implemented" };

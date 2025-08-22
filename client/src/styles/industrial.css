@@ -41,27 +41,36 @@
   text-shadow: none !important; /* No text shadows */
 }
 
-/* Sophisticated typography - professional sans-serif */
+/* Sophisticated typography - professional and readable */
 body, .swim-button, button, input, textarea, select {
-  font-family: 'SF Pro Display', 'Segoe UI Variable', 'system-ui', '-apple-system', 'BlinkMacSystemFont', sans-serif !important;
-  font-weight: 600 !important; /* More sophisticated weight */
+  font-family: 'Helvetica Neue', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', sans-serif !important;
+  font-weight: 500 !important; /* Readable weight */
   color: #171717 !important; /* High contrast dark text */
-  letter-spacing: -0.01em !important; /* Tighter, more refined spacing */
+  letter-spacing: -0.005em !important; /* Refined spacing */
+  font-size: 16px !important; /* Larger base font size for better readability */
 }
 
-/* Enhanced text contrast for better legibility */
+/* Enhanced text contrast and size for better legibility */
 .swim-caption, .swim-mode-description, .mode-explanation {
   color: #262626 !important; /* Darker text for better contrast */
   font-weight: 500 !important;
+  font-size: 15px !important; /* Slightly larger for readability */
 }
 
-/* Headings with extra sophistication */
+/* Headings with clarity and readability */
 h1, h2, h3, h4, h5, h6, .panel-heading, .swim-subtitle {
-  font-family: 'SF Pro Display', 'Segoe UI Variable', 'system-ui', sans-serif !important;
-  font-weight: 700 !important; /* Bold headings */
+  font-family: 'Helvetica Neue', 'Inter', 'system-ui', sans-serif !important;
+  font-weight: 600 !important; /* Strong but readable headings */
   color: #0A0A0A !important; /* Maximum contrast */
-  letter-spacing: -0.02em !important; /* Tighter spacing for headings */
+  letter-spacing: -0.01em !important; /* Refined spacing for headings */
 }
+
+h1 { font-size: 28px !important; }
+h2 { font-size: 24px !important; }
+h3 { font-size: 20px !important; }
+h4 { font-size: 18px !important; }
+.panel-heading { font-size: 18px !important; }
+.swim-subtitle { font-size: 16px !important; }
 
 /* Mode tab styling with distinctive colors */
 .dive-panel {
@@ -199,10 +208,12 @@ button:hover {
   transform: translateY(-0.5px) !important; /* Minimal lift */
 }
 
-/* Refined button typography */
+/* Refined button typography with better readability */
 .swim-button,
 button {
-  font-family: 'SF Pro Display', 'Segoe UI Variable', 'system-ui', sans-serif !important;
+  font-family: 'Helvetica Neue', 'Inter', 'system-ui', sans-serif !important;
+  font-size: 15px !important; /* Larger button text */
+  font-weight: 500 !important; /* Clear weight */
 }
 
 /* Active states use asphalt gray */
