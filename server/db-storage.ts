@@ -16,6 +16,28 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User> {
+    const [updated] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
@@ -187,5 +209,26 @@ export class DatabaseStorage implements IStorage {
     });
 
     return stats;
+  }
+
+  // File attachment methods (stub implementations for database storage)
+  async createFileAttachment(attachment: any): Promise<any> {
+    // Implementation would create file attachment record in database
+    // For now, return the attachment object
+    return { ...attachment, id: attachment.id, createdAt: new Date() };
+  }
+
+  async getFileAttachment(fileId: string): Promise<any> {
+    // Implementation would fetch file attachment from database
+    return null;
+  }
+
+  async getUserFileAttachments(userId: string): Promise<any[]> {
+    // Implementation would fetch user's file attachments from database
+    return [];
+  }
+
+  async deleteFileAttachment(fileId: string): Promise<void> {
+    // Implementation would delete file attachment from database
   }
 }

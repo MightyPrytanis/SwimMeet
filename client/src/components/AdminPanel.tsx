@@ -200,7 +200,7 @@ export function AdminPanel({ authToken }: AdminPanelProps) {
             textAlign: 'center'
           }}>
             <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1976d2' }}>
-              {users.length}
+              {Array.isArray(users) ? users.length : 0}
             </div>
             <div style={{ fontSize: '12px', color: '#555' }}>Total Users</div>
           </div>
@@ -211,7 +211,7 @@ export function AdminPanel({ authToken }: AdminPanelProps) {
             textAlign: 'center'
           }}>
             <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#388e3c' }}>
-              {users.filter(u => u.status === 'active').length}
+              {Array.isArray(users) ? users.filter(u => u.status === 'active').length : 0}
             </div>
             <div style={{ fontSize: '12px', color: '#555' }}>Active</div>
           </div>
@@ -375,7 +375,7 @@ export function AdminPanel({ authToken }: AdminPanelProps) {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {Array.isArray(users) ? users.map((user) => (
                 <tr key={user.id} style={{ borderBottom: '1px solid #eee' }}>
                   <td style={{ padding: '12px' }}>
                     <strong>{user.username}</strong>
@@ -427,7 +427,13 @@ export function AdminPanel({ authToken }: AdminPanelProps) {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={6} style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    {isLoading ? 'Loading users...' : 'No users found'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

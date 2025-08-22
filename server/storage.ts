@@ -71,7 +71,11 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const user: User = { 
       ...insertUser, 
-      id, 
+      id,
+      email: insertUser.email || null,
+      name: insertUser.name || null, 
+      status: insertUser.status || 'active',
+      lastLogin: null,
       encryptedCredentials: {},
       createdAt: new Date(),
     };
@@ -150,6 +154,10 @@ export class MemStorage implements IStorage {
       id,
       status: insertResponse.status || "pending",
       metadata: insertResponse.metadata || {},
+      award: insertResponse.award || null,
+      responseTimeMs: insertResponse.responseTimeMs || null,
+      verificationStatus: insertResponse.verificationStatus || null,
+      verificationResults: insertResponse.verificationResults || null,
       createdAt: new Date(),
     };
     this.responses.set(id, response);
@@ -259,6 +267,7 @@ export class MemStorage implements IStorage {
   async createFileAttachment(attachment: InsertFileAttachment): Promise<FileAttachment> {
     const fileAttachment: FileAttachment = {
       ...attachment,
+      mimeType: attachment.mimeType || null,
       createdAt: new Date()
     };
     this.fileAttachments.set(attachment.id, fileAttachment);
