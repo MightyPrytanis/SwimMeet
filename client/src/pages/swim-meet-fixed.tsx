@@ -575,7 +575,9 @@ export default function SwimMeetFixed() {
               title={showStats ? 'Hide Statistics' : 'Show Statistics'}
               style={{
                 padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto'
+                minWidth: 'auto',
+                background: 'var(--stats-orange)',
+                color: 'white'
               }}
             >
               <BarChart3 size={20} />
@@ -610,8 +612,8 @@ export default function SwimMeetFixed() {
                 style={{
                   padding: 'calc(var(--grid-unit) * 0.75)',
                   minWidth: 'auto',
-                  background: 'linear-gradient(135deg, #ffd700 0%, #ffed4a 100%)',
-                  color: '#000'
+                  background: 'var(--admin-indigo)',
+                  color: 'white'
                 }}
               >
                 <Shield size={20} />
@@ -642,7 +644,9 @@ export default function SwimMeetFixed() {
               title={showSettings ? 'Hide Cloud Storage' : 'Show Cloud Storage'}
               style={{
                 padding: 'calc(var(--grid-unit) * 0.75)',
-                minWidth: 'auto'
+                minWidth: 'auto',
+                background: 'var(--settings-amber)',
+                color: 'white'
               }}
             >
               <Settings size={20} />
@@ -656,7 +660,8 @@ export default function SwimMeetFixed() {
               style={{
                 padding: 'calc(var(--grid-unit) * 0.75)',
                 minWidth: 'auto',
-                color: 'hsl(var(--poolside-red))'
+                background: 'var(--logout-red)',
+                color: 'white'
               }}
             >
               Logout

@@ -1,10 +1,19 @@
 /* Industrial Cement/Asphalt Design System */
 
 :root {
-  /* Industrial Color Palette */
-  --cement-gray: #BFBFBF; /* Cement gray - replaces white backgrounds */
+  /* Industrial Color Palette - Updated */
+  --cement-gray: #E8E8E8; /* Lighter Karl the Fog gray - replaces white backgrounds */
   --asphalt-gray: #595959; /* Asphalt gray - replaces gray elements */
   --concrete-background: #8B9DC3; /* Main background color */
+  
+  /* Mode-specific aquatic colors */
+  --dive-blue: #2563EB; /* Distinctive blue for DIVE mode */
+  --turn-purple: #7C3AED; /* Distinctive purple for TURN mode */
+  --work-teal: #059669; /* Distinctive teal for WORK mode */
+  --stats-orange: #EA580C; /* Stats button color */
+  --admin-indigo: #4F46E5; /* Admin button color */
+  --settings-amber: #D97706; /* Settings button color */
+  --logout-red: #DC2626; /* Logout button color */
   
   /* Override existing colors with industrial scheme */
   --background: var(--cement-gray);
@@ -29,6 +38,74 @@
 * {
   border-radius: 0 !important;
   box-shadow: none !important;
+  text-shadow: none !important; /* No text shadows */
+}
+
+/* Improved typography - bold sans-serif */
+body, .swim-button, button, input, textarea, select {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif !important;
+  font-weight: 500 !important; /* Bolder but clean */
+  color: #1F2937 !important; /* Adequate contrast on light backgrounds */
+}
+
+/* Mode tab styling with distinctive colors */
+.dive-panel {
+  background: var(--dive-blue) !important;
+  color: white !important;
+}
+
+.turn-panel {
+  background: var(--turn-purple) !important;
+  color: white !important;
+}
+
+.work-panel {
+  background: var(--work-teal) !important;
+  color: white !important;
+}
+
+/* Active mode styling */
+.dive-panel.swim-mode-panel--active,
+.turn-panel.swim-mode-panel--active,
+.work-panel.swim-mode-panel--active {
+  opacity: 1 !important;
+}
+
+/* Inactive mode styling */
+.dive-panel:not(.swim-mode-panel--active) {
+  background: var(--cement-gray) !important;
+  color: var(--dive-blue) !important;
+}
+
+.turn-panel:not(.swim-mode-panel--active) {
+  background: var(--cement-gray) !important;
+  color: var(--turn-purple) !important;
+}
+
+.work-panel:not(.swim-mode-panel--active) {
+  background: var(--cement-gray) !important;
+  color: var(--work-teal) !important;
+}
+
+/* Navigation buttons with distinctive colors */
+button[data-testid*="stats"] {
+  background: var(--stats-orange) !important;
+  color: white !important;
+}
+
+button[data-testid*="admin"] {
+  background: var(--admin-indigo) !important;
+  color: white !important;
+}
+
+button[data-testid*="settings"] {
+  background: var(--settings-amber) !important;
+  color: white !important;
+}
+
+button[data-testid*="logout"] {
+  background: var(--logout-red) !important;
+  color: white !important;
 }
 
 /* Industrial Body */
@@ -48,7 +125,28 @@ body {
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  margin: 10px 0 !important; /* Transparent spacing instead of borders */
+  margin: 5px 0 !important; /* Reduced vertical spacing */
+}
+
+/* AI Provider selection boxes - reduced spacing */
+.provider-grid {
+  gap: 6px !important; /* Reduced horizontal spacing */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important; /* Tighter columns */
+}
+
+.provider-grid > * {
+  margin: 3px !important; /* Reduced margins around provider cards */
+}
+
+/* Reduce spacing in provider cards */
+.provider-card,
+.consistent-provider-card {
+  padding: 12px !important; /* Reduced internal padding */
+}
+
+.provider-card .swim-provider-name,
+.consistent-provider-card .swim-provider-name {
+  margin-bottom: 6px !important; /* Reduced bottom margin */
 }
 
 /* Industrial Buttons */
