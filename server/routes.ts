@@ -1184,6 +1184,99 @@ Truth, Accuracy, and User Sovereignty`;
     }
   });
 
+  // Execute custom workflow from workflow builder
+  app.post("/api/workflows/execute", authenticateToken, async (req: any, res) => {
+    try {
+      const { workflow, initialInput } = req.body;
+      const userId = req.user.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get user credentials
+      let credentials: Record<string, string> = {};
+      if (user.encryptedCredentials?.encrypted) {
+        try {
+          credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+        } catch (error) {
+          console.error('Failed to decrypt credentials:', error);
+        }
+      }
+
+      const aiService = new AIService(credentials);
+      const workflowEngine = new WorkflowEngine(aiService);
+      
+      // Validate workflow
+      const validation = workflowEngine.validateWorkflow(workflow);
+      if (!validation.valid) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Invalid workflow", 
+          details: validation.errors 
+        });
+      }
+
+      // Execute workflow
+      const result = await workflowEngine.executeWorkflow(workflow, initialInput, credentials);
+      
+      if (result.success) {
+        // Store execution results in database
+        const conversation = await storage.createConversation({
+          userId,
+          query: initialInput,
+          mode: 'work',
+          workflowState: {
+            type: 'custom',
+            workflowDefinition: workflow,
+            executionSteps: result.steps,
+            status: 'complete'
+          }
+        });
+
+        // Store each step as a response
+        for (const step of result.steps) {
+          await storage.createResponse({
+            conversationId: conversation.id,
+            aiProvider: step.node.provider || step.node.type,
+            content: typeof step.result === 'string' ? step.result : JSON.stringify(step.result),
+            status: step.status === 'completed' ? 'complete' : step.status,
+            responseTime: step.endTime && step.startTime ? 
+              step.endTime.getTime() - step.startTime.getTime() : undefined
+          });
+        }
+
+        res.json({
+          success: true,
+          conversationId: conversation.id,
+          result: result.result,
+          steps: result.steps.map(step => ({
+            nodeId: step.nodeId,
+            nodeTitle: step.node.title,
+            status: step.status,
+            result: step.result,
+            error: step.error,
+            executionTime: step.endTime && step.startTime ? 
+              step.endTime.getTime() - step.startTime.getTime() : null
+          }))
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error,
+          steps: result.steps
+        });
+      }
+    } catch (error: any) {
+      console.error('Workflow execution error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Report AI Fabrication - Truth enforcement mechanism
   app.post("/api/responses/:id/fabrication-report", authenticateToken, async (req: any, res) => {
     try {

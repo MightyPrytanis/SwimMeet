@@ -73,6 +73,7 @@ export default function SwimMeetFixed() {
   const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
+  const [workflowMode, setWorkflowMode] = useState<'preset' | 'custom'>('preset');
 
   // Remove duplicate - handled below
 
@@ -371,6 +372,63 @@ export default function SwimMeetFixed() {
           : r
       ));
     }).catch(console.error);
+  };
+
+  // Handle custom workflow execution
+  const handleCustomWorkflowExecution = async (workflow: any) => {
+    try {
+      setIsQuerying(true);
+      setResponses([]);
+      setConversationId(null);
+      
+      if (!workflow || !workflow.nodes || workflow.nodes.length === 0) {
+        throw new Error('Please create a workflow with at least one node');
+      }
+      
+      const response = await fetch('/api/workflows/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          workflow,
+          initialInput: query
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Custom Workflow executed:', data);
+      
+      // Convert workflow steps to response format
+      const workflowResponses = data.steps?.map((step: any, index: number) => ({
+        id: `workflow-step-${index}`,
+        aiProvider: step.nodeTitle || 'Custom Node',
+        content: step.result || step.error || 'No output',
+        status: step.status === 'completed' ? 'complete' : step.status,
+        responseTime: step.executionTime,
+        metadata: { nodeId: step.nodeId, workflowStep: true }
+      })) || [];
+      
+      setConversationId(data.conversationId);
+      setResponses(workflowResponses);
+      
+    } catch (error: any) {
+      console.error('❌ Workflow execution error:', error);
+      setResponses([{
+        id: 'workflow-error',
+        aiProvider: 'system',
+        content: `Error: ${error.message}`,
+        status: 'error' as const
+      }]);
+    } finally {
+      setIsQuerying(false);
+    }
   };
 
   const getProviderFeedbackInfo = (provider: string) => {
@@ -686,27 +744,81 @@ export default function SwimMeetFixed() {
       {/* Mode-specific content areas with explanatory text */}
       <div className={`mode-themed-container ${mode}-mode`}>
         
-        {/* AI Provider Selection with mode-specific explanation */}
-        <section className="swim-section">
-          <h3 className="panel-heading">Select AI Providers</h3>
-          {mode === 'dive' && (
-            <div className="mode-explanation dive-explanation">
-              <strong>DIVE Mode:</strong> Choose as many AI competitors as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.
-            </div>
-          )}
-          {mode === 'turn' && (
-            <div className="mode-explanation turn-explanation">
-              <strong>TURN Mode:</strong> Choose primary AI providers, then select a verifier AI. The verifier will fact-check and critique the primary responses for accuracy.
-            </div>
-          )}
-          {mode === 'work' && (
-            <div className="mode-explanation work-explanation">
-              <strong>WORK Mode:</strong> Choose AI team members for the project. They will agree on roles for each agent, or you can designate them yourself. Sequential collaboration on complex problems.
-              <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f8ff', borderLeft: '4px solid #007BFF', fontSize: '14px' }}>
-                <strong>Role Assignment:</strong> After selecting AIs, you can assign specific roles like "Analyst", "Designer", "Reviewer" by clicking the role button next to each selected AI.
+        {/* WORK Mode Workflow Selection */}
+        {mode === 'work' && (
+          <section className="swim-section">
+            <h3 className="panel-heading">Workflow Type</h3>
+            <div className="swim-grid swim-grid--two-col" style={{ marginBottom: '20px' }}>
+              <div 
+                className={`swim-panel ${workflowMode === 'preset' ? 'swim-panel--active' : ''}`}
+                onClick={() => setWorkflowMode('preset')}
+                style={{ cursor: 'pointer', padding: '15px' }}
+                data-testid="workflow-preset"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Users size={20} style={{ color: 'hsl(var(--work-primary))' }} />
+                  <span style={{ fontWeight: '600', fontSize: '16px' }}>AI-Structured Workflow</span>
+                </div>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
+                  AI automatically creates a collaborative workflow based on your query and selected providers
+                </p>
+              </div>
+              
+              <div 
+                className={`swim-panel ${workflowMode === 'custom' ? 'swim-panel--active' : ''}`}
+                onClick={() => setWorkflowMode('custom')}
+                style={{ cursor: 'pointer', padding: '15px' }}
+                data-testid="workflow-custom"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <GitBranch size={20} style={{ color: '#8b5cf6' }} />
+                  <span style={{ fontWeight: '600', fontSize: '16px' }}>Custom Workflow Builder</span>
+                </div>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
+                  Design your own visual workflow with drag-drop nodes and custom AI configurations
+                </p>
               </div>
             </div>
-          )}
+          </section>
+        )}
+
+        {/* Custom Workflow Builder (only show in WORK mode with custom selected) */}
+        {mode === 'work' && workflowMode === 'custom' && (
+          <section className="swim-section">
+            <div style={{ marginBottom: '20px' }}>
+              <WorkflowBuilder onExecute={(workflow) => {
+                if (!query.trim()) {
+                  alert('Please enter a query before executing the workflow');
+                  return;
+                }
+                handleCustomWorkflowExecution(workflow);
+              }} />
+            </div>
+          </section>
+        )}
+
+        {/* AI Provider Selection with mode-specific explanation */}
+        {(mode !== 'work' || workflowMode === 'preset') && (
+          <section className="swim-section">
+            <h3 className="panel-heading">Select AI Providers</h3>
+            {mode === 'dive' && (
+              <div className="mode-explanation dive-explanation">
+                <strong>DIVE Mode:</strong> Choose as many AI competitors as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.
+              </div>
+            )}
+            {mode === 'turn' && (
+              <div className="mode-explanation turn-explanation">
+                <strong>TURN Mode:</strong> Choose primary AI providers, then select a verifier AI. The verifier will fact-check and critique the primary responses for accuracy.
+              </div>
+            )}
+            {mode === 'work' && (
+              <div className="mode-explanation work-explanation">
+                <strong>WORK Mode:</strong> Choose AI team members for the project. They will agree on roles for each agent, or you can designate them yourself. Sequential collaboration on complex problems.
+                <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f8ff', borderLeft: '4px solid #007BFF', fontSize: '14px' }}>
+                  <strong>Role Assignment:</strong> After selecting AIs, you can assign specific roles like "Analyst", "Designer", "Reviewer" by clicking the role button next to each selected AI.
+                </div>
+              </div>
+            )}
           
           <div className="provider-grid">
             {providers.map((provider, index) => {
@@ -784,8 +896,11 @@ export default function SwimMeetFixed() {
             })}
           </div>
 
-          {/* WORK Mode Role Assignment Section */}
-          {mode === 'work' && selectedAIs.length > 0 && (
+        </section>
+        )}
+
+        {/* WORK Mode Role Assignment Section */}
+        {(mode === 'work' && workflowMode === 'preset') && selectedAIs.length > 0 && (
             <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#fff8f0', borderRadius: '8px', border: '2px solid #f59e0b' }}>
               <h4 style={{ margin: '0 0 15px 0', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Users size={20} />
@@ -830,8 +945,7 @@ export default function SwimMeetFixed() {
                 })}
               </div>
             </div>
-          )}
-        </section>
+        )}
 
         {/* File Upload Interface with mode-specific explanation */}
         <section className="swim-section">
@@ -1246,7 +1360,7 @@ export default function SwimMeetFixed() {
           />
         )}
 
-        {/* Workflow Builder Demo */}
+        {/* Standalone Workflow Builder Demo (from header button) */}
         {showWorkflowBuilder && (
           <div style={{ marginBottom: '20px' }}>
             <WorkflowBuilder />

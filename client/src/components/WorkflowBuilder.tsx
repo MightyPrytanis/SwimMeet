@@ -39,7 +39,11 @@ const SAMPLE_CONNECTIONS: Connection[] = [
   { id: 'c5', from: 'decision', to: 'end', animated: true }
 ];
 
-export function WorkflowBuilder() {
+interface WorkflowBuilderProps {
+  onExecute?: (workflow: { nodes: any[], edges: any[] }) => void;
+}
+
+export function WorkflowBuilder({ onExecute }: WorkflowBuilderProps = {}) {
   const [nodes, setNodes] = useState<Node[]>(SAMPLE_NODES);
   const [connections, setConnections] = useState<Connection[]>(SAMPLE_CONNECTIONS);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);
@@ -322,6 +326,17 @@ export function WorkflowBuilder() {
             <Download className="w-4 h-4" />
             Export
           </button>
+          
+          {onExecute && (
+            <button
+              onClick={() => onExecute({ nodes, edges: connections })}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              data-testid="button-execute-workflow"
+            >
+              <Zap className="w-4 h-4" />
+              Execute Workflow
+            </button>
+          )}
         </div>
       </div>
 
