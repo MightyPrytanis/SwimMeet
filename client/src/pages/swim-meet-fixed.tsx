@@ -80,19 +80,35 @@ export default function SwimMeetFixed() {
   // Custom icons for different modes
   const ShallowDiveIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M6 18c0-4 3-8 6-8s6 4 6 8" />
-      <path d="M8 14l4-4 4 4" />
-      <circle cx="12" cy="8" r="2" fill="currentColor" />
-      <path d="M6 20h12" strokeWidth="1" opacity="0.5" />
+      {/* Side view diver */}
+      <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+      <path d="M4 8l3 4 5 2" strokeLinecap="round" />
+      <path d="M7 12l8 4" strokeLinecap="round" />
+      <path d="M15 16l5 2" strokeLinecap="round" strokeWidth="1" />
+      <path d="M2 20h20" strokeWidth="1" opacity="0.4" />
     </svg>
   );
 
   const FlipTurnIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9" />
-      <path d="M12 3v6l4-4" />
-      <path d="M8 16l4 4v-6" />
-      <circle cx="12" cy="12" r="2" fill="currentColor" />
+      {/* Clean flip turn motion */}
+      <path d="M4 12h8" strokeLinecap="round" />
+      <path d="M12 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 12c0-4 4-8 4-8" strokeLinecap="round" strokeWidth="1.5" />
+      <circle cx="20" cy="4" r="1" fill="currentColor" />
+      <path d="M20 6v6" strokeWidth="1" opacity="0.6" />
+    </svg>
+  );
+
+  const WorkTeamIcon = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      {/* Four figures for team collaboration */}
+      <circle cx="6" cy="6" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="18" cy="18" r="2" />
+      <path d="M8 12h8" strokeWidth="1" opacity="0.6" />
+      <path d="M12 8v8" strokeWidth="1" opacity="0.6" />
     </svg>
   );
 
@@ -101,7 +117,7 @@ export default function SwimMeetFixed() {
     switch (mode) {
       case 'dive': return <ShallowDiveIcon size={20} />;
       case 'turn': return <FlipTurnIcon size={20} />;
-      case 'work': return <Users size={20} />;
+      case 'work': return <WorkTeamIcon size={20} />;
       default: return <ShallowDiveIcon size={20} />;
     }
   };
@@ -700,7 +716,7 @@ export default function SwimMeetFixed() {
           {[
             { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <ShallowDiveIcon size={20} /> },
             { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <FlipTurnIcon size={20} /> },
-            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
+            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <WorkTeamIcon size={20} /> }
           ].map(m => {
             const isActive = mode === m.id;
             const panelClass = `swim-mode-panel ${m.id}-panel ${isActive ? 'swim-mode-panel--active' : ''}`;
@@ -714,13 +730,15 @@ export default function SwimMeetFixed() {
                 data-testid={`mode-${m.id}`}
                 data-tip={`Click to switch to ${m.name} mode - ${m.desc}`}
               >
-                <div className="swim-mode-title">
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'calc(var(--grid-unit) / 2)', marginBottom: 'calc(var(--grid-unit) / 2)' }}>
-                    {m.icon}
-                    {m.name}
-                  </div>
+                <div className="mode-icon">
+                  {m.icon}
                 </div>
-                <div className="swim-mode-description">{m.desc}</div>
+                <div className="mode-title">
+                  {m.name}
+                </div>
+                <div className="mode-desc">
+                  {m.desc}
+                </div>
               </div>
             );
           })}
@@ -742,7 +760,7 @@ export default function SwimMeetFixed() {
                 data-testid="workflow-preset"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <Users size={20} style={{ color: 'hsl(var(--work-primary))' }} />
+                  <WorkTeamIcon size={20} />
                   <span style={{ fontWeight: '600', fontSize: '16px' }}>AI-Structured Workflow</span>
                 </div>
                 <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>

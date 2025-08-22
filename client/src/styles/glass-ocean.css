@@ -334,10 +334,25 @@ textarea::placeholder {
     }
 }
 
-/* Mode panel transitions */
+/* Mode selector alignment fixes */
+.swim-mode-selector {
+    display: flex !important;
+    gap: 1rem !important;
+    align-items: stretch !important;
+    margin-bottom: 2rem !important;
+}
+
 .swim-mode-panel {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    padding: 1.5rem 1rem !important;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     transform: translateY(0) !important;
+    min-height: 120px !important;
 }
 
 .swim-mode-panel:hover {
@@ -347,6 +362,27 @@ textarea::placeholder {
 .swim-mode-panel--active {
     transform: translateY(-2px) !important;
     box-shadow: 0 8px 25px rgba(96, 165, 250, 0.3) !important;
+}
+
+/* Ensure icon and text alignment */
+.swim-mode-panel .mode-icon {
+    margin-bottom: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.swim-mode-panel .mode-title {
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 0.5rem !important;
+    letter-spacing: 1px !important;
+}
+
+.swim-mode-panel .mode-desc {
+    font-size: 0.9rem !important;
+    opacity: 0.8 !important;
+    line-height: 1.4 !important;
 }
 
 /* Provider card transitions */
