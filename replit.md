@@ -39,7 +39,10 @@
   - Authentication protecting all query endpoints
   - Background async processing with proper error handling
   - Mistral AI placeholder added for future integration
-✅ **TURN Mode Verification**: Complete AI-to-AI fact-checking system with accuracy scores working perfectly with collaborative verification responses
+✅ **TURN Mode Verification**: Complete AI-to-AI fact-checking system with accuracy scores working perfectly:
+  - Fixed attachment context bug - TURN verification now includes attached file information
+  - Enhanced verification prompts with SwimMeet core values and file integration criteria
+  - Verifier AIs now properly consider attached files when evaluating response completeness
 ✅ **WORK MODE COLLABORATION**: FULLY FUNCTIONAL - Sequential AI collaboration system with authentic handoffs:
   - Step 1 (OpenAI): Problem analysis and framework development
   - Step 2 (Anthropic): Building on analysis with detailed solutions

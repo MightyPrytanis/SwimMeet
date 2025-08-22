@@ -1555,21 +1555,33 @@ Provide only the reply text, no explanations.`;
 
       const aiService = new AIService(credentials);
       
-      const verificationPrompt = `TURN MODE VERIFICATION TASK
+      // Include attachment context if files were attached to the original conversation
+      let attachmentContext = "";
+      if (conversation.attachedFiles && conversation.attachedFiles.length > 0) {
+        attachmentContext = `\n\nATTACHED FILES IN ORIGINAL QUERY:
+${conversation.attachedFiles.map(f => `- ${f.filename} (${f.type}, ${Math.round(f.size / 1024)}KB)`).join('\n')}
+
+NOTE: The original response was generated with access to these files. When verifying, consider whether the response appropriately references or analyzes the attached files as relevant to the query.`;
+      }
       
+      const verificationPrompt = `🏊‍♂️ TURN MODE VERIFICATION TASK
+
 You are performing AI-to-AI verification. Carefully analyze this response for accuracy, completeness, and quality.
 
-ORIGINAL QUERY: "${conversation.query}"
+ORIGINAL QUERY: "${conversation.query}"${attachmentContext}
 
-RESPONSE TO VERIFY (from ${response.aiProvider}):
+RESPONSE TO VERIFY (from ${response.aiProvider.toUpperCase()}):
 "${response.content}"
 
 VERIFICATION CRITERIA:
 1. Factual Accuracy - Are all stated facts correct?
-2. Completeness - Does it adequately address the query?
+2. Completeness - Does it adequately address the query${conversation.attachedFiles?.length > 0 ? ' and any attached files' : ''}?
 3. Clarity - Is it clear and well-structured?
 4. Bias Detection - Any obvious bias or unsupported claims?
 5. Source Quality - Are implicit sources reliable?
+${conversation.attachedFiles?.length > 0 ? '6. File Integration - Does the response appropriately reference or analyze attached files when relevant?' : ''}
+
+**CORE VALUES**: SwimMeet prioritizes truth, accuracy, and user sovereignty. Flag any fabricated information or unsupported claims.
 
 Respond in JSON format with:
 {
