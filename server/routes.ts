@@ -1555,13 +1555,28 @@ Provide only the reply text, no explanations.`;
 
       const aiService = new AIService(credentials);
       
-      // Include attachment context if files were attached to the original conversation
+      // Include attachment context WITH ACTUAL FILE CONTENT if files were attached
       let attachmentContext = "";
       if (conversation.attachedFiles && conversation.attachedFiles.length > 0) {
-        attachmentContext = `\n\nATTACHED FILES IN ORIGINAL QUERY:
-${conversation.attachedFiles.map(f => `- ${f.filename} (${f.type}, ${Math.round(f.size / 1024)}KB)`).join('\n')}
-
-NOTE: The original response was generated with access to these files. When verifying, consider whether the response appropriately references or analyzes the attached files as relevant to the query.`;
+        attachmentContext = `\n\nATTACHED FILES WITH COMPLETE CONTENT:\n`;
+        
+        for (const file of conversation.attachedFiles) {
+          try {
+            // Get file content from local storage (same method as WORK mode)
+            const fileContent = await localStorage.getFile(file.id || file.filename);
+            if (fileContent) {
+              const textContent = fileContent.toString('utf-8');
+              attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n${textContent}\n--- END OF FILE ---\n`;
+            } else {
+              attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n[FILE CONTENT NOT ACCESSIBLE]\n--- END OF FILE ---\n`;
+            }
+          } catch (error) {
+            console.error(`Error reading file ${file.filename} for verification:`, error);
+            attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n[ERROR READING FILE: ${error}]\n--- END OF FILE ---\n`;
+          }
+        }
+        
+        attachmentContext += `\n*Above are the COMPLETE file contents that were available to the original AI. You can now verify if the response properly analyzed these files.*`;
       }
       
       const verificationPrompt = `🏊‍♂️ TURN MODE VERIFICATION TASK
