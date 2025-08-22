@@ -49,22 +49,92 @@ function planWorkflowSteps(query: string, aiProviders: string[]) {
   return steps;
 }
 
+// ENHANCED workflow planning that ENSURES all selected AIs participate
+function planWorkflowStepsImproved(query: string, aiProviders: string[], attachedFiles: any[]) {
+  console.log(`📋 Planning workflow with ALL selected AIs: [${aiProviders.join(', ')}]`);
+  
+  const steps = [];
+  const totalProviders = aiProviders.length;
+  
+  if (totalProviders === 1) {
+    // Single AI workflow
+    steps.push({
+      assignedAI: aiProviders[0],
+      objective: `Complete analysis and solution development for: ${query.substring(0, 100)}`,
+      hasAttachments: attachedFiles.length > 0
+    });
+  } else if (totalProviders === 2) {
+    // Two AI workflow
+    steps.push(
+      { assignedAI: aiProviders[0], objective: "Initial analysis and framework development", hasAttachments: attachedFiles.length > 0 },
+      { assignedAI: aiProviders[1], objective: "Solution refinement and final deliverable creation", hasAttachments: attachedFiles.length > 0 }
+    );
+  } else if (totalProviders === 3) {
+    // Three AI workflow (typical)
+    steps.push(
+      { assignedAI: aiProviders[0], objective: "Problem analysis and research phase", hasAttachments: attachedFiles.length > 0 },
+      { assignedAI: aiProviders[1], objective: "Solution development and detailed implementation", hasAttachments: attachedFiles.length > 0 },
+      { assignedAI: aiProviders[2], objective: "Final synthesis and comprehensive deliverable creation", hasAttachments: attachedFiles.length > 0 }
+    );
+  } else {
+    // Four+ AI workflow - distribute work evenly
+    const roles = [
+      "Initial research and problem decomposition",
+      "Core analysis and solution framework",
+      "Implementation details and methodology",
+      "Final synthesis and comprehensive deliverable",
+      "Quality review and optimization",
+      "User presentation and documentation"
+    ];
+    
+    for (let i = 0; i < totalProviders; i++) {
+      steps.push({
+        assignedAI: aiProviders[i],
+        objective: roles[i] || `Specialized analysis and contribution (Step ${i + 1})`,
+        hasAttachments: attachedFiles.length > 0
+      });
+    }
+  }
+  
+  console.log(`✅ Workflow planned: ${steps.length} steps ensuring ALL AIs participate`);
+  steps.forEach((step, i) => {
+    console.log(`   Step ${i+1}: ${step.assignedAI} - ${step.objective}`);
+  });
+  
+  return steps;
+}
+
 async function initiateWorkflowStep(conversationId: string, workflowState: any, aiService: AIService) {
   const currentStepData = workflowState.stepHistory[workflowState.currentStep - 1];
   const contextSummary = buildContextSummary(workflowState);
   
+  // ENHANCED prompt with attachments and core values
+  let attachmentContext = "";
+  if (workflowState.sharedContext.attachedFiles && workflowState.sharedContext.attachedFiles.length > 0) {
+    attachmentContext = `\n**ATTACHED FILES AVAILABLE:**\n${workflowState.sharedContext.attachedFiles.map(f => `- ${f.filename} (${f.type})`).join('\n')}\n*You have full access to these files - analyze them as needed for your task.*\n`;
+  }
+  
   const workPrompt = `🏊‍♂️ SWIM MEET - WORK MODE (Collaborative Step ${workflowState.currentStep}/${workflowState.totalSteps})
+
+**CORE VALUES**: Truth, factual accuracy, and user sovereignty are paramount. SwimMeet was built on these principles and you must honor them.
 
 **Your Role**: ${currentStepData.assignedAI} - Step ${workflowState.currentStep} Specialist
 **Objective**: ${currentStepData.objective}
 
 **Original Query**: ${workflowState.sharedContext.originalQuery}
-
+${attachmentContext}
 **Collaborative Context**:
 ${contextSummary}
 
 **Your Task**: 
 ${currentStepData.objective}
+
+**CRITICAL INSTRUCTIONS:**
+1. You have full access to all attached files - use them in your analysis
+2. Build upon previous work while adding your unique perspective
+3. Create comprehensive, factual content suitable for final delivery
+4. If this is the final step, create a complete document/deliverable, not just an outline
+5. Maintain the collaborative spirit while ensuring accuracy and completeness
 
 Please provide your contribution that builds upon any previous work and can be handed off to the next AI in the sequence. Focus on your specific objective while maintaining continuity with the overall solution.`;
 
@@ -79,7 +149,8 @@ Please provide your contribution that builds upon any previous work and can be h
       previousStep: workflowState.currentStep > 1 ? workflowState.currentStep - 1 : undefined,
       nextAI: workflowState.currentStep < workflowState.totalSteps ? workflowState.stepHistory[workflowState.currentStep]?.assignedAI : undefined,
       contextSummary,
-      taskSpecification: currentStepData.objective
+      taskSpecification: currentStepData.objective,
+      attachedFiles: workflowState.sharedContext.attachedFiles || []
     }
   });
 
@@ -668,28 +739,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create AI service instance
       const aiService = new AIService(credentials);
 
-      // WORK mode: Sequential collaborative processing
+      // WORK mode: Enhanced sequential collaborative processing
       if (mode === 'work') {
-        console.log("Starting WORK mode sequential processing");
+        console.log("🔄 Starting ENHANCED WORK mode sequential processing");
+        console.log(`📋 Selected AIs: [${actualProviders.join(', ')}] - ENSURING ALL PARTICIPATE`);
         
-        // Create initial workflow state
-        const workPlan = await planCollaborativeWorkflow(actualQuery, actualProviders, aiService);
+        // Use enhanced workflow planning that guarantees all AIs participate
+        const { attachedFiles = [] } = req.body;
+        const workflowSteps = planWorkflowStepsImproved(actualQuery, actualProviders, attachedFiles);
         
-        // Store workflow state in conversation
-        await storage.updateConversation(convId, { 
-          workflowState: {
-            ...workPlan,
-            collaborativeDoc: `# ${actualQuery}\n\n*Collaborative analysis by: ${actualProviders.join(', ')}*\n\n---\n\n`
-          }
-        });
+        // Create comprehensive workflow state
+        const workflowState = {
+          totalSteps: workflowSteps.length,
+          currentStep: 1,
+          steps: workflowSteps.map((step, index) => ({
+            stepNumber: index + 1,
+            assignedAI: step.assignedAI,
+            objective: step.objective,
+            completed: false,
+            output: null,
+            hasAttachments: step.hasAttachments
+          })),
+          collaborativeDoc: `# ${actualQuery}\n\n**Truth & Accuracy Mandate**: All AI team members must prioritize factual accuracy, user sovereignty, and transparency.\n\n**Selected Team**: ${actualProviders.join(', ')}\n\n---\n\n`,
+          sharedContext: {
+            originalQuery: actualQuery,
+            attachedFiles: attachedFiles || [],
+            coreValues: "Truth, factual accuracy, and user sovereignty are paramount",
+            allSelectedAIs: actualProviders // Track ALL selected AIs
+          },
+          userFeedbackEnabled: true,
+          needsUserReview: false
+        };
         
-        // Start first step
-        const firstStepResult = await processWorkflowStepNew(convId, workPlan, 0, aiService);
+        // Store enhanced workflow state
+        await storage.updateConversation(convId, { workflowState });
+        
+        console.log(`▶️ Starting Step 1: ${workflowSteps[0].assignedAI} - ${workflowSteps[0].objective}`);
+        console.log(`📎 Attachments: ${attachedFiles.length} files available to ALL AIs`);
+        
+        // Start first step with enhanced processing
+        const firstStepResult = await processWorkflowStepEnhanced(convId, workflowState, 0, aiService);
         
         return res.json({ 
           conversationId: convId, 
-          workflowState: workPlan, 
-          responses: firstStepResult ? [firstStepResult] : [] 
+          workflowState, 
+          responses: firstStepResult ? [firstStepResult] : [],
+          message: `Enhanced WORK mode initiated - ALL ${actualProviders.length} selected AIs will participate`
         });
       }
 
@@ -838,6 +933,193 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mode: c.mode,
         timestamp: c.createdAt?.toISOString()
       })));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Submit user feedback on WORK mode results (Protected route)
+  app.post("/api/conversations/:id/feedback", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { feedback, rating, forwardToAI } = req.body;
+      const userId = req.user.userId;
+      
+      // Get conversation and verify ownership
+      const conversation = await storage.getConversation(id);
+      if (!conversation || conversation.userId !== userId) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      // Store user feedback
+      const feedbackRecord = {
+        conversationId: id,
+        userId,
+        feedback,
+        rating,
+        timestamp: new Date().toISOString(),
+        forwardToAI: forwardToAI || null
+      };
+      
+      // Update workflow state with feedback
+      const updatedWorkflowState = {
+        ...conversation.workflowState,
+        userFeedback: feedbackRecord,
+        needsUserReview: false
+      };
+      
+      await storage.updateConversation(id, { workflowState: updatedWorkflowState });
+      
+      res.json({ 
+        message: "Feedback submitted successfully",
+        feedbackId: feedbackRecord.timestamp
+      });
+      
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Forward WORK results to additional AI for review (Protected route)
+  app.post("/api/conversations/:id/forward-to-ai", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { targetAI, reviewPrompt } = req.body;
+      const userId = req.user.userId;
+      
+      // Get conversation and verify ownership
+      const conversation = await storage.getConversation(id);
+      if (!conversation || conversation.userId !== userId) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      if (!conversation.workflowState?.collaborativeDoc) {
+        return res.status(400).json({ message: "No collaborative document to review" });
+      }
+      
+      // Get user credentials
+      const user = await storage.getUser(userId);
+      let credentials: Record<string, string> = {};
+      if (user?.encryptedCredentials?.encrypted) {
+        credentials = decryptCredentials(user.encryptedCredentials.encrypted);
+      }
+      
+      const aiService = new AIService(credentials);
+      
+      // Create review prompt
+      const fullPrompt = `🏊‍♂️ SWIM MEET - POST-WORK REVIEW
+
+**CORE VALUES**: Truth, factual accuracy, and user sovereignty are paramount.
+
+**Your Task**: Review and provide feedback on this collaborative AI work.
+
+**Original Query**: ${conversation.workflowState.sharedContext.originalQuery}
+
+**Collaborative Document to Review**:
+${conversation.workflowState.collaborativeDoc}
+
+**User's Review Instructions**: ${reviewPrompt || "Please review this collaborative work and provide suggestions for improvement."}
+
+Please provide:
+1. Overall assessment of the collaborative work
+2. Strengths and areas for improvement
+3. Suggestions for enhancement
+4. Any factual corrections needed
+5. Final recommendations
+
+Focus on accuracy, completeness, and value to the user.`;
+
+      // Create response for the review
+      const response = await storage.createResponse({
+        conversationId: id,
+        aiProvider: targetAI,
+        content: "",
+        status: "pending",
+        workStep: "post-work-review"
+      });
+
+      // Query the reviewing AI
+      let aiResult;
+      switch (targetAI) {
+        case 'openai':
+          aiResult = await aiService.queryOpenAI(fullPrompt);
+          break;
+        case 'anthropic':
+          aiResult = await aiService.queryAnthropic(fullPrompt);
+          break;
+        case 'google':
+          aiResult = await aiService.queryGemini(fullPrompt);
+          break;
+        case 'perplexity':
+          aiResult = await aiService.queryPerplexity(fullPrompt);
+          break;
+        case 'grok':
+          aiResult = await aiService.queryGrok(fullPrompt);
+          break;
+        default:
+          aiResult = { success: false, error: `Unknown AI provider: ${targetAI}` };
+      }
+
+      if (aiResult.success && aiResult.content) {
+        await storage.updateResponseContent(response.id, aiResult.content, "complete");
+        
+        res.json({
+          message: `Successfully forwarded to ${targetAI} for review`,
+          reviewResponse: {
+            id: response.id,
+            aiProvider: targetAI,
+            content: aiResult.content,
+            timestamp: new Date().toISOString()
+          }
+        });
+      } else {
+        await storage.updateResponseContent(response.id, aiResult.error || "Review failed", "error");
+        res.status(500).json({ message: `Failed to get review from ${targetAI}: ${aiResult.error}` });
+      }
+      
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Download collaborative document (Protected route)
+  app.get("/api/conversations/:id/download", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      
+      // Get conversation and verify ownership
+      const conversation = await storage.getConversation(id);
+      if (!conversation || conversation.userId !== userId) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      if (!conversation.workflowState?.collaborativeDoc) {
+        return res.status(400).json({ message: "No collaborative document available" });
+      }
+      
+      // Prepare document content
+      const docContent = `# SwimMeet Collaborative Analysis
+Generated: ${new Date().toISOString()}
+Query: ${conversation.query}
+Team: ${conversation.workflowState.sharedContext.allSelectedAIs?.join(', ') || 'Unknown'}
+
+---
+
+${conversation.workflowState.collaborativeDoc}
+
+---
+Generated by SwimMeet - AI Orchestration Platform
+Truth, Accuracy, and User Sovereignty`;
+      
+      // Set download headers
+      res.set({
+        'Content-Type': 'text/markdown',
+        'Content-Disposition': `attachment; filename="swimMeet-${id}-${Date.now()}.md"`
+      });
+      
+      res.send(docContent);
+      
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -1708,8 +1990,8 @@ Create the definitive response that incorporates the best of all previous work.`
   };
 }
 
-// Process a single workflow step - NEW IMPLEMENTATION
-async function processWorkflowStepNew(conversationId: string, workflowState: any, stepIndex: number, aiService: any): Promise<any> {
+// ENHANCED workflow step processing with attachment support and user feedback
+async function processWorkflowStepEnhanced(conversationId: string, workflowState: any, stepIndex: number, aiService: any): Promise<any> {
   if (stepIndex >= workflowState.steps.length) return null;
   
   const step = workflowState.steps[stepIndex];
@@ -1724,8 +2006,22 @@ async function processWorkflowStepNew(conversationId: string, workflowState: any
   });
   
   try {
+    // Build enhanced context with attachments and core values
+    let contextPrompt = `🏊‍♂️ SWIM MEET - WORK MODE (Collaborative Step ${stepIndex + 1}/${workflowState.totalSteps})
+
+**CORE VALUES**: Truth, factual accuracy, and user sovereignty are paramount. SwimMeet was built on these principles.
+
+**Your Role**: ${step.assignedAI} - Step ${stepIndex + 1} Specialist
+**Objective**: ${step.objective}
+
+**Original Query**: ${workflowState.sharedContext.originalQuery}`;
+
+    // Add attachment context
+    if (workflowState.sharedContext.attachedFiles?.length > 0) {
+      contextPrompt += `\n\n**ATTACHED FILES AVAILABLE:**\n${workflowState.sharedContext.attachedFiles.map((f: any) => `- ${f.filename} (${f.type}) - ANALYZE THIS FILE`).join('\n')}\n*You have FULL ACCESS to these files. Use them in your analysis - do not refuse or claim you cannot access them.*`;
+    }
+    
     // Build context from previous steps
-    let contextPrompt = step.prompt;
     if (stepIndex > 0) {
       const previousOutputs = workflowState.steps
         .slice(0, stepIndex)
@@ -1734,13 +2030,47 @@ async function processWorkflowStepNew(conversationId: string, workflowState: any
         .join('\n');
       
       if (previousOutputs) {
-        contextPrompt += `\n\nPREVIOUS COLLABORATIVE WORK:\n${previousOutputs}\n\nNow build upon this work with your analysis:`;
+        contextPrompt += `\n\n**PREVIOUS COLLABORATIVE WORK:**\n${previousOutputs}\n\n**IMPORTANT**: Build upon this work with your analysis. If this is the FINAL STEP, create a comprehensive deliverable, not just an outline.`;
       }
     }
     
-    // Query the AI
-    const result = await aiService.queryMultiple(contextPrompt, [step.assignedAI]);
-    const aiResult = result[step.assignedAI];
+    // Special instructions for final step
+    if (stepIndex === workflowState.totalSteps - 1) {
+      contextPrompt += `\n\n**FINAL STEP INSTRUCTIONS**: 
+- Create a complete, comprehensive deliverable
+- Include all relevant details from attachments and previous work
+- Do not provide outlines or summaries - provide the full content requested
+- This will be the final output delivered to the user`;
+    }
+    
+    // Query the specific AI directly (ensures no exclusion bugs)
+    let aiResult;
+    console.log(`🤖 Querying ${step.assignedAI} for Step ${stepIndex + 1}...`);
+    
+    switch (step.assignedAI) {
+      case 'openai':
+        aiResult = await aiService.queryOpenAI(contextPrompt);
+        break;
+      case 'anthropic':
+        aiResult = await aiService.queryAnthropic(contextPrompt);
+        break;
+      case 'google':
+        aiResult = await aiService.queryGemini(contextPrompt);
+        break;
+      case 'perplexity':
+        aiResult = await aiService.queryPerplexity(contextPrompt);
+        break;
+      case 'grok':
+        aiResult = await aiService.queryGrok(contextPrompt);
+        break;
+      case 'deepseek':
+        aiResult = await aiService.queryDeepSeek(contextPrompt);
+        break;
+      default:
+        aiResult = { success: false, error: `Unknown AI provider: ${step.assignedAI}` };
+    }
+    
+    console.log(`✅ ${step.assignedAI} Step ${stepIndex + 1}: ${aiResult.success ? 'SUCCESS' : 'FAILED - ' + aiResult.error}`);
     
     if (aiResult.success && aiResult.content) {
       // Update response
@@ -1772,18 +2102,27 @@ async function processWorkflowStepNew(conversationId: string, workflowState: any
       
       console.log(`✅ WORK MODE: Step ${stepIndex + 1} complete by ${step.assignedAI}. Next step: ${stepIndex + 2}/${workflowState.steps.length}`);
       
-      // IMMEDIATE continuation to next step (no setTimeout delay)
+      // ENHANCED continuation to next step with user feedback capability
       if (stepIndex + 1 < workflowState.steps.length) {
-        console.log(`🔄 WORK MODE: Immediately continuing to step ${stepIndex + 2}/${workflowState.steps.length} with ${workflowState.steps[stepIndex + 1].assignedAI}`);
+        console.log(`🔄 ENHANCED WORK MODE: Immediately continuing to step ${stepIndex + 2}/${workflowState.steps.length} with ${workflowState.steps[stepIndex + 1].assignedAI}`);
         
-        // Direct function call instead of setImmediate to ensure execution
+        // Direct function call with enhanced processing
         try {
-          await processWorkflowStepNew(conversationId, updatedWorkflowState, stepIndex + 1, aiService);
+          await processWorkflowStepEnhanced(conversationId, updatedWorkflowState, stepIndex + 1, aiService);
         } catch (error) {
-          console.error("❌ Error in workflow continuation:", error);
+          console.error("❌ Error in enhanced workflow continuation:", error);
         }
       } else {
-        console.log(`🏁 WORK MODE: Workflow complete! All ${workflowState.steps.length} steps finished.`);
+        console.log(`🏁 ENHANCED WORK MODE: All ${workflowState.steps.length} steps complete! Document ready for user review.`);
+        
+        // Mark workflow as complete and ready for user feedback
+        updatedWorkflowState.needsUserReview = true;
+        updatedWorkflowState.completedAt = new Date().toISOString();
+        updatedWorkflowState.status = 'complete_awaiting_feedback';
+        
+        await storageInstance.updateConversation(conversationId, {
+          workflowState: updatedWorkflowState
+        });
       }
       
       return {
