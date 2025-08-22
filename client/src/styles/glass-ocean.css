@@ -307,11 +307,117 @@ textarea::placeholder {
     transform: translateY(-1px) !important;
 }
 
-/* Main container positioning */
+/* Main container positioning with transitions */
 .main-container {
     max-width: 1400px !important;
     margin: 0 auto !important;
     padding: 2rem !important;
     position: relative !important;
     z-index: 10 !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Smooth page transitions */
+.swim-section {
+    animation: slideInUp 0.6s ease-out !important;
+    transition: all 0.3s ease !important;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mode panel transitions */
+.swim-mode-panel {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform: translateY(0) !important;
+}
+
+.swim-mode-panel:hover {
+    transform: translateY(-4px) !important;
+}
+
+.swim-mode-panel--active {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(96, 165, 250, 0.3) !important;
+}
+
+/* Provider card transitions */
+.consistent-provider-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.consistent-provider-card:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* Button interactions */
+.toolbar-btn,
+.swim-button,
+button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.toolbar-btn:active,
+.swim-button:active,
+button:active {
+    transform: translateY(1px) scale(0.98) !important;
+}
+
+/* Response animations */
+.ai-response-container {
+    animation: fadeInScale 0.5s ease-out !important;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Loading states */
+.loading-state {
+    opacity: 0.7 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease !important;
+}
+
+/* Onboarding tooltip styles */
+.onboarding-tooltip {
+    position: relative !important;
+}
+
+.onboarding-tooltip::after {
+    content: attr(data-tip) !important;
+    position: absolute !important;
+    bottom: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: var(--panel-glass) !important;
+    backdrop-filter: blur(10px) !important;
+    color: var(--crystal-white) !important;
+    padding: 0.5rem 1rem !important;
+    border: 1px solid var(--panel-border) !important;
+    font-size: 0.875rem !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease !important;
+    z-index: 1000 !important;
+}
+
+.onboarding-tooltip:hover::after {
+    opacity: 1 !important;
 }

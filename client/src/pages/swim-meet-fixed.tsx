@@ -6,7 +6,7 @@ import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
 import { AdminPanel } from "@/components/AdminPanel";
 import { WorkflowBuilder } from "@/components/WorkflowBuilder";
-import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 import "../styles/glass-ocean.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
@@ -77,12 +77,22 @@ export default function SwimMeetFixed() {
 
   // Remove duplicate - handled below
 
+  // Custom flip-turn icon for WORK mode
+  const FlipTurnIcon = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9" />
+      <path d="M12 3v6l4-4" />
+      <path d="M8 16l4 4v-6" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+    </svg>
+  );
+
   // Helper function for mode icons
   const getModeIcon = () => {
     switch (mode) {
       case 'dive': return <Play size={20} />;
       case 'turn': return <GitBranch size={20} />;
-      case 'work': return <Users size={20} />;
+      case 'work': return <FlipTurnIcon size={20} />;
       default: return <Play size={20} />;
     }
   };
@@ -550,7 +560,39 @@ export default function SwimMeetFixed() {
                   <path d="M16 20 L20 24 L24 16" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                 </svg>
               </div>
-              <div className="logo-text">SwimMeet</div>
+              <div className="logo-text">
+                <svg width="180" height="40" viewBox="0 0 180 40" fill="none">
+                  {/* Retro Euro Style SwimMeet Logo */}
+                  <defs>
+                    <linearGradient id="swimGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style={{stopColor: "#1e3a8a", stopOpacity: 1}} />
+                      <stop offset="25%" style={{stopColor: "#3b82f6", stopOpacity: 1}} />
+                      <stop offset="50%" style={{stopColor: "#06b6d4", stopOpacity: 1}} />
+                      <stop offset="75%" style={{stopColor: "#8b5cf6", stopOpacity: 1}} />
+                      <stop offset="100%" style={{stopColor: "#f59e0b", stopOpacity: 1}} />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Integrated swimmer silhouette */}
+                  <path d="M8 20 Q15 10, 25 20 Q35 25, 45 20 Q50 18, 55 20" 
+                        stroke="url(#swimGradient)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                  <circle cx="12" cy="18" r="2" fill="url(#swimGradient)"/>
+                  
+                  {/* SwimMeet text */}
+                  <text x="65" y="16" fontFamily="SF Pro Display, -apple-system, sans-serif" 
+                        fontSize="14" fontWeight="300" fill="var(--crystal-white)" letterSpacing="1px">
+                    Swim
+                  </text>
+                  <text x="105" y="16" fontFamily="SF Pro Display, -apple-system, sans-serif" 
+                        fontSize="14" fontWeight="500" fill="url(#swimGradient)" letterSpacing="1px">
+                    Meet
+                  </text>
+                  
+                  {/* Subtle wave pattern */}
+                  <path d="M65 25 Q85 22, 105 25 Q125 28, 145 25" 
+                        stroke="rgba(96, 165, 250, 0.3)" strokeWidth="1" fill="none"/>
+                </svg>
+              </div>
             </div>
             {user && <span className="user-info">Welcome, {user.username}</span>}
           </div>
@@ -657,7 +699,7 @@ export default function SwimMeetFixed() {
           {[
             { id: 'dive', name: 'DIVE', desc: 'Multiple AIs respond simultaneously', icon: <Play size={20} /> },
             { id: 'turn', name: 'TURN', desc: 'AI fact-checking and critique', icon: <GitBranch size={20} /> },
-            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <Users size={20} /> }
+            { id: 'work', name: 'WORK', desc: 'Multi-step collaborative solving', icon: <FlipTurnIcon size={20} /> }
           ].map(m => {
             const isActive = mode === m.id;
             const panelClass = `swim-mode-panel ${m.id}-panel ${isActive ? 'swim-mode-panel--active' : ''}`;
@@ -665,10 +707,11 @@ export default function SwimMeetFixed() {
             return (
               <div
                 key={m.id}
-                className={panelClass}
+                className={`${panelClass} onboarding-tooltip`}
                 onClick={() => setMode(m.id as 'dive' | 'turn' | 'work')}
                 style={{ cursor: 'pointer' }}
                 data-testid={`mode-${m.id}`}
+                data-tip={`Click to switch to ${m.name} mode - ${m.desc}`}
               >
                 <div className="swim-mode-title">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'calc(var(--grid-unit) / 2)', marginBottom: 'calc(var(--grid-unit) / 2)' }}>
@@ -698,11 +741,11 @@ export default function SwimMeetFixed() {
                 data-testid="workflow-preset"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <Users size={20} style={{ color: 'hsl(var(--work-primary))' }} />
+                  <FlipTurnIcon size={20} />
                   <span style={{ fontWeight: '600', fontSize: '16px' }}>AI-Structured Workflow</span>
                 </div>
                 <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                  AI automatically creates a collaborative workflow based on your query and selected providers
+                  <em>AI automatically creates a collaborative workflow based on your query and selected providers</em>
                 </p>
               </div>
               
@@ -745,17 +788,17 @@ export default function SwimMeetFixed() {
             <h3 className="panel-heading">Select AI Providers</h3>
             {mode === 'dive' && (
               <div className="mode-explanation dive-explanation">
-                <strong>DIVE Mode:</strong> Choose as many AI competitors as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.
+                <strong>DIVE Mode:</strong> <em>Choose as many AI competitors as you like. Each AI will respond simultaneously to your query, giving you multiple perspectives at once.</em>
               </div>
             )}
             {mode === 'turn' && (
               <div className="mode-explanation turn-explanation">
-                <strong>TURN Mode:</strong> Choose primary AI providers, then select a verifier AI. The verifier will fact-check and critique the primary responses for accuracy.
+                <strong>TURN Mode:</strong> <em>Choose primary AI providers, then select a verifier AI. The verifier will fact-check and critique the primary responses for accuracy.</em>
               </div>
             )}
             {mode === 'work' && (
               <div className="mode-explanation work-explanation">
-                <strong>WORK Mode:</strong> Choose AI team members for the project. They will agree on roles for each agent, or you can designate them yourself. Sequential collaboration on complex problems.
+                <strong>WORK Mode:</strong> <em>Choose AI team members for the project. They will agree on roles for each agent, or you can designate them yourself. Sequential collaboration on complex problems.</em>
                 <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f8ff', borderLeft: '4px solid #007BFF', fontSize: '14px' }}>
                   <strong>Role Assignment:</strong> After selecting AIs, you can assign specific roles like "Analyst", "Designer", "Reviewer" by clicking the role button next to each selected AI.
                 </div>
@@ -1249,8 +1292,8 @@ export default function SwimMeetFixed() {
                           Report Fabrication
                         </button>
                         
-                        {/* TURN Validation Button - properly aligned */}
-                        {(mode === 'dive' || mode === 'work') && (
+                        {/* TURN Validation Button - available on all modes */}
+                        {(mode === 'dive' || mode === 'turn' || mode === 'work') && (
                           <button
                             onClick={() => handleTurnValidation(response.id)}
                             className="swim-button swim-button--secondary"
