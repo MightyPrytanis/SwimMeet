@@ -81,31 +81,31 @@ export default function SwimMeetFixed() {
   // Custom icons for different modes
   const ShallowDiveIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      {/* Gently arcing line with arrow */}
-      <path d="M4 16 Q12 8 20 12" strokeLinecap="round" fill="none" />
-      <path d="M18 10 L20 12 L18 14" strokeLinecap="round" fill="none" />
+      {/* Gently arcing line with arrow - arrow point level with arc start */}
+      <path d="M4 16 Q12 8 20 16" strokeLinecap="round" fill="none" />
+      <path d="M18 14 L20 16 L18 18" strokeLinecap="round" fill="none" />
     </svg>
   );
 
   const FlipTurnIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      {/* U-shape line with arrow */}
-      <path d="M6 8 Q6 16 12 16 Q18 16 18 8" strokeLinecap="round" fill="none" />
-      <path d="M16 6 L18 8 L16 10" strokeLinecap="round" fill="none" />
+      {/* U-shape line with arrow - rotated 90 degrees counterclockwise */}
+      <path d="M16 6 Q8 6 8 12 Q8 18 16 18" strokeLinecap="round" fill="none" />
+      <path d="M18 16 L16 18 L14 16" strokeLinecap="round" fill="none" />
     </svg>
   );
 
   const WorkTeamIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      {/* Four arrows pointing inward to center */}
-      <path d="M12 4 L12 10" strokeLinecap="round" />
-      <path d="M10 8 L12 10 L14 8" strokeLinecap="round" fill="none" />
-      <path d="M12 20 L12 14" strokeLinecap="round" />
-      <path d="M10 16 L12 14 L14 16" strokeLinecap="round" fill="none" />
-      <path d="M4 12 L10 12" strokeLinecap="round" />
-      <path d="M8 10 L10 12 L8 14" strokeLinecap="round" fill="none" />
+      {/* Four arrows pointing inward to center - rotated 90 degrees counterclockwise */}
       <path d="M20 12 L14 12" strokeLinecap="round" />
       <path d="M16 10 L14 12 L16 14" strokeLinecap="round" fill="none" />
+      <path d="M4 12 L10 12" strokeLinecap="round" />
+      <path d="M8 14 L10 12 L8 10" strokeLinecap="round" fill="none" />
+      <path d="M12 20 L12 14" strokeLinecap="round" />
+      <path d="M14 16 L12 14 L10 16" strokeLinecap="round" fill="none" />
+      <path d="M12 4 L12 10" strokeLinecap="round" />
+      <path d="M14 8 L12 10 L10 8" strokeLinecap="round" fill="none" />
     </svg>
   );
 
@@ -605,7 +605,7 @@ export default function SwimMeetFixed() {
               <img 
                 src={logoImage} 
                 alt="SwimMeet Logo" 
-                style={{ height: '80px', width: 'auto', maxWidth: '300px' }}
+                style={{ height: '128px', width: 'auto', maxWidth: '480px' }}
                 onError={(e) => {
                   console.error('Logo failed to load, trying fallback');
                   e.currentTarget.src = '/swimlogo.png';
