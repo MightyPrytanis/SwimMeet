@@ -5,7 +5,7 @@ import { AuthForm } from "@/components/AuthForm";
 import { StandardFileUpload } from "@/components/StandardFileUpload";
 import { CloudStorageSettings } from "@/components/CloudStorageSettings";
 import { AdminPanel } from "@/components/AdminPanel";
-import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield } from "lucide-react";
+import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 import "../styles/modernist.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
@@ -24,8 +24,8 @@ interface AIResponse {
   content: string;
   status: 'pending' | 'complete' | 'error';
   responseTime?: number;
-  award?: 'gold' | 'silver' | 'bronze' | 'titanic';
-  awardSaved?: boolean;
+  rating?: 'positive' | 'negative';
+  ratingSaved?: boolean;
   metadata?: any;
 }
 
@@ -304,6 +304,80 @@ export default function SwimMeetFixed() {
       case 'setup_required': return '#eab308';
       case 'disabled': return '#6b7280';
       default: return '#dc2626';
+    }
+  };
+
+  const handleClearContent = () => {
+    setQuery('');
+    setResponses([]);
+    setAttachedFiles([]);
+    setConversationId(null);
+    console.log('✓ Content cleared - ready for new query');
+  };
+
+  const handleRateResponse = (responseId: string, rating: string) => {
+    console.log(`Rating ${rating} for response ${responseId}`);
+    
+    // Optimistically update UI
+    setResponses(prev => 
+      prev.map(r => r.id === responseId ? { ...r, rating: rating as any, ratingSaved: false } : r)
+    );
+    
+    // Save to backend (using existing mutation)
+    fetch(`/api/responses/${responseId}/rating`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating })
+    }).then(() => {
+      setResponses(prev => 
+        prev.map(r => r.id === responseId ? { ...r, ratingSaved: true } : r)
+      );
+    }).catch(console.error);
+  };
+
+  const handleTurnValidation = (responseId: string) => {
+    console.log(`Starting TURN validation for response ${responseId}`);
+    
+    // Find the response to validate
+    const response = responses.find(r => r.id === responseId);
+    if (!response) return;
+    
+    // Use Anthropic as default verifier for TURN validation
+    fetch(`/api/responses/${responseId}/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ verifierAI: 'anthropic' })
+    }).then(res => res.json()).then(data => {
+      console.log('✓ TURN validation completed:', data);
+      // Update response with validation results
+      setResponses(prev => prev.map(r => 
+        r.id === responseId 
+          ? { ...r, metadata: { ...r.metadata, turnValidation: data } }
+          : r
+      ));
+    }).catch(console.error);
+  };
+
+  const handleReportFabrication = (responseId: string, aiProvider: string) => {
+    const confirmed = confirm(
+      `Report ${aiProvider.toUpperCase()} for fabricating facts or lying?\n\nThis will:\n• Flag the response as containing false information\n• Submit feedback to improve AI accuracy\n• Help track fabrication patterns`
+    );
+    
+    if (confirmed) {
+      console.log(`🚨 FABRICATION REPORTED: ${aiProvider} response ${responseId}`);
+      
+      // Submit fabrication report
+      fetch(`/api/responses/${responseId}/fabrication-report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          aiProvider,
+          reportType: 'fabrication',
+          timestamp: new Date().toISOString()
+        })
+      }).then(() => {
+        alert(`✓ Fabrication report submitted for ${aiProvider.toUpperCase()}.\n\nThank you for helping improve AI accuracy!`);
+      }).catch(console.error);
     }
   };
 
@@ -612,15 +686,15 @@ export default function SwimMeetFixed() {
                 </div>
                 
                 {/* User Favorability Rating */}
-                {(providerStats as any)?.[provider.id]?.userRating && (
+                {(providerStats as any)?.[provider.id]?.positiveRating !== undefined && (
                   <div style={{ 
                     fontSize: '11px', 
                     marginBottom: '6px',
-                    color: (providerStats as any)[provider.id].userRating >= 75 ? '#16a34a' : 
-                           (providerStats as any)[provider.id].userRating >= 50 ? '#1f2937' : '#dc2626',
+                    color: (providerStats as any)[provider.id].positiveRating >= 75 ? '#16a34a' : 
+                           (providerStats as any)[provider.id].positiveRating >= 50 ? '#1f2937' : '#dc2626',
                     fontWeight: '500'
                   }}>
-                    👥 {(providerStats as any)[provider.id].userRating}% user approval
+                    👥 {(providerStats as any)[provider.id].positiveRating}% user approval
                   </div>
                 )}
                 
@@ -769,24 +843,49 @@ export default function SwimMeetFixed() {
         <section className="swim-section">
         <h3 className="panel-heading">Query Input</h3>
         <div className="swim-query-container">
-          <textarea
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter your query here..."
-            data-testid="input-query"
-            className="swim-textarea"
-          />
-          <button
-            onClick={handleSubmitQuery}
-            disabled={!query.trim() || selectedAIs.length === 0 || isQuerying}
-            data-testid="button-submit-query"
-            className={`swim-button swim-button--primary swim-button--large ${isQuerying ? 'swim-button--disabled' : ''}`}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(var(--grid-unit) / 2)' }}>
-              {getModeIcon()}
-              <span>{isQuerying ? 'Processing...' : `Submit to ${selectedAIs.length} AI${selectedAIs.length !== 1 ? 's' : ''}`}</span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--panel-gap)' }}>
+            <div style={{ flex: 1 }}>
+              <textarea
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Enter your query here..."
+                data-testid="input-query"
+                className="swim-textarea"
+                style={{ width: '100%' }}
+              />
+              
+              {/* Clear Content Button */}
+              {(query.trim() || responses.length > 0) && (
+                <button
+                  onClick={handleClearContent}
+                  className="swim-button swim-button--secondary"
+                  style={{
+                    marginTop: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    minWidth: 'auto'
+                  }}
+                  data-testid="button-clear-content"
+                  title="Clear query and responses to start fresh"
+                >
+                  <Trash2 size={14} style={{ marginRight: '4px' }} />
+                  Clear Content
+                </button>
+              )}
             </div>
-          </button>
+            
+            <button
+              onClick={handleSubmitQuery}
+              disabled={!query.trim() || selectedAIs.length === 0 || isQuerying}
+              data-testid="button-submit-query"
+              className={`swim-button swim-button--primary swim-button--large ${isQuerying ? 'swim-button--disabled' : ''}`}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'calc(var(--grid-unit) / 2)' }}>
+                {getModeIcon()}
+                <span>{isQuerying ? 'Processing...' : `Submit to ${selectedAIs.length} AI${selectedAIs.length !== 1 ? 's' : ''}`}</span>
+              </div>
+            </button>
+          </div>
         </div>
         </section>
       </div>
@@ -935,6 +1034,106 @@ export default function SwimMeetFixed() {
                   {response.responseTime && (
                     <div className="swim-response-time">
                       Response time: {(response.responseTime / 1000).toFixed(1)}s
+                    </div>
+                  )}
+                  
+                  {/* Rating Buttons and TURN Validation */}
+                  {response.status === 'complete' && (
+                    <div style={{
+                      marginTop: '15px',
+                      padding: '12px',
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: '600', color: '#374151' }}>Rate Response:</span>
+                        
+                        {/* TURN Validation Button */}
+                        {(mode === 'dive' || mode === 'work') && (
+                          <button
+                            onClick={() => handleTurnValidation(response.id)}
+                            className="swim-button swim-button--secondary"
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '11px',
+                              minWidth: 'auto',
+                              backgroundColor: '#0ea5e9',
+                              color: 'white'
+                            }}
+                            data-testid={`button-turn-validate-${response.id}`}
+                            title="Fact-check this response with AI verification"
+                          >
+                            <CheckCircle size={12} style={{ marginRight: '4px' }} />
+                            TURN Validate
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {/* Thumbs Up */}
+                        <button
+                          onClick={() => handleRateResponse(response.id, 'positive')}
+                          className={`swim-button ${response.rating === 'positive' ? 'swim-button--primary' : 'swim-button--secondary'}`}
+                          style={{
+                            padding: '6px 12px',
+                            fontSize: '12px',
+                            minWidth: 'auto',
+                            backgroundColor: response.rating === 'positive' ? '#16a34a' : undefined,
+                            color: response.rating === 'positive' ? 'white' : undefined
+                          }}
+                          data-testid={`button-thumbs-up-${response.id}`}
+                        >
+                          <ThumbsUp size={14} style={{ marginRight: '4px' }} />
+                          Good
+                        </button>
+                        
+                        {/* Thumbs Down */}
+                        <button
+                          onClick={() => handleRateResponse(response.id, 'negative')}
+                          className={`swim-button ${response.rating === 'negative' ? 'swim-button--primary' : 'swim-button--secondary'}`}
+                          style={{
+                            padding: '6px 12px',
+                            fontSize: '12px',
+                            minWidth: 'auto',
+                            backgroundColor: response.rating === 'negative' ? '#dc2626' : undefined,
+                            color: response.rating === 'negative' ? 'white' : undefined
+                          }}
+                          data-testid={`button-thumbs-down-${response.id}`}
+                        >
+                          <ThumbsDown size={14} style={{ marginRight: '4px' }} />
+                          Poor
+                        </button>
+                        
+                        {/* Anti-Fabrication Button */}
+                        <button
+                          onClick={() => handleReportFabrication(response.id, response.aiProvider)}
+                          className="swim-button swim-button--secondary"
+                          style={{
+                            padding: '6px 12px',
+                            fontSize: '12px',
+                            minWidth: 'auto',
+                            backgroundColor: '#f59e0b',
+                            color: 'white'
+                          }}
+                          data-testid={`button-report-fabrication-${response.id}`}
+                          title="Report this AI for making up facts or lying"
+                        >
+                          <AlertTriangle size={14} style={{ marginRight: '4px' }} />
+                          Report Fabrication
+                        </button>
+                        
+                        {/* Rating Status */}
+                        {response.rating && (
+                          <span style={{
+                            fontSize: '11px',
+                            color: response.ratingSaved ? '#16a34a' : '#eab308',
+                            marginLeft: '8px'
+                          }}>
+                            {response.ratingSaved ? '✓ Saved' : '⏳ Saving...'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
