@@ -1,9 +1,9 @@
 /* Industrial Cement/Asphalt Design System */
 
 :root {
-  /* Industrial Color Palette - Updated */
-  --cement-gray: #E8E8E8; /* Lighter Karl the Fog gray - replaces white backgrounds */
-  --asphalt-gray: #595959; /* Asphalt gray - replaces gray elements */
+  /* Industrial Color Palette - Refined */
+  --cement-gray: #D4D4D4; /* Balanced cement gray - darker than Karl the Fog */
+  --asphalt-gray: #737373; /* Lighter asphalt gray for better contrast */
   --concrete-background: #8B9DC3; /* Main background color */
   
   /* Mode-specific aquatic colors */
@@ -41,11 +41,26 @@
   text-shadow: none !important; /* No text shadows */
 }
 
-/* Improved typography - bold sans-serif */
+/* Sophisticated typography - professional sans-serif */
 body, .swim-button, button, input, textarea, select {
-  font-family: 'Inter', 'Helvetica Neue', sans-serif !important;
-  font-weight: 500 !important; /* Bolder but clean */
-  color: #1F2937 !important; /* Adequate contrast on light backgrounds */
+  font-family: 'SF Pro Display', 'Segoe UI Variable', 'system-ui', '-apple-system', 'BlinkMacSystemFont', sans-serif !important;
+  font-weight: 600 !important; /* More sophisticated weight */
+  color: #171717 !important; /* High contrast dark text */
+  letter-spacing: -0.01em !important; /* Tighter, more refined spacing */
+}
+
+/* Enhanced text contrast for better legibility */
+.swim-caption, .swim-mode-description, .mode-explanation {
+  color: #262626 !important; /* Darker text for better contrast */
+  font-weight: 500 !important;
+}
+
+/* Headings with extra sophistication */
+h1, h2, h3, h4, h5, h6, .panel-heading, .swim-subtitle {
+  font-family: 'SF Pro Display', 'Segoe UI Variable', 'system-ui', sans-serif !important;
+  font-weight: 700 !important; /* Bold headings */
+  color: #0A0A0A !important; /* Maximum contrast */
+  letter-spacing: -0.02em !important; /* Tighter spacing for headings */
 }
 
 /* Mode tab styling with distinctive colors */
@@ -108,13 +123,14 @@ button[data-testid*="logout"] {
   color: white !important;
 }
 
-/* Industrial Body */
+/* Industrial Body with luxe background */
 body {
-  background: var(--concrete-background) !important;
+  background: linear-gradient(135deg, var(--concrete-background) 0%, #9CA3AF 100%) !important;
   min-height: 100vh;
+  font-feature-settings: "kern" 1, "liga" 1 !important; /* Typography refinement */
 }
 
-/* Industrial Panels - Replace white backgrounds with cement gray */
+/* Industrial Panels with luxe sophistication */
 .swim-panel,
 .glass-panel,
 .glass-panel-large,
@@ -126,6 +142,17 @@ body {
   border-radius: 0 !important;
   box-shadow: none !important;
   margin: 5px 0 !important; /* Reduced vertical spacing */
+  position: relative !important;
+}
+
+/* Add subtle sophistication with minimal 3D effect */
+.swim-panel:hover,
+.provider-card:hover,
+.consistent-provider-card:hover {
+  background: var(--asphalt-gray) !important;
+  color: white !important;
+  transform: translateY(-1px) !important; /* Minimal 3D lift */
+  transition: all 0.2s ease !important;
 }
 
 /* AI Provider selection boxes - reduced spacing */
@@ -149,7 +176,7 @@ body {
   margin-bottom: 6px !important; /* Reduced bottom margin */
 }
 
-/* Industrial Buttons */
+/* Industrial Buttons with luxe sophistication */
 .swim-button,
 button {
   background: var(--cement-gray) !important;
@@ -157,6 +184,25 @@ button {
   border-radius: 0 !important;
   box-shadow: none !important;
   margin: 2px !important; /* Transparent spacing */
+  position: relative !important;
+  overflow: hidden !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.005em !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Add subtle luxury hover effects */
+.swim-button:hover,
+button:hover {
+  background: var(--asphalt-gray) !important;
+  color: white !important;
+  transform: translateY(-0.5px) !important; /* Minimal lift */
+}
+
+/* Refined button typography */
+.swim-button,
+button {
+  font-family: 'SF Pro Display', 'Segoe UI Variable', 'system-ui', sans-serif !important;
 }
 
 /* Active states use asphalt gray */
@@ -199,21 +245,46 @@ select {
   gap: 10px !important;
 }
 
-/* Header styling */
+/* Header styling with luxe sophistication */
 header {
   background: var(--cement-gray) !important;
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   margin-bottom: 10px !important;
+  position: relative !important;
 }
 
-/* Logo styling */
+/* Add subtle bottom accent for header */
+header::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 20px !important;
+  right: 20px !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, var(--dive-blue) 0%, var(--turn-purple) 50%, var(--work-teal) 100%) !important;
+}
+
+/* Logo styling with luxe sophistication */
 .logo-container {
   background: var(--cement-gray) !important;
-  border: 4px solid #4A5568 !important; /* Keep existing silver border but make it asphalt */
+  border: 3px solid var(--asphalt-gray) !important; /* Refined border thickness */
   border-radius: 0 !important;
   box-shadow: none !important;
+  position: relative !important;
+}
+
+/* Add subtle gradient overlay for luxury */
+.logo-container::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.05) 100%) !important;
+  pointer-events: none !important;
 }
 
 /* Response containers */
@@ -226,7 +297,7 @@ header {
   margin: 10px 0 !important;
 }
 
-/* Mode explanation boxes */
+/* Mode explanation boxes with enhanced sophistication */
 .mode-explanation {
   background: var(--asphalt-gray) !important;
   color: white !important;
@@ -234,7 +305,31 @@ header {
   border-radius: 0 !important;
   box-shadow: none !important;
   margin: 10px 0 !important;
-  padding: 15px !important;
+  padding: 18px !important; /* Slightly more generous padding */
+  position: relative !important;
+}
+
+/* Add subtle accent line for sophistication */
+.mode-explanation::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 4px !important;
+  background: var(--dive-blue) !important; /* Default accent */
+}
+
+.dive-explanation::before {
+  background: var(--dive-blue) !important;
+}
+
+.turn-explanation::before {
+  background: var(--turn-purple) !important;
+}
+
+.work-explanation::before {
+  background: var(--work-teal) !important;
 }
 
 /* File upload areas */
@@ -308,4 +403,39 @@ header {
 .shadow-xl,
 [class*="shadow"] {
   box-shadow: none !important;
+}
+
+/* Sophisticated selection states */
+.provider-selected,
+.swim-panel--active {
+  background: var(--asphalt-gray) !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Add subtle texture overlay for luxury panels */
+.swim-panel,
+.provider-card,
+.consistent-provider-card {
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 50%, rgba(0,0,0,0.02) 100%) !important;
+}
+
+/* Enhanced focus states for accessibility and luxury */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--dive-blue) !important;
+  outline-offset: 2px !important;
+  background: var(--cement-gray) !important;
+}
+
+/* Refined spacing for professional appearance */
+.provider-grid {
+  padding: 12px !important; /* More generous outer padding */
+}
+
+.swim-section {
+  padding: 16px !important; /* Refined section padding */
 }
