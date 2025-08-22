@@ -607,22 +607,12 @@ export default function SwimMeetFixed() {
               <img 
                 src={logoImage} 
                 alt="SwimMeet Logo" 
-                style={{ height: '192px', width: 'auto', maxWidth: '900px', transform: 'scaleX(1.25)' }}
+                style={{ height: '192px', width: 'auto', maxWidth: '900px', transform: 'scaleX(1.20)' }}
                 onError={(e) => {
                   console.error('Logo failed to load, trying fallback');
                   e.currentTarget.src = '/swimlogo.png';
                 }}
               />
-              <div style={{ 
-                color: '#DAA520', 
-                fontSize: '32px', 
-                fontWeight: 'bold', 
-                marginTop: '8px',
-                fontFamily: 'system-ui',
-                letterSpacing: '2px'
-              }}>
-                SwimMeet
-              </div>
             </div>
             {user && <span className="user-info">Welcome, {user.username}</span>}
           </div>
