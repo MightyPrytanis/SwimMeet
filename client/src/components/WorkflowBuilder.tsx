@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Zap, MessageSquare, CheckCircle, ArrowRight, Move, Plus } from 'lucide-react';
+import { Zap, MessageSquare, CheckCircle, ArrowRight, Move, Plus, Download, Edit, Trash, Settings } from 'lucide-react';
 
 interface Node {
   id: string;
@@ -8,7 +8,12 @@ interface Node {
   y: number;
   title: string;
   provider?: string;
-  config?: any;
+  config?: {
+    prompt?: string;
+    temperature?: number;
+    maxTokens?: number;
+    systemPrompt?: string;
+  };
 }
 
 interface Connection {
@@ -39,14 +44,125 @@ export function WorkflowBuilder() {
   const [connections, setConnections] = useState<Connection[]>(SAMPLE_CONNECTIONS);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [showNodeEditor, setShowNodeEditor] = useState(false);
+  const [nodeBeingEdited, setNodeBeingEdited] = useState<Node | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [executionStep, setExecutionStep] = useState<number>(-1);
+  const [workflowName, setWorkflowName] = useState('My AI Workflow');
 
   const handleNodeDrag = useCallback((nodeId: string, newX: number, newY: number) => {
     setNodes(prev => prev.map(node => 
       node.id === nodeId ? { ...node, x: newX, y: newY } : node
     ));
   }, []);
+
+  const addNode = (type: Node['type'], provider?: string) => {
+    const newNode: Node = {
+      id: `node_${Date.now()}`,
+      type,
+      x: 300 + Math.random() * 200,
+      y: 150 + Math.random() * 100,
+      title: type === 'ai' ? `${provider || 'AI'} Node` : `${type.charAt(0).toUpperCase() + type.slice(1)} Node`,
+      provider,
+      config: type === 'ai' ? { 
+        prompt: 'Analyze the input and provide insights',
+        temperature: 0.7,
+        maxTokens: 500
+      } : undefined
+    };
+    setNodes(prev => [...prev, newNode]);
+  };
+
+  const deleteNode = (nodeId: string) => {
+    setNodes(prev => prev.filter(node => node.id !== nodeId));
+    setConnections(prev => prev.filter(conn => conn.from !== nodeId && conn.to !== nodeId));
+  };
+
+  const editNode = (node: Node) => {
+    setNodeBeingEdited(node);
+    setShowNodeEditor(true);
+  };
+
+  const saveNodeEdit = (updatedNode: Node) => {
+    setNodes(prev => prev.map(node => 
+      node.id === updatedNode.id ? updatedNode : node
+    ));
+    setShowNodeEditor(false);
+    setNodeBeingEdited(null);
+  };
+
+  const exportWorkflow = () => {
+    const workflow = {
+      name: workflowName,
+      nodes,
+      connections,
+      version: '1.0',
+      created: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${workflowName.replace(/\s+/g, '_')}.json`;
+    a.click();
+  };
+
+  const executeWorkflow = async () => {
+    // This would integrate with your existing AI query system
+    console.log('Executing workflow:', { nodes, connections });
+    
+    // Find start node
+    const startNode = nodes.find(n => n.type === 'start');
+    if (!startNode) {
+      alert('No start node found!');
+      return;
+    }
+
+    // Build execution plan
+    const executionPlan = buildExecutionPlan(nodes, connections);
+    console.log('Execution plan:', executionPlan);
+    
+    // Simulate execution for demo
+    simulateExecution();
+  };
+
+  const buildExecutionPlan = (nodes: Node[], connections: Connection[]) => {
+    // Build a topological sort of the workflow
+    const plan: { step: number; node: Node; dependencies: string[] }[] = [];
+    const processed = new Set<string>();
+    
+    function processNode(nodeId: string, step: number): number {
+      if (processed.has(nodeId)) return step;
+      
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node) return step;
+      
+      const dependencies = connections
+        .filter(conn => conn.to === nodeId)
+        .map(conn => conn.from);
+      
+      plan.push({ step, node, dependencies });
+      processed.add(nodeId);
+      
+      // Process connected nodes
+      const nextConnections = connections.filter(conn => conn.from === nodeId);
+      let nextStep = step + 1;
+      for (const conn of nextConnections) {
+        nextStep = Math.max(nextStep, processNode(conn.to, nextStep));
+      }
+      
+      return nextStep;
+    }
+    
+    const startNode = nodes.find(n => n.type === 'start');
+    if (startNode) {
+      processNode(startNode.id, 0);
+    }
+    
+    return plan.sort((a, b) => a.step - b.step);
+  };
 
   const getNodeIcon = (type: string, provider?: string) => {
     switch (type) {
@@ -140,6 +256,21 @@ export function WorkflowBuilder() {
           <p className="text-sm text-slate-600">Drag nodes to rearrange • Click to simulate execution</p>
         </div>
         <div className="flex gap-2">
+          <input
+            type="text"
+            value={workflowName}
+            onChange={(e) => setWorkflowName(e.target.value)}
+            className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
+            placeholder="Workflow name"
+          />
+          <button
+            onClick={executeWorkflow}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+            data-testid="button-execute-workflow"
+          >
+            <Zap className="w-4 h-4" />
+            Execute
+          </button>
           <button
             onClick={simulateExecution}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
@@ -148,12 +279,48 @@ export function WorkflowBuilder() {
             <Zap className="w-4 h-4" />
             Simulate
           </button>
+          <div className="relative group">
+            <button
+              className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors flex items-center gap-2"
+              data-testid="button-add-node"
+            >
+              <Plus className="w-4 h-4" />
+              Add Node
+            </button>
+            <div className="absolute top-full mt-2 right-0 bg-white border border-slate-300 rounded-lg shadow-lg p-2 hidden group-hover:block z-20">
+              <button
+                onClick={() => addNode('ai', 'openai')}
+                className="block w-full text-left px-3 py-2 hover:bg-blue-50 rounded text-sm"
+              >
+                + OpenAI Node
+              </button>
+              <button
+                onClick={() => addNode('ai', 'anthropic')}
+                className="block w-full text-left px-3 py-2 hover:bg-orange-50 rounded text-sm"
+              >
+                + Anthropic Node
+              </button>
+              <button
+                onClick={() => addNode('ai', 'google')}
+                className="block w-full text-left px-3 py-2 hover:bg-red-50 rounded text-sm"
+              >
+                + Google Node
+              </button>
+              <button
+                onClick={() => addNode('decision')}
+                className="block w-full text-left px-3 py-2 hover:bg-yellow-50 rounded text-sm"
+              >
+                + Decision Node
+              </button>
+            </div>
+          </div>
           <button
-            className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors flex items-center gap-2"
-            data-testid="button-add-node"
+            onClick={exportWorkflow}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2"
+            data-testid="button-export-workflow"
           >
-            <Plus className="w-4 h-4" />
-            Add Node
+            <Download className="w-4 h-4" />
+            Export
           </button>
         </div>
       </div>
@@ -214,16 +381,43 @@ export function WorkflowBuilder() {
             }}
             onDragEnd={() => setDraggedNode(null)}
             data-testid={`node-${node.id}`}
+            onDoubleClick={() => editNode(node)}
           >
             <div className={`
               w-20 h-10 ${getNodeColor(node.type, node.provider)} 
               rounded-lg flex items-center justify-center text-white shadow-md
-              border-2 border-white relative
+              border-2 border-white relative group
               ${executionStep !== -1 && nodes.indexOf(node) === executionStep ? 
                 'animate-pulse ring-4 ring-blue-300' : ''}
             `}>
               {getNodeIcon(node.type, node.provider)}
               <Move className="absolute -top-2 -right-2 w-3 h-3 opacity-60" />
+              
+              {/* Node controls */}
+              <div className="absolute -top-1 -left-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    editNode(node);
+                  }}
+                  className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600"
+                  title="Edit node"
+                >
+                  <Edit className="w-2 h-2" />
+                </button>
+                {node.type !== 'start' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteNode(node.id);
+                    }}
+                    className="w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                    title="Delete node"
+                  >
+                    <Trash className="w-2 h-2" />
+                  </button>
+                )}
+              </div>
             </div>
             <div className="text-xs text-center mt-1 font-medium text-slate-700 bg-white/80 rounded px-1">
               {node.title}
@@ -254,15 +448,115 @@ export function WorkflowBuilder() {
       </div>
 
       <div className="mt-4 text-sm text-slate-600">
-        <strong>Features Demonstrated:</strong>
+        <strong>Workflow Builder Features:</strong>
         <ul className="list-disc list-inside mt-1 space-y-1">
-          <li>Drag & drop nodes to rearrange workflow</li>
-          <li>Animated connectors showing data flow direction</li>
-          <li>Real-time execution simulation with progress tracking</li>
-          <li>Provider-specific node colors (Blue=OpenAI, Orange=Anthropic)</li>
-          <li>Interactive workflow building with visual feedback</li>
+          <li><strong>Add Nodes:</strong> Hover over "Add Node" to select AI providers or decision nodes</li>
+          <li><strong>Edit Nodes:</strong> Double-click any node or use the edit button to configure settings</li>
+          <li><strong>Delete Nodes:</strong> Hover over nodes and click the red trash button</li>
+          <li><strong>Drag & Drop:</strong> Rearrange workflow by dragging nodes</li>
+          <li><strong>Execute:</strong> Run real workflows through your AI providers</li>
+          <li><strong>Export:</strong> Save workflows as JSON files for reuse</li>
         </ul>
       </div>
+
+      {/* Node Editor Modal */}
+      {showNodeEditor && nodeBeingEdited && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-w-full">
+            <h3 className="text-lg font-semibold mb-4">Edit Node: {nodeBeingEdited.title}</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Node Title</label>
+                <input
+                  type="text"
+                  value={nodeBeingEdited.title}
+                  onChange={(e) => setNodeBeingEdited({...nodeBeingEdited, title: e.target.value})}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                />
+              </div>
+
+              {nodeBeingEdited.type === 'ai' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">AI Provider</label>
+                    <select
+                      value={nodeBeingEdited.provider || ''}
+                      onChange={(e) => setNodeBeingEdited({...nodeBeingEdited, provider: e.target.value})}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                    >
+                      <option value="openai">OpenAI (ChatGPT-4)</option>
+                      <option value="anthropic">Anthropic (Claude)</option>
+                      <option value="google">Google (Gemini)</option>
+                      <option value="perplexity">Perplexity</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Prompt Template</label>
+                    <textarea
+                      value={nodeBeingEdited.config?.prompt || ''}
+                      onChange={(e) => setNodeBeingEdited({
+                        ...nodeBeingEdited, 
+                        config: {...nodeBeingEdited.config, prompt: e.target.value}
+                      })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg h-20"
+                      placeholder="Enter the prompt for this AI node..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Temperature</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="2"
+                        step="0.1"
+                        value={nodeBeingEdited.config?.temperature || 0.7}
+                        onChange={(e) => setNodeBeingEdited({
+                          ...nodeBeingEdited, 
+                          config: {...nodeBeingEdited.config, temperature: parseFloat(e.target.value)}
+                        })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Max Tokens</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="4000"
+                        value={nodeBeingEdited.config?.maxTokens || 500}
+                        onChange={(e) => setNodeBeingEdited({
+                          ...nodeBeingEdited, 
+                          config: {...nodeBeingEdited.config, maxTokens: parseInt(e.target.value)}
+                        })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={() => saveNodeEdit(nodeBeingEdited)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => {setShowNodeEditor(false); setNodeBeingEdited(null);}}
+                className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

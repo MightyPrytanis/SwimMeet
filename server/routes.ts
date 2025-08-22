@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { encryptCredentials, decryptCredentials } from "./services/encryption";
 import { AIService } from "./services/ai-service";
+import { WorkflowEngine } from "./workflow-engine";
 import { credentialsSchema, insertConversationSchema, insertResponseSchema, insertUserSchema, type QueryRequest, type AIProvider } from "@shared/schema";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
