@@ -606,7 +606,7 @@ export default function SwimMeetFixed() {
           <div className="logo-section">
             <div className="logo-container">
               <img 
-                src="/attached_assets/Sleek Lettermark SwimMeet Logo for Sports_1755887370233.png" 
+                src="/swimlogo.png" 
                 alt="SwimMeet Logo" 
                 style={{ height: '60px', width: 'auto' }}
               />
