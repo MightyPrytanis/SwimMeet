@@ -283,11 +283,24 @@ export default function SwimMeetFixed() {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const downloadFile = (path: string, filename: string) => {
+  const downloadFile = (content: string, filename: string) => {
+    // Create blob with the content
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
     const link = document.createElement('a');
-    link.href = path;
+    link.href = url;
     link.download = filename;
+    link.style.display = 'none';
+    
+    // Trigger download
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    
+    // Clean up object URL
+    URL.revokeObjectURL(url);
   };
 
   const getModeColor = () => {
@@ -807,7 +820,19 @@ export default function SwimMeetFixed() {
                     </div>
                     <div className="swim-file-actions">
                       <button
-                        onClick={() => downloadFile(file.path, file.name)}
+                        onClick={() => {
+                          // For attached files, we need to fetch the content first
+                          fetch(file.path || `/api/files/${file.id}`)
+                            .then(res => res.text())
+                            .then(content => downloadFile(content, file.name))
+                            .catch(() => {
+                              // Fallback: try direct download
+                              const link = document.createElement('a');
+                              link.href = file.path || `/api/files/${file.id}`;
+                              link.download = file.name;
+                              link.click();
+                            });
+                        }}
                         className="swim-button swim-button--secondary"
                         style={{
                           padding: 'calc(var(--grid-unit) / 2) var(--grid-unit)',
@@ -815,6 +840,7 @@ export default function SwimMeetFixed() {
                           minWidth: 'auto'
                         }}
                         data-testid={`button-download-${index}`}
+                        title={`Download ${file.name}`}
                       >
                         <Download size={14} />
                       </button>
@@ -1014,7 +1040,7 @@ export default function SwimMeetFixed() {
                       </div>
                       {response.status === 'complete' && (
                         <button
-                          onClick={() => downloadFile(`data:text/plain;charset=utf-8,${encodeURIComponent(response.content)}`, `${response.aiProvider}-response.txt`)}
+                          onClick={() => downloadFile(response.content, `${response.aiProvider}-response-${new Date().toISOString().slice(0,10)}.txt`)}
                           className="swim-button swim-button--secondary"
                           style={{
                             padding: 'calc(var(--grid-unit) / 2) var(--grid-unit)',
@@ -1022,6 +1048,7 @@ export default function SwimMeetFixed() {
                             minWidth: 'auto'
                           }}
                           data-testid={`button-download-response-${response.id}`}
+                          title={`Download ${response.aiProvider} response as text file`}
                         >
                           <Download size={14} />
                         </button>
