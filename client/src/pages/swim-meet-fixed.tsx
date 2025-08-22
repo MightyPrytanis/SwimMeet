@@ -97,15 +97,15 @@ export default function SwimMeetFixed() {
 
   const WorkTeamIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      {/* Four arrows pointing inward to center - rotated 90 degrees counterclockwise */}
-      <path d="M20 12 L14 12" strokeLinecap="round" />
-      <path d="M16 10 L14 12 L16 14" strokeLinecap="round" fill="none" />
-      <path d="M4 12 L10 12" strokeLinecap="round" />
-      <path d="M8 14 L10 12 L8 10" strokeLinecap="round" fill="none" />
-      <path d="M12 20 L12 14" strokeLinecap="round" />
-      <path d="M14 16 L12 14 L10 16" strokeLinecap="round" fill="none" />
-      <path d="M12 4 L12 10" strokeLinecap="round" />
-      <path d="M14 8 L12 10 L10 8" strokeLinecap="round" fill="none" />
+      {/* Four arrows pointing inward to center - rotated 45 degrees from cardinal */}
+      <path d="M18.5 5.5 L13.5 10.5" strokeLinecap="round" />
+      <path d="M15.5 8.5 L13.5 10.5 L15.5 12.5" strokeLinecap="round" fill="none" />
+      <path d="M5.5 18.5 L10.5 13.5" strokeLinecap="round" />
+      <path d="M8.5 15.5 L10.5 13.5 L12.5 15.5" strokeLinecap="round" fill="none" />
+      <path d="M18.5 18.5 L13.5 13.5" strokeLinecap="round" />
+      <path d="M15.5 15.5 L13.5 13.5 L15.5 11.5" strokeLinecap="round" fill="none" />
+      <path d="M5.5 5.5 L10.5 10.5" strokeLinecap="round" />
+      <path d="M8.5 8.5 L10.5 10.5 L12.5 8.5" strokeLinecap="round" fill="none" />
     </svg>
   );
 
@@ -419,7 +419,9 @@ export default function SwimMeetFixed() {
         // Refresh responses to see validation after a moment
         setTimeout(() => {
           if (conversationId) {
-            refetchResponses();
+            queryClient.invalidateQueries({
+              queryKey: [`/api/conversations/${conversationId}/responses`]
+            });
           }
         }, 3000);
       } else {
@@ -605,7 +607,7 @@ export default function SwimMeetFixed() {
               <img 
                 src={logoImage} 
                 alt="SwimMeet Logo" 
-                style={{ height: '128px', width: 'auto', maxWidth: '480px' }}
+                style={{ height: '192px', width: 'auto', maxWidth: '720px' }}
                 onError={(e) => {
                   console.error('Logo failed to load, trying fallback');
                   e.currentTarget.src = '/swimlogo.png';
