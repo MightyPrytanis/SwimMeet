@@ -26,19 +26,9 @@
   --work-gold-light: #FFF8DC;
 }
 
-/* Water-inspired background - subtle and memory efficient */
+/* Industrial concrete background - solid and uniform */
 body {
-  background: linear-gradient(135deg, 
-    #f8fafc 0%,
-    #e2e8f0 20%,
-    #cbd5e1 35%,
-    #e2e8f0 50%,
-    #f1f5f9 65%,
-    #e2e8f0 80%,
-    #f8fafc 100%
-  );
-  background-size: 400% 400%;
-  animation: waterFlow 25s ease-in-out infinite;
+  background: #8B9DC3; /* Cement gray background */
   min-height: 100vh;
 }
 

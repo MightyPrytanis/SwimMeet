@@ -8,6 +8,7 @@ import { AdminPanel } from "@/components/AdminPanel";
 import { WorkflowBuilder } from "@/components/WorkflowBuilder";
 import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 import "../styles/modernist.css";
+import "../styles/industrial.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
 
 // Types

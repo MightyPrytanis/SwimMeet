@@ -1,0 +1,213 @@
+/* Industrial Cement/Asphalt Design System */
+
+:root {
+  /* Industrial Color Palette */
+  --cement-gray: #BFBFBF; /* Cement gray - replaces white backgrounds */
+  --asphalt-gray: #595959; /* Asphalt gray - replaces gray elements */
+  --concrete-background: #8B9DC3; /* Main background color */
+  
+  /* Override existing colors with industrial scheme */
+  --background: var(--cement-gray);
+  --card: var(--cement-gray);
+  --popover: var(--cement-gray);
+  --input: var(--cement-gray);
+  --sidebar: var(--cement-gray);
+  --muted: var(--asphalt-gray);
+  
+  /* Remove all rounded corners and shadows */
+  --radius: 0px;
+  --border-radius: 0px;
+  --shadow: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --box-shadow: none;
+}
+
+/* Override all rounded corners globally */
+* {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Industrial Body */
+body {
+  background: var(--concrete-background) !important;
+  min-height: 100vh;
+}
+
+/* Industrial Panels - Replace white backgrounds with cement gray */
+.swim-panel,
+.glass-panel,
+.glass-panel-large,
+.provider-card,
+.consistent-provider-card,
+.swim-mode-panel {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 10px 0 !important; /* Transparent spacing instead of borders */
+}
+
+/* Industrial Buttons */
+.swim-button,
+button {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 2px !important; /* Transparent spacing */
+}
+
+/* Active states use asphalt gray */
+.swim-button:hover,
+.swim-panel--active,
+.swim-mode-panel--active,
+.provider-selected {
+  background: var(--asphalt-gray) !important;
+  color: white !important;
+}
+
+/* Industrial Input Fields */
+input,
+textarea,
+select {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 2px !important;
+}
+
+/* Industrial Cards and Containers */
+.mode-themed-container,
+.swim-section,
+.swim-grid {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  gap: 10px !important; /* Transparent spacing */
+}
+
+/* Remove all borders and add transparent spacing */
+.swim-mode-selector > *,
+.provider-grid > *,
+.swim-grid > * {
+  margin: 10px !important;
+  border: none !important;
+  gap: 10px !important;
+}
+
+/* Header styling */
+header {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-bottom: 10px !important;
+}
+
+/* Logo styling */
+.logo-container {
+  background: var(--cement-gray) !important;
+  border: 4px solid #4A5568 !important; /* Keep existing silver border but make it asphalt */
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Response containers */
+.ai-response-container,
+.response-card {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 10px 0 !important;
+}
+
+/* Mode explanation boxes */
+.mode-explanation {
+  background: var(--asphalt-gray) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 10px 0 !important;
+  padding: 15px !important;
+}
+
+/* File upload areas */
+.file-upload-area,
+.drag-drop-zone {
+  background: var(--cement-gray) !important;
+  border: 2px dashed var(--asphalt-gray) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Workflow builder styling */
+.workflow-builder-container {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Settings panels */
+.cloud-storage-panel,
+.admin-panel {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Statistics panels */
+.stats-panel {
+  background: var(--cement-gray) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Override any white backgrounds that might remain */
+.bg-white,
+[style*="background: white"],
+[style*="background-color: white"],
+[style*="background: #fff"],
+[style*="background-color: #fff"] {
+  background: var(--cement-gray) !important;
+}
+
+/* Override any gray backgrounds with asphalt gray */
+.bg-gray-50,
+.bg-gray-100,
+.bg-gray-200,
+[style*="background: #f8f9fa"],
+[style*="background: #e9ecef"],
+[style*="background: #dee2e6"] {
+  background: var(--asphalt-gray) !important;
+}
+
+/* Remove any remaining rounded corners */
+.rounded,
+.rounded-sm,
+.rounded-md,
+.rounded-lg,
+.rounded-xl,
+[class*="rounded"] {
+  border-radius: 0 !important;
+}
+
+/* Remove any remaining shadows */
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+[class*="shadow"] {
+  box-shadow: none !important;
+}
