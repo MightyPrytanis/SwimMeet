@@ -52,7 +52,7 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
         } else {
           setProviderStatuses(prev => ({
             ...prev,
-            [provider.id]: provider.status
+            [provider.id]: provider.status as 'connected' | 'error' | 'setup_required'
           }));
         }
       });
