@@ -59,6 +59,12 @@ export default function Dashboard() {
     }));
   }, []);
 
+  // Mode change handler
+  const handleModeChange = useCallback((newMode: string) => {
+    console.log(`Switching to ${newMode} mode`);
+    setActiveTab(newMode);
+  }, []);
+
   // Action handler for dropdowns
   const handleAction = useCallback((responseId: string, action: string) => {
     console.log(`Action ${action} on response ${responseId}`);
@@ -74,12 +80,6 @@ export default function Dashboard() {
       toast({ title: "Reply", description: `Generating reply for response ${responseId}` });
     }
   }, [toast]);
-
-  // Mode change handler
-  const handleModeChange = useCallback((newMode: string) => {
-    console.log('Mode changing to:', newMode);
-    setActiveTab(newMode);
-  }, []);
 
   // Bulk action handler
   const handleBulkAction = useCallback((action: string, selectedResponses: string[]) => {
