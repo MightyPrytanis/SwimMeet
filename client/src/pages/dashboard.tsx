@@ -568,7 +568,6 @@ This is the final stage of the work - make it count!`;
                 </CardHeader>
                 <CardContent>
                   <BulkActions
-                    responses={responses}
                     onSubmitAllToGroup={handleBulkSubmitToGroup}
                     onFactCheckAll={handleBulkFactCheck}
                   />
