@@ -61,6 +61,16 @@ export function AuthForm({ onAuth }: AuthFormProps) {
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <img 
+            src="/logo.png"
+            alt="SwimMeet Logo"
+            style={{
+              width: '120px',
+              height: 'auto',
+              margin: '0 auto 16px auto',
+              display: 'block'
+            }}
+          />
           <h1 style={{
             fontSize: '28px',
             fontWeight: 'bold',
@@ -257,6 +267,18 @@ export function AuthForm({ onAuth }: AuthFormProps) {
         }}>
           💾 All your conversations, statistics, and documents are permanently saved to the database. 
           Access your research projects and analysis work anytime by logging in.
+        </div>
+
+        {/* Copyright disclaimer - fine print */}
+        <div style={{
+          marginTop: '16px',
+          fontSize: '9px',
+          color: '#9ca3af',
+          lineHeight: '1.3',
+          textAlign: 'center',
+          padding: '0 8px'
+        }}>
+          Significant coding and other content Copyright 2025 Cyrano LLC; Patents pending, all rights reserved to their respective owners. Cyrano does not sell your personal private data without your consent, and then only after it has been thoroughly scrubbed and all personal identifying information has been removed.
         </div>
       </div>
     </div>

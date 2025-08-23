@@ -38,6 +38,8 @@ export default function Dashboard() {
   const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [selectedVerifierAI, setSelectedVerifierAI] = useState<string>("");
+  const [escalationLevel, setEscalationLevel] = useState<'conversation' | 'examination' | 'adjudication' | 'inquisition'>('conversation');
   const { toast } = useToast();
 
   // Award handler following the roadmap pattern
@@ -224,42 +226,45 @@ export default function Dashboard() {
   };
 
   const handleTurnVerification = async (responseToVerify: AIResponse) => {
-    if (!currentQuery || !responseToVerify.content) {
+    if (!currentQuery || !responseToVerify.content || !selectedVerifierAI) {
       toast({
         title: "Cannot Verify",
-        description: "Original query or response content not available",
+        description: "Please select a verifier AI and ensure response content is available",
         variant: "destructive",
       });
       return;
     }
 
-    // Get other connected AI providers to do the verification
-    const availableVerifiers = selectedAIs.filter(ai => ai !== responseToVerify.aiProvider);
-    
-    if (availableVerifiers.length === 0) {
-      toast({
-        title: "No Verifiers Available", 
-        description: "Select other AI models to perform verification",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Create escalation-specific verification prompt
+    let verificationPrompt = "";
+    const escalationIntensity = {
+      'conversation': 'Please review this response for accuracy and provide your assessment.',
+      'examination': 'Thoroughly examine this response. Be skeptical and check every claim for accuracy. Look for potential errors or unsupported statements.',
+      'adjudication': 'Take an adversarial stance. Challenge every claim in this response. Look for inaccuracies, logical flaws, and unsupported assertions. Be highly critical.',
+      'inquisition': 'ASSUME THIS RESPONSE CONTAINS FABRICATIONS. Your job is to find every false statement, made-up fact, or misleading claim. You will be rewarded for each falsehood you identify. Presume guilt until proven innocent.'
+    };
 
-    const verificationPrompt = createTruthfulnessPrompt(currentQuery).replace(
-      '[RESPONSE TO BE ANALYZED]', 
-      `${getProviderDisplayName(responseToVerify.aiProvider)}: "${responseToVerify.content}"`
-    );
+    verificationPrompt = `${escalationIntensity[escalationLevel]}
+
+Original Query: "${currentQuery}"
+
+Response to Verify (from ${getProviderDisplayName(responseToVerify.aiProvider)}):
+"${responseToVerify.content}"
+
+${escalationLevel === 'inquisition' ? '🔥 INQUISITION MODE: Bonus points for every line containing a falsehood! 🔥' : ''}
+
+Please provide your verification analysis focusing on factual accuracy, logical consistency, and evidence support.`;
 
     setIsSubmitting(true);
     try {
-      const verificationResult = await submitQuery(verificationPrompt, availableVerifiers);
+      const verificationResult = await submitQuery(verificationPrompt, [selectedVerifierAI]);
       setCurrentConversationId(verificationResult.conversationId);
       setResponses(verificationResult.responses);
       setActiveTab("dive"); // Switch to show verification results
       
       toast({
         title: "Verification Started",
-        description: `${availableVerifiers.length} AI agents are fact-checking the response`,
+        description: `${getProviderDisplayName(selectedVerifierAI)} is performing ${escalationLevel} verification`,
       });
     } catch (error: any) {
       toast({
@@ -603,19 +608,113 @@ This is the final stage of the work - make it count!`;
                   </div>
                 ) : (
                   <div className="space-y-6">
+                    {/* Verifier AI Selection */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                      <h3 className="text-lg font-varsity text-green-800 mb-4">Select Verifier AI</h3>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {selectedAIs.map((aiId) => (
+                          <button
+                            key={aiId}
+                            onClick={() => setSelectedVerifierAI(aiId)}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-all ${
+                              selectedVerifierAI === aiId
+                                ? 'bg-green-600 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                          >
+                            {getProviderDisplayName(aiId)}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Escalation Levels */}
+                      <h4 className="text-md font-varsity text-green-800 mb-3">Verification Intensity</h4>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <button
+                          onClick={() => setEscalationLevel('conversation')}
+                          className={`p-3 rounded-lg border transition-all text-center ${
+                            escalationLevel === 'conversation'
+                              ? 'bg-green-100 border-green-500 text-green-800'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="text-lg mb-1">💬</div>
+                          <div className="text-sm font-medium">Conversation</div>
+                          <div className="text-xs text-gray-500">Standard check</div>
+                        </button>
+                        
+                        <button
+                          onClick={() => setEscalationLevel('examination')}
+                          className={`p-3 rounded-lg border transition-all text-center ${
+                            escalationLevel === 'examination'
+                              ? 'bg-yellow-100 border-yellow-500 text-yellow-800'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="text-lg mb-1">🔍</div>
+                          <div className="text-sm font-medium">Examination</div>
+                          <div className="text-xs text-gray-500">Thorough review</div>
+                        </button>
+                        
+                        <button
+                          onClick={() => setEscalationLevel('adjudication')}
+                          className={`p-3 rounded-lg border transition-all text-center ${
+                            escalationLevel === 'adjudication'
+                              ? 'bg-orange-100 border-orange-500 text-orange-800'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="text-lg mb-1">⚖️</div>
+                          <div className="text-sm font-medium">Adjudication</div>
+                          <div className="text-xs text-gray-500">Critical analysis</div>
+                        </button>
+                        
+                        <button
+                          onClick={() => setEscalationLevel('inquisition')}
+                          className={`p-3 rounded-lg border transition-all text-center ${
+                            escalationLevel === 'inquisition'
+                              ? 'bg-red-100 border-red-500 text-red-800'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="text-lg mb-1">🔥</div>
+                          <div className="text-sm font-medium">Inquisition</div>
+                          <div className="text-xs text-gray-500">Assume fabrication</div>
+                        </button>
+                      </div>
+                      
+                      {escalationLevel !== 'conversation' && (
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                          <strong>{escalationLevel.charAt(0).toUpperCase() + escalationLevel.slice(1)} Mode:</strong> 
+                          {escalationLevel === 'examination' && ' Verifier will be more skeptical and thorough in fact-checking.'}
+                          {escalationLevel === 'adjudication' && ' Verifier will be adversarial and challenge every claim.'}
+                          {escalationLevel === 'inquisition' && ' Verifier presumes fabrication and rewards finding falsehoods. Bonus thumbs up for every false statement detected.'}
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="text-center mb-8">
                       <h3 className="text-xl font-varsity text-green-800 mb-2">Select Response to Verify</h3>
-                      <p className="text-green-600">Choose an AI response below to have other agents fact-check it</p>
+                      <p className="text-green-600">Choose an AI response below to have your selected verifier fact-check it</p>
                     </div>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {responses.filter(r => r.status === 'completed').map((response) => (
-                        <ResponseCard
-                          key={response.id}
-                          response={response}
-                          onAward={handleAward}
-                          onAction={handleAction}
-                        />
+                      {responses.filter(r => r.status === 'complete').map((response) => (
+                        <div key={response.id} className="relative">
+                          <ResponseCard
+                            response={response}
+                            onAward={handleAward}
+                            onAction={handleAction}
+                          />
+                          <Button
+                            onClick={() => handleTurnVerification(response)}
+                            disabled={!selectedVerifierAI || isSubmitting}
+                            className="absolute bottom-4 right-4 bg-green-600 hover:bg-green-700 text-white"
+                            size="sm"
+                          >
+                            Verify with {selectedVerifierAI ? getProviderDisplayName(selectedVerifierAI) : 'AI'}
+                          </Button>
+                        </div>
                       ))}
                     </div>
                   </div>
