@@ -24,11 +24,33 @@
 body {
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     background: linear-gradient(180deg, var(--ocean-deep) 0%, var(--ocean-mid) 60%, var(--steel-blue) 100%) !important;
-    color: var(--crystal-white) !important;
+    color: #FFFFFF !important;
     line-height: 1.4 !important;
     min-height: 100vh !important;
     position: relative !important;
     overflow-x: hidden !important;
+    font-size: 16px !important;
+}
+
+/* High contrast text utility classes */
+.panel-text {
+    color: #FFFFFF !important;
+    font-weight: 500 !important;
+}
+
+.panel-text-secondary {
+    color: #E2E8F0 !important;
+    font-weight: 400 !important;
+}
+
+.panel-text-muted {
+    color: #CBD5E0 !important;
+    font-weight: 400 !important;
+}
+
+.panel-text-strong {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
 }
 
 /* Sharp geometric underwater caustics */
@@ -130,8 +152,8 @@ body {
 /* Typography overrides */
 h1, h2, h3, h4, h5, h6,
 .panel-heading, .swim-subtitle, .swim-mode-title {
-    color: var(--crystal-white) !important;
-    font-weight: 300 !important;
+    color: #FFFFFF !important;
+    font-weight: 400 !important;
     letter-spacing: 1px !important;
     font-family: 'Helvetica Neue', Arial, sans-serif !important;
 }
@@ -161,9 +183,9 @@ h3, .panel-heading, .swim-subtitle {
 
 .swim-mode-description,
 .mode-explanation {
-    color: var(--steel-gray) !important;
+    color: #E2E8F0 !important;
     font-size: 1rem !important;
-    font-weight: 300 !important;
+    font-weight: 400 !important;
     letter-spacing: 0.5px !important;
 }
 

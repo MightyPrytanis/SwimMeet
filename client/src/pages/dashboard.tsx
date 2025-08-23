@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [awards, setAwards] = useState<Record<string, string>>({});
   const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>("");
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const { toast } = useToast();
 
   // Award handler following the roadmap pattern
@@ -181,6 +182,45 @@ export default function Dashboard() {
   const handleOpenConversation = (conversationId: string) => {
     setCurrentConversationId(conversationId);
     // This will trigger the query to fetch responses for this conversation
+  };
+
+  // Clear content handler that properly clears both frontend and backend
+  const handleClearContent = async () => {
+    try {
+      // Clear backend files and session
+      const response = await fetch('/api/conversations/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear backend content');
+      }
+
+      // Clear frontend state
+      setCurrentQuery('');
+      setResponses([]);
+      setAttachedFiles([]);
+      setCurrentConversationId(null);
+      setAwards({});
+      setSelectedResponses([]);
+      
+      toast({
+        title: "Content Cleared",
+        description: "All queries, responses, and files have been cleared",
+      });
+      
+      console.log('✓ Content cleared completely - frontend and backend');
+    } catch (error: any) {
+      console.error('Clear content error:', error);
+      toast({
+        title: "Clear Failed",
+        description: error.message || "Failed to clear content",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleTurnVerification = async (responseToVerify: AIResponse) => {
@@ -403,6 +443,18 @@ This is the final stage of the work - make it count!`;
             </div>
             
             <div className="flex items-center space-x-3">
+              {(currentQuery || responses.length > 0 || attachedFiles.length > 0) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearContent}
+                  className="text-orange-200 hover:text-white hover:bg-orange-600"
+                  data-testid="button-clear-content"
+                >
+                  <span className="text-lg mr-2">🧹</span>
+                  Clear Content
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"

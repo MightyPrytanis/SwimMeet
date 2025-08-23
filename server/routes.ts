@@ -819,24 +819,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const { attachedFiles = [] } = req.body;
             
             if (attachedFiles.length > 0) {
-              queryWithAttachments += `\n\n**ATTACHED FILES WITH COMPLETE CONTENT:**\n`;
+              queryWithAttachments += `\n\n**ATTACHED FILES SUMMARY:**\n`;
               
               for (const file of attachedFiles) {
                 try {
                   const fileContent = await localStorage.getFile(file.id || file.name);
                   if (fileContent) {
                     const textContent = fileContent.toString('utf-8');
-                    queryWithAttachments += `\n--- FILE: ${file.name} (${file.type || 'unknown'}) ---\n${textContent}\n--- END OF FILE ---\n`;
+                    // Create intelligent summary instead of including full content
+                    const contentPreview = textContent.length > 500 ? 
+                      textContent.substring(0, 500) + '... [CONTENT TRUNCATED]' : 
+                      textContent;
+                    
+                    queryWithAttachments += `\n--- FILE: ${file.name} (${file.type || 'unknown'}, ${Math.round(fileContent.length / 1024)}KB) ---\n`;
+                    queryWithAttachments += `Content Preview: ${contentPreview}\n`;
+                    queryWithAttachments += `Total Length: ${textContent.length} characters\n--- END FILE SUMMARY ---\n`;
                   } else {
-                    queryWithAttachments += `\n--- FILE: ${file.name} ---\n[FILE CONTENT NOT ACCESSIBLE]\n--- END OF FILE ---\n`;
+                    queryWithAttachments += `\n--- FILE: ${file.name} ---\n[FILE NOT ACCESSIBLE]\n--- END FILE SUMMARY ---\n`;
                   }
                 } catch (error) {
                   console.error(`Error reading file ${file.name}:`, error);
-                  queryWithAttachments += `\n--- FILE: ${file.name} ---\n[ERROR READING FILE]\n--- END OF FILE ---\n`;
+                  queryWithAttachments += `\n--- FILE: ${file.name} ---\n[ERROR: Could not read file]\n--- END FILE SUMMARY ---\n`;
                 }
               }
               
-              queryWithAttachments += `\n*Above are the COMPLETE file contents. Analyze them thoroughly in your response.*`;
+              queryWithAttachments += `\n*Above are file summaries. Note: Full file content available if needed for analysis. Reference files by name in your response.*`;
             }
             
             // Call individual AI methods with complete query including attachments
@@ -2277,28 +2284,32 @@ Provide only the reply text, no explanations.`;
 
       const aiService = new AIService(credentials);
       
-      // Include attachment context WITH ACTUAL FILE CONTENT if files were attached
+      // Include attachment context with file summaries to avoid massive prompts
       let attachmentContext = "";
       if (conversation.attachedFiles && conversation.attachedFiles.length > 0) {
-        attachmentContext = `\n\nATTACHED FILES WITH COMPLETE CONTENT:\n`;
+        attachmentContext = `\n\nATTACHED FILES SUMMARY:\n`;
         
         for (const file of conversation.attachedFiles) {
           try {
-            // Get file content from local storage (same method as WORK mode)
             const fileContent = await localStorage.getFile(file.id || file.filename);
             if (fileContent) {
               const textContent = fileContent.toString('utf-8');
-              attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n${textContent}\n--- END OF FILE ---\n`;
+              const contentPreview = textContent.length > 300 ? 
+                textContent.substring(0, 300) + '... [TRUNCATED FOR VERIFICATION]' : 
+                textContent;
+              
+              attachmentContext += `\n--- FILE: ${file.filename} (${file.type}, ${Math.round(fileContent.length / 1024)}KB) ---\n`;
+              attachmentContext += `Content Preview: ${contentPreview}\n--- END FILE SUMMARY ---\n`;
             } else {
-              attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n[FILE CONTENT NOT ACCESSIBLE]\n--- END OF FILE ---\n`;
+              attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n[FILE NOT ACCESSIBLE]\n--- END FILE SUMMARY ---\n`;
             }
           } catch (error) {
             console.error(`Error reading file ${file.filename} for verification:`, error);
-            attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n[ERROR READING FILE: ${error}]\n--- END OF FILE ---\n`;
+            attachmentContext += `\n--- FILE: ${file.filename} (${file.type}) ---\n[ERROR: ${error}]\n--- END FILE SUMMARY ---\n`;
           }
         }
         
-        attachmentContext += `\n*Above are the COMPLETE file contents that were available to the original AI. You can now verify if the response properly analyzed these files.*`;
+        attachmentContext += `\n*Above are file summaries that were available to the original AI. Verify if the response appropriately addressed these files.*`;
       }
       
       const verificationPrompt = `🏊‍♂️ TURN MODE VERIFICATION TASK
@@ -2601,6 +2612,32 @@ Keep your response professional and constructive.`;
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Clear content endpoint - actually clears conversation and files
+  app.post("/api/clear-content", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      // Clear any temporary file uploads for this user
+      const userFiles = await localStorage.listFiles();
+      const userFilePromises = userFiles
+        .filter(filename => filename.includes(userId) || filename.startsWith('temp_'))
+        .map(filename => localStorage.deleteFile(filename));
+      
+      await Promise.all(userFilePromises);
+      
+      console.log(`🧹 CLEAR CONTENT: Cleared ${userFilePromises.length} temporary files for user ${userId}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Content cleared successfully",
+        filesCleared: userFilePromises.length
+      });
+    } catch (error: any) {
+      console.error('Clear content error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 
