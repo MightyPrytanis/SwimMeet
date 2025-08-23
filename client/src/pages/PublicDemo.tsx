@@ -4,13 +4,45 @@ import '../styles/glass-ocean.css';
 
 export function PublicDemo() {
   return (
-    <div className="min-h-screen relative">
+    <div style={{
+      minHeight: '100vh',
+      position: 'relative',
+      fontFamily: '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      background: 'linear-gradient(180deg, #0A1A2A 0%, #1E3A5F 60%, #2C5282 100%)',
+      color: '#FFFFFF',
+      lineHeight: '1.4',
+      overflowX: 'hidden'
+    }}>
       {/* Underwater caustics layer */}
-      <div className="caustics-layer"></div>
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        pointerEvents: 'none',
+        zIndex: 1,
+        opacity: 0.04,
+        backgroundImage: `
+          linear-gradient(45deg, transparent 30%, #60A5FA 31%, #60A5FA 33%, transparent 34%),
+          linear-gradient(-45deg, transparent 30%, #60A5FA 31%, #60A5FA 33%, transparent 34%),
+          linear-gradient(90deg, transparent 45%, rgba(255,255,255,0.1) 46%, rgba(255,255,255,0.1) 48%, transparent 49%)
+        `,
+        backgroundSize: '60px 60px, 60px 60px, 120px 120px',
+        animation: 'caustics-flow 25s linear infinite'
+      }}></div>
       
       {/* Header */}
-      <header className="header">
-        <div className="header-content" style={{ 
+      <header style={{
+        background: 'linear-gradient(135deg, rgba(44, 82, 130, 0.9) 0%, rgba(30, 58, 95, 0.95) 100%)',
+        backdropFilter: 'blur(20px) saturate(120%)',
+        borderBottom: '2px solid rgba(255, 255, 255, 0.15)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{ 
           maxWidth: '1400px', 
           margin: '0 auto', 
           textAlign: 'center', 
@@ -29,7 +61,7 @@ export function PublicDemo() {
             margin: '24px 0 12px 0', 
             fontSize: '48px', 
             fontWeight: '700',
-            color: 'var(--crystal-white)',
+            color: '#FFFFFF',
             textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             letterSpacing: '0.02em'
           }}>
@@ -38,7 +70,7 @@ export function PublicDemo() {
           <p style={{ 
             margin: 0, 
             fontSize: '20px', 
-            color: 'var(--steel-gray)',
+            color: '#94A3B8',
             fontWeight: '400',
             letterSpacing: '0.01em'
           }}>
@@ -60,16 +92,16 @@ export function PublicDemo() {
         <section style={{ 
           marginBottom: '80px', 
           textAlign: 'center',
-          background: 'var(--panel-glass)',
+          background: 'rgba(255, 255, 255, 0.08)',
           backdropFilter: 'blur(20px) saturate(120%)',
-          border: '2px solid var(--panel-border)',
+          border: '2px solid rgba(255, 255, 255, 0.15)',
           padding: '48px 32px',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
         }}>
           <h2 style={{ 
             fontSize: '42px', 
             marginBottom: '24px', 
-            color: 'var(--crystal-white)',
+            color: '#FFFFFF',
             fontWeight: '700',
             letterSpacing: '0.02em',
             textShadow: '0 2px 8px rgba(0,0,0,0.5)'
@@ -81,7 +113,7 @@ export function PublicDemo() {
             lineHeight: '1.6', 
             maxWidth: '900px', 
             margin: '0 auto', 
-            color: 'var(--steel-gray)',
+            color: '#94A3B8',
             fontWeight: '400',
             letterSpacing: '0.01em'
           }}>
@@ -97,7 +129,7 @@ export function PublicDemo() {
             fontSize: '38px', 
             marginBottom: '48px', 
             textAlign: 'center', 
-            color: 'var(--crystal-white)',
+            color: '#FFFFFF',
             fontWeight: '700',
             letterSpacing: '0.02em',
             textShadow: '0 2px 8px rgba(0,0,0,0.5)'
@@ -113,7 +145,7 @@ export function PublicDemo() {
             
             {/* DIVE Mode */}
             <div style={{
-              background: 'var(--panel-glass)',
+              background: 'rgba(255, 255, 255, 0.08)',
               backdropFilter: 'blur(20px) saturate(120%)',
               border: '2px solid #2563EB',
               padding: '32px',
@@ -141,7 +173,7 @@ export function PublicDemo() {
                 fontSize: '18px', 
                 lineHeight: '1.6', 
                 marginBottom: '24px',
-                color: 'var(--steel-gray)',
+                color: '#94A3B8',
                 fontWeight: '400'
               }}>
                 Simultaneous multi-AI querying. Submit your question to multiple AI providers 
@@ -152,7 +184,7 @@ export function PublicDemo() {
                 padding: '20px', 
                 fontSize: '16px',
                 border: '1px solid rgba(37, 99, 235, 0.3)',
-                color: 'var(--crystal-white)'
+                color: '#FFFFFF'
               }}>
                 <strong style={{ color: '#60A5FA' }}>Example:</strong> "Analyze the impact of remote work on productivity"
                 <br /><br />
@@ -163,7 +195,7 @@ export function PublicDemo() {
 
             {/* TURN Mode */}
             <div style={{
-              background: 'var(--panel-glass)',
+              background: 'rgba(255, 255, 255, 0.08)',
               backdropFilter: 'blur(20px) saturate(120%)',
               border: '2px solid #7C3AED',
               padding: '32px',
@@ -191,7 +223,7 @@ export function PublicDemo() {
                 fontSize: '18px', 
                 lineHeight: '1.6', 
                 marginBottom: '24px',
-                color: 'var(--steel-gray)',
+                color: '#94A3B8',
                 fontWeight: '400'
               }}>
                 AI-to-AI fact-checking and verification. Select a verifier AI to critique 
@@ -202,7 +234,7 @@ export function PublicDemo() {
                 padding: '20px', 
                 fontSize: '16px',
                 border: '1px solid rgba(124, 58, 237, 0.3)',
-                color: 'var(--crystal-white)'
+                color: '#FFFFFF'
               }}>
                 <strong style={{ color: '#A855F7' }}>Example:</strong> Get ChatGPT's analysis of climate data, then have Claude 
                 fact-check it for accuracy, providing scores and identifying any errors.
@@ -213,7 +245,7 @@ export function PublicDemo() {
 
             {/* WORK Mode */}
             <div style={{
-              background: 'var(--panel-glass)',
+              background: 'rgba(255, 255, 255, 0.08)',
               backdropFilter: 'blur(20px) saturate(120%)',
               border: '2px solid #059669',
               padding: '32px',
@@ -241,7 +273,7 @@ export function PublicDemo() {
                 fontSize: '18px', 
                 lineHeight: '1.6', 
                 marginBottom: '24px',
-                color: 'var(--steel-gray)',
+                color: '#94A3B8',
                 fontWeight: '400'
               }}>
                 Sequential AI collaboration. Multiple AIs work together in stages, 
@@ -252,7 +284,7 @@ export function PublicDemo() {
                 padding: '20px', 
                 fontSize: '16px',
                 border: '1px solid rgba(5, 150, 105, 0.3)',
-                color: 'var(--crystal-white)'
+                color: '#FFFFFF'
               }}>
                 <strong style={{ color: '#10B981' }}>Example:</strong> "Develop a marketing strategy for a new product"
                 <br /><br />
@@ -268,7 +300,7 @@ export function PublicDemo() {
             fontSize: '38px', 
             marginBottom: '48px', 
             textAlign: 'center', 
-            color: 'var(--crystal-white)',
+            color: '#FFFFFF',
             fontWeight: '700',
             letterSpacing: '0.02em',
             textShadow: '0 2px 8px rgba(0,0,0,0.5)'
@@ -283,44 +315,44 @@ export function PublicDemo() {
             textAlign: 'center'
           }}>
             <div style={{ 
-              background: 'var(--panel-glass)', 
+              background: 'rgba(255, 255, 255, 0.08)', 
               backdropFilter: 'blur(20px) saturate(120%)',
-              border: '2px solid var(--panel-border)',
+              border: '2px solid rgba(255, 255, 255, 0.15)',
               padding: '32px 24px', 
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
             }}>
               <div style={{ fontSize: '48px', fontWeight: '700', color: '#60A5FA', marginBottom: '8px' }}>8</div>
-              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>AI Providers</div>
+              <div style={{ fontSize: '16px', color: '#94A3B8', fontWeight: '500' }}>AI Providers</div>
             </div>
             <div style={{ 
-              background: 'var(--panel-glass)', 
+              background: 'rgba(255, 255, 255, 0.08)', 
               backdropFilter: 'blur(20px) saturate(120%)',
-              border: '2px solid var(--panel-border)',
+              border: '2px solid rgba(255, 255, 255, 0.15)',
               padding: '32px 24px', 
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
             }}>
               <div style={{ fontSize: '48px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>4</div>
-              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>Active Connections</div>
+              <div style={{ fontSize: '16px', color: '#94A3B8', fontWeight: '500' }}>Active Connections</div>
             </div>
             <div style={{ 
-              background: 'var(--panel-glass)', 
+              background: 'rgba(255, 255, 255, 0.08)', 
               backdropFilter: 'blur(20px) saturate(120%)',
-              border: '2px solid var(--panel-border)',
+              border: '2px solid rgba(255, 255, 255, 0.15)',
               padding: '32px 24px', 
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
             }}>
               <div style={{ fontSize: '48px', fontWeight: '700', color: '#A855F7', marginBottom: '8px' }}>∞</div>
-              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>Conversations</div>
+              <div style={{ fontSize: '16px', color: '#94A3B8', fontWeight: '500' }}>Conversations</div>
             </div>
             <div style={{ 
-              background: 'var(--panel-glass)', 
+              background: 'rgba(255, 255, 255, 0.08)', 
               backdropFilter: 'blur(20px) saturate(120%)',
-              border: '2px solid var(--panel-border)',
+              border: '2px solid rgba(255, 255, 255, 0.15)',
               padding: '32px 24px', 
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
             }}>
-              <div style={{ fontSize: '48px', fontWeight: '700', color: 'var(--crystal-white)', marginBottom: '8px' }}>24/7</div>
-              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>Availability</div>
+              <div style={{ fontSize: '48px', fontWeight: '700', color: '#FFFFFF', marginBottom: '8px' }}>24/7</div>
+              <div style={{ fontSize: '16px', color: '#94A3B8', fontWeight: '500' }}>Availability</div>
             </div>
           </div>
         </section>
