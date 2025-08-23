@@ -1,42 +1,46 @@
 import React from 'react';
 import logoImage from '@assets/Sleek Lettermark SwimMeet Logo for Sports_1755887370233.png';
+import '../styles/glass-ocean.css';
 
 export function PublicDemo() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #001f3f 0%, #003d7a 25%, #0074d9 50%, #39cccc 75%, #2ecc40 100%)',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      color: '#fff'
-    }}>
+    <div className="min-h-screen relative">
+      {/* Underwater caustics layer */}
+      <div className="caustics-layer"></div>
+      
       {/* Header */}
-      <header style={{
-        background: 'rgba(0, 31, 63, 0.9)',
-        backdropFilter: 'blur(10px)',
-        padding: '20px 0',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
+      <header className="header">
+        <div className="header-content" style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto', 
+          textAlign: 'center', 
+          padding: '32px 24px'
+        }}>
           <img 
             src={logoImage} 
             alt="SwimMeet Logo" 
-            style={{ height: '120px', transform: 'scaleX(1.20)' }}
+            style={{ 
+              height: '120px', 
+              transform: 'scaleX(1.20)',
+              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))'
+            }}
           />
           <h1 style={{ 
-            margin: '16px 0 8px 0', 
+            margin: '24px 0 12px 0', 
             fontSize: '48px', 
-            fontWeight: 'bold',
-            background: 'linear-gradient(45deg, #ffd700, #ff6b6b)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            fontWeight: '700',
+            color: 'var(--crystal-white)',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+            letterSpacing: '0.02em'
           }}>
             SwimMeet
           </h1>
           <p style={{ 
             margin: 0, 
-            fontSize: '18px', 
-            opacity: 0.9,
-            fontWeight: '300'
+            fontSize: '20px', 
+            color: 'var(--steel-gray)',
+            fontWeight: '400',
+            letterSpacing: '0.01em'
           }}>
             Advanced AI Orchestration Platform
           </p>
@@ -44,14 +48,43 @@ export function PublicDemo() {
       </header>
 
       {/* Main Content */}
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
+      <main style={{ 
+        maxWidth: '1400px', 
+        margin: '0 auto', 
+        padding: '48px 24px',
+        position: 'relative',
+        zIndex: 10
+      }}>
         
         {/* Platform Overview */}
-        <section style={{ marginBottom: '60px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '36px', marginBottom: '20px', color: '#ffd700' }}>
+        <section style={{ 
+          marginBottom: '80px', 
+          textAlign: 'center',
+          background: 'var(--panel-glass)',
+          backdropFilter: 'blur(20px) saturate(120%)',
+          border: '2px solid var(--panel-border)',
+          padding: '48px 32px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+        }}>
+          <h2 style={{ 
+            fontSize: '42px', 
+            marginBottom: '24px', 
+            color: 'var(--crystal-white)',
+            fontWeight: '700',
+            letterSpacing: '0.02em',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)'
+          }}>
             🏊‍♂️ Multi-AI Orchestration Platform
           </h2>
-          <p style={{ fontSize: '20px', lineHeight: '1.6', maxWidth: '800px', margin: '0 auto', opacity: 0.9 }}>
+          <p style={{ 
+            fontSize: '22px', 
+            lineHeight: '1.6', 
+            maxWidth: '900px', 
+            margin: '0 auto', 
+            color: 'var(--steel-gray)',
+            fontWeight: '400',
+            letterSpacing: '0.01em'
+          }}>
             SwimMeet enables simultaneous querying of multiple AI services with advanced response management, 
             fact-checking capabilities, and collaborative workflows. Think of it as conducting an orchestra 
             of AI assistants working together on your challenges.
@@ -59,55 +92,119 @@ export function PublicDemo() {
         </section>
 
         {/* Three Modes */}
-        <section style={{ marginBottom: '60px' }}>
-          <h2 style={{ fontSize: '32px', marginBottom: '40px', textAlign: 'center', color: '#ffd700' }}>
+        <section style={{ marginBottom: '80px' }}>
+          <h2 style={{ 
+            fontSize: '38px', 
+            marginBottom: '48px', 
+            textAlign: 'center', 
+            color: 'var(--crystal-white)',
+            fontWeight: '700',
+            letterSpacing: '0.02em',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)'
+          }}>
             Three Powerful Modes
           </h2>
           
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '30px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+            gap: '32px'
           }}>
             
             {/* DIVE Mode */}
             <div style={{
-              background: 'rgba(37, 99, 235, 0.1)',
+              background: 'var(--panel-glass)',
+              backdropFilter: 'blur(20px) saturate(120%)',
               border: '2px solid #2563EB',
-              padding: '30px',
-              backdropFilter: 'blur(10px)'
+              padding: '32px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+              position: 'relative'
             }}>
-              <h3 style={{ color: '#2563EB', fontSize: '24px', marginBottom: '16px' }}>
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '4px',
+                background: 'linear-gradient(90deg, #2563EB, #60A5FA)',
+              }}></div>
+              <h3 style={{ 
+                color: '#60A5FA', 
+                fontSize: '28px', 
+                marginBottom: '20px',
+                fontWeight: '600',
+                letterSpacing: '0.01em'
+              }}>
                 🏊‍♂️ DIVE Mode
               </h3>
-              <p style={{ fontSize: '16px', lineHeight: '1.6', marginBottom: '20px' }}>
+              <p style={{ 
+                fontSize: '18px', 
+                lineHeight: '1.6', 
+                marginBottom: '24px',
+                color: 'var(--steel-gray)',
+                fontWeight: '400'
+              }}>
                 Simultaneous multi-AI querying. Submit your question to multiple AI providers 
                 at once and compare their responses side-by-side.
               </p>
-              <div style={{ background: 'rgba(37, 99, 235, 0.2)', padding: '16px', fontSize: '14px' }}>
-                <strong>Example:</strong> "Analyze the impact of remote work on productivity"
+              <div style={{ 
+                background: 'rgba(37, 99, 235, 0.15)', 
+                padding: '20px', 
+                fontSize: '16px',
+                border: '1px solid rgba(37, 99, 235, 0.3)',
+                color: 'var(--crystal-white)'
+              }}>
+                <strong style={{ color: '#60A5FA' }}>Example:</strong> "Analyze the impact of remote work on productivity"
                 <br /><br />
-                <strong>Result:</strong> Get perspectives from ChatGPT-4, Claude 4, Gemini Pro, 
+                <strong style={{ color: '#60A5FA' }}>Result:</strong> Get perspectives from ChatGPT-4, Claude 4, Gemini Pro, 
                 and Perplexity simultaneously, with quality ratings and response time tracking.
               </div>
             </div>
 
             {/* TURN Mode */}
             <div style={{
-              background: 'rgba(124, 58, 237, 0.1)',
+              background: 'var(--panel-glass)',
+              backdropFilter: 'blur(20px) saturate(120%)',
               border: '2px solid #7C3AED',
-              padding: '30px',
-              backdropFilter: 'blur(10px)'
+              padding: '32px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+              position: 'relative'
             }}>
-              <h3 style={{ color: '#7C3AED', fontSize: '24px', marginBottom: '16px' }}>
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '4px',
+                background: 'linear-gradient(90deg, #7C3AED, #A855F7)',
+              }}></div>
+              <h3 style={{ 
+                color: '#A855F7', 
+                fontSize: '28px', 
+                marginBottom: '20px',
+                fontWeight: '600',
+                letterSpacing: '0.01em'
+              }}>
                 🔄 TURN Mode
               </h3>
-              <p style={{ fontSize: '16px', lineHeight: '1.6', marginBottom: '20px' }}>
+              <p style={{ 
+                fontSize: '18px', 
+                lineHeight: '1.6', 
+                marginBottom: '24px',
+                color: 'var(--steel-gray)',
+                fontWeight: '400'
+              }}>
                 AI-to-AI fact-checking and verification. Select a verifier AI to critique 
                 and score the accuracy of other AI responses.
               </p>
-              <div style={{ background: 'rgba(124, 58, 237, 0.2)', padding: '16px', fontSize: '14px' }}>
-                <strong>Example:</strong> Get ChatGPT's analysis of climate data, then have Claude 
+              <div style={{ 
+                background: 'rgba(124, 58, 237, 0.15)', 
+                padding: '20px', 
+                fontSize: '16px',
+                border: '1px solid rgba(124, 58, 237, 0.3)',
+                color: 'var(--crystal-white)'
+              }}>
+                <strong style={{ color: '#A855F7' }}>Example:</strong> Get ChatGPT's analysis of climate data, then have Claude 
                 fact-check it for accuracy, providing scores and identifying any errors.
                 <br /><br />
                 <strong>Result:</strong> Accuracy scores, factual error identification, and improvement recommendations.
@@ -116,54 +213,114 @@ export function PublicDemo() {
 
             {/* WORK Mode */}
             <div style={{
-              background: 'rgba(218, 165, 32, 0.1)',
-              border: '2px solid #DAA520',
-              padding: '30px',
-              backdropFilter: 'blur(10px)'
+              background: 'var(--panel-glass)',
+              backdropFilter: 'blur(20px) saturate(120%)',
+              border: '2px solid #059669',
+              padding: '32px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+              position: 'relative'
             }}>
-              <h3 style={{ color: '#DAA520', fontSize: '24px', marginBottom: '16px' }}>
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                height: '4px',
+                background: 'linear-gradient(90deg, #059669, #10B981)',
+              }}></div>
+              <h3 style={{ 
+                color: '#10B981', 
+                fontSize: '28px', 
+                marginBottom: '20px',
+                fontWeight: '600',
+                letterSpacing: '0.01em'
+              }}>
                 ⚙️ WORK Mode
               </h3>
-              <p style={{ fontSize: '16px', lineHeight: '1.6', marginBottom: '20px' }}>
+              <p style={{ 
+                fontSize: '18px', 
+                lineHeight: '1.6', 
+                marginBottom: '24px',
+                color: 'var(--steel-gray)',
+                fontWeight: '400'
+              }}>
                 Sequential AI collaboration. Multiple AIs work together in stages, 
                 building on each other's work to create comprehensive solutions.
               </p>
-              <div style={{ background: 'rgba(218, 165, 32, 0.2)', padding: '16px', fontSize: '14px' }}>
-                <strong>Example:</strong> "Develop a marketing strategy for a new product"
+              <div style={{ 
+                background: 'rgba(5, 150, 105, 0.15)', 
+                padding: '20px', 
+                fontSize: '16px',
+                border: '1px solid rgba(5, 150, 105, 0.3)',
+                color: 'var(--crystal-white)'
+              }}>
+                <strong style={{ color: '#10B981' }}>Example:</strong> "Develop a marketing strategy for a new product"
                 <br /><br />
-                <strong>Workflow:</strong> Step 1 (OpenAI): Market analysis → Step 2 (Anthropic): Strategy development → Step 3 (Google): Implementation plan
+                <strong style={{ color: '#10B981' }}>Workflow:</strong> Step 1 (OpenAI): Market analysis → Step 2 (Anthropic): Strategy development → Step 3 (Google): Implementation plan
               </div>
             </div>
           </div>
         </section>
 
         {/* Live Statistics */}
-        <section style={{ marginBottom: '60px' }}>
-          <h2 style={{ fontSize: '32px', marginBottom: '30px', textAlign: 'center', color: '#ffd700' }}>
+        <section style={{ marginBottom: '80px' }}>
+          <h2 style={{ 
+            fontSize: '38px', 
+            marginBottom: '48px', 
+            textAlign: 'center', 
+            color: 'var(--crystal-white)',
+            fontWeight: '700',
+            letterSpacing: '0.02em',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)'
+          }}>
             Platform Statistics
           </h2>
           
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '24px',
             textAlign: 'center'
           }}>
-            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '20px', backdropFilter: 'blur(10px)' }}>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#39cccc' }}>8</div>
-              <div style={{ fontSize: '14px', opacity: 0.8 }}>AI Providers</div>
+            <div style={{ 
+              background: 'var(--panel-glass)', 
+              backdropFilter: 'blur(20px) saturate(120%)',
+              border: '2px solid var(--panel-border)',
+              padding: '32px 24px', 
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }}>
+              <div style={{ fontSize: '48px', fontWeight: '700', color: '#60A5FA', marginBottom: '8px' }}>8</div>
+              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>AI Providers</div>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '20px', backdropFilter: 'blur(10px)' }}>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#2ecc40' }}>4</div>
-              <div style={{ fontSize: '14px', opacity: 0.8 }}>Active Connections</div>
+            <div style={{ 
+              background: 'var(--panel-glass)', 
+              backdropFilter: 'blur(20px) saturate(120%)',
+              border: '2px solid var(--panel-border)',
+              padding: '32px 24px', 
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }}>
+              <div style={{ fontSize: '48px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>4</div>
+              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>Active Connections</div>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '20px', backdropFilter: 'blur(10px)' }}>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#ff6b6b' }}>∞</div>
-              <div style={{ fontSize: '14px', opacity: 0.8 }}>Conversations</div>
+            <div style={{ 
+              background: 'var(--panel-glass)', 
+              backdropFilter: 'blur(20px) saturate(120%)',
+              border: '2px solid var(--panel-border)',
+              padding: '32px 24px', 
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }}>
+              <div style={{ fontSize: '48px', fontWeight: '700', color: '#A855F7', marginBottom: '8px' }}>∞</div>
+              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>Conversations</div>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '20px', backdropFilter: 'blur(10px)' }}>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#ffd700' }}>24/7</div>
-              <div style={{ fontSize: '14px', opacity: 0.8 }}>Availability</div>
+            <div style={{ 
+              background: 'var(--panel-glass)', 
+              backdropFilter: 'blur(20px) saturate(120%)',
+              border: '2px solid var(--panel-border)',
+              padding: '32px 24px', 
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }}>
+              <div style={{ fontSize: '48px', fontWeight: '700', color: 'var(--crystal-white)', marginBottom: '8px' }}>24/7</div>
+              <div style={{ fontSize: '16px', color: 'var(--steel-gray)', fontWeight: '500' }}>Availability</div>
             </div>
           </div>
         </section>
