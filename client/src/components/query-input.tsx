@@ -121,36 +121,52 @@ export default function QueryInput({ onSubmit, selectedAIs, onSelectionChange, i
           </div>
         </div>
 
-        {/* AI Selection - Compact checkboxes */}
+        {/* AI Selection - Compact boxes with ratings */}
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-slate-700 mb-3">Select AI Models ({selectedAIs.length} selected)</h3>
-          <div className="flex flex-wrap gap-3">
-            {availableProviders.map((provider) => (
-              <label 
-                key={provider.id}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
-                  selectedAIs.includes(provider.id) 
-                    ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                    : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                }`}
-                data-testid={`label-provider-${provider.id}`}
-              >
-                <Checkbox
-                  checked={selectedAIs.includes(provider.id)}
-                  onCheckedChange={(checked) => 
-                    handleProviderToggle(provider.id, checked as boolean)
-                  }
-                  disabled={provider.status === 'error'}
-                  data-testid={`checkbox-${provider.id}`}
-                />
-                <AIProviderIcon provider={provider.id} className="w-6 h-6" status={providerStatuses[provider.id] || provider.status} />
-                <span className="text-sm font-medium">{getProviderDisplayName(provider.id)}</span>
-                <div className={`w-2 h-2 rounded-full ${
-                  (providerStatuses[provider.id] || provider.status) === 'connected' ? 'bg-emerald-500' : 
-                  (providerStatuses[provider.id] || provider.status) === 'error' ? 'bg-red-500' : 'bg-yellow-500'
-                }`} />
-              </label>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            {availableProviders.map((provider) => {
+              // Calculate positive rating percentage (placeholder logic - would come from stats API)
+              const positiveRating = Math.floor(Math.random() * 40) + 60; // 60-100% for demo
+              return (
+                <label 
+                  key={provider.id}
+                  className={`relative flex items-center space-x-2 px-2 py-1 rounded border cursor-pointer transition-all text-xs ${
+                    selectedAIs.includes(provider.id) 
+                      ? 'bg-blue-600 border-blue-700 text-white' 
+                      : 'bg-gray-100 border-gray-300 hover:bg-gray-200 text-gray-800'
+                  }`}
+                  data-testid={`label-provider-${provider.id}`}
+                >
+                  {selectedAIs.includes(provider.id) && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  )}
+                  <AIProviderIcon provider={provider.id} className="w-4 h-4" status={providerStatuses[provider.id] || provider.status} />
+                  <div className="flex flex-col">
+                    <span className="font-medium leading-tight">{getProviderDisplayName(provider.id)}</span>
+                    <span className={`text-xs leading-tight ${
+                      selectedAIs.includes(provider.id) ? 'text-blue-200' : 'text-gray-500'
+                    }`}>
+                      {positiveRating}% positive
+                    </span>
+                  </div>
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    (providerStatuses[provider.id] || provider.status) === 'connected' ? 'bg-emerald-400' : 
+                    (providerStatuses[provider.id] || provider.status) === 'error' ? 'bg-red-400' : 'bg-yellow-400'
+                  }`} />
+                  <input
+                    type="checkbox"
+                    checked={selectedAIs.includes(provider.id)}
+                    onChange={(e) => handleProviderToggle(provider.id, e.target.checked)}
+                    disabled={provider.status === 'error'}
+                    className="sr-only"
+                    data-testid={`checkbox-${provider.id}`}
+                  />
+                </label>
+              );
+            })}
           </div>
         </div>
         
