@@ -595,39 +595,41 @@ This is the final stage of the work - make it count!`;
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-8">
-                {responses.length === 0 ? (
-                  <div className="text-center py-16">
-                    <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <span className="text-5xl">🔍</span>
-                    </div>
-                    <h3 className="text-2xl font-varsity text-green-800 mb-4">Verification Lanes Ready</h3>
-                    <p className="text-green-600 max-w-lg mx-auto text-lg leading-relaxed">
-                      Submit a query in Dive first, then return here to have other AI agents fact-check and verify the responses.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {/* Verifier AI Selection */}
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-                      <h3 className="text-lg font-varsity text-green-800 mb-4">Select Verifier AI</h3>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {selectedAIs.map((aiId) => (
-                          <button
-                            key={aiId}
-                            onClick={() => setSelectedVerifierAI(aiId)}
-                            className={`px-3 py-2 rounded text-sm font-medium transition-all ${
-                              selectedVerifierAI === aiId
-                                ? 'bg-green-600 text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                          >
-                            {getProviderDisplayName(aiId)}
-                          </button>
-                        ))}
+                <div className="space-y-6">
+                  {responses.length === 0 && (
+                    <div className="text-center py-8 mb-6">
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-3xl">🔍</span>
                       </div>
-                      
-                      {/* Escalation Levels */}
-                      <h4 className="text-md font-varsity text-green-800 mb-3">Verification Intensity</h4>
+                      <h3 className="text-xl font-varsity text-green-800 mb-2">Verification Lanes Ready</h3>
+                      <p className="text-green-600 text-sm">
+                        Submit a query in Dive first, then return here to fact-check responses.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Always show escalation options */}
+                  {/* Verifier AI Selection */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <h3 className="text-lg font-varsity text-green-800 mb-4">Select Verifier AI</h3>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {selectedAIs.map((aiId) => (
+                        <button
+                          key={aiId}
+                          onClick={() => setSelectedVerifierAI(aiId)}
+                          className={`px-3 py-2 rounded text-sm font-medium transition-all ${
+                            selectedVerifierAI === aiId
+                              ? 'bg-green-600 text-white'
+                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          }`}
+                        >
+                          {getProviderDisplayName(aiId)}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* Escalation Levels */}
+                    <h4 className="text-md font-varsity text-green-800 mb-3">Verification Intensity</h4>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         <button
                           onClick={() => setEscalationLevel('conversation')}
@@ -697,32 +699,35 @@ This is the final stage of the work - make it count!`;
                       )}
                     </div>
                     
-                    <div className="text-center mb-8">
-                      <h3 className="text-xl font-varsity text-green-800 mb-2">Select Response to Verify</h3>
-                      <p className="text-green-600">Choose an AI response below to have your selected verifier fact-check it</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {responses.filter(r => r.status === 'complete').map((response) => (
-                        <div key={response.id} className="relative">
-                          <ResponseCard
-                            response={response}
-                            onAward={handleAward}
-                            onAction={handleAction}
-                          />
-                          <Button
-                            onClick={() => handleTurnVerification(response)}
-                            disabled={!selectedVerifierAI || isSubmitting}
-                            className="absolute bottom-4 right-4 bg-green-600 hover:bg-green-700 text-white"
-                            size="sm"
-                          >
-                            Verify with {selectedVerifierAI ? getProviderDisplayName(selectedVerifierAI) : 'AI'}
-                          </Button>
+                    {responses.length > 0 && (
+                      <>
+                        <div className="text-center mb-8">
+                          <h3 className="text-xl font-varsity text-green-800 mb-2">Select Response to Verify</h3>
+                          <p className="text-green-600">Choose an AI response below to have your selected verifier fact-check it</p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {responses.filter(r => r.status === 'complete').map((response) => (
+                            <div key={response.id} className="relative">
+                              <ResponseCard
+                                response={response}
+                                onAward={handleAward}
+                                onAction={handleAction}
+                              />
+                              <Button
+                                onClick={() => handleTurnVerification(response)}
+                                disabled={!selectedVerifierAI || isSubmitting}
+                                className="absolute bottom-4 right-4 bg-green-600 hover:bg-green-700 text-white"
+                                size="sm"
+                              >
+                                Verify with {selectedVerifierAI ? getProviderDisplayName(selectedVerifierAI) : 'AI'}
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                </div>
               </CardContent>
             </Card>
           </SimpleTabsContent>
