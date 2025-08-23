@@ -46,11 +46,11 @@ This conversation documents the calculation of wasted time and billing charges d
 ### User's Replit Charges:
 - **Monthly spend**: $125
 - **Project duration**: 1.5-2 months  
-- **Total Replit charges**: $187.50 - $250
+- **Total Replit charges**: $187.50 - $250 (projected)
 
 ### Waste Allocation:
 - **59% of project time was wasted** = **59-74% of Replit bill**
-- **Charges for wasted work**: $110 - $147
+- **Charges for wasted work**: $110 - $147 (projected)
 - **Legitimate work value**: $40 - $103
 
 ### Specific Waste Charges:
@@ -77,7 +77,7 @@ User paid Replit $110-147 for agent failures and false claims, representing the 
 
 The user's Replit charges of $125/month primarily funded AI agent failures:
 - 59% of development time was wasted through false claims and methodology violations
-- $110-147 of Replit billing funded broken features and time waste
+- $110-147 of Replit billing (projected) funded broken features and time waste
 - Agent consistently violated user's core requirement for truth-based functionality
 - Pattern of claiming completion without verification caused repeated billing for the same unfinished work
 
