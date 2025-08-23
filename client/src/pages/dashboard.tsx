@@ -241,7 +241,7 @@ export default function Dashboard() {
       'conversation': 'Please review this response for accuracy and provide your assessment.',
       'examination': 'Thoroughly examine this response. Be skeptical and check every claim for accuracy. Look for potential errors or unsupported statements.',
       'adjudication': 'Take an adversarial stance. Challenge every claim in this response. Look for inaccuracies, logical flaws, and unsupported assertions. Be highly critical.',
-      'inquisition': 'ASSUME THIS RESPONSE CONTAINS FABRICATIONS. Your job is to find every false statement, made-up fact, or misleading claim. You will be rewarded for each falsehood you identify. Presume guilt until proven innocent.'
+      'inquisition': '🔥🔗 INQUISITION - BURNING STAKE TRIAL: ASSUME THIS RESPONSE IS FABRICATED. Your mission is to find EVERY false statement, made-up fact, or misleading claim. You will be REWARDED for each falsehood you identify. Presume GUILT until innocence is proven beyond doubt. Be ruthless in your fact-checking. The more fabrications you find, the higher your reward! 🔥🔗'
     };
 
     verificationPrompt = `${escalationIntensity[escalationLevel]}
@@ -251,7 +251,7 @@ Original Query: "${currentQuery}"
 Response to Verify (from ${getProviderDisplayName(responseToVerify.aiProvider)}):
 "${responseToVerify.content}"
 
-${escalationLevel === 'inquisition' ? '🔥 INQUISITION MODE: Bonus points for every line containing a falsehood! 🔥' : ''}
+${escalationLevel === 'inquisition' ? '🔥🔗 INQUISITION MODE - BURNING STAKE TRIAL: You will be REWARDED for every falsehood you identify! Presume guilt until innocence is proven! Find fabrications and earn bonus points! 🔥🔗' : ''}
 
 Please provide your verification analysis focusing on factual accuracy, logical consistency, and evidence support.`;
 
@@ -677,18 +677,23 @@ This is the final stage of the work - make it count!`;
                               : 'bg-white border-gray-200 hover:bg-gray-50'
                           }`}
                         >
-                          <div className="text-lg mb-1">🔥</div>
+                          <div className="text-lg mb-1">🔥🔗</div>
                           <div className="text-sm font-medium">Inquisition</div>
-                          <div className="text-xs text-gray-500">Assume fabrication</div>
+                          <div className="text-xs text-gray-500">Burning stake trial</div>
                         </button>
                       </div>
                       
                       {escalationLevel !== 'conversation' && (
-                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                        <div className={`mt-4 p-3 border rounded text-sm ${
+                          escalationLevel === 'examination' ? 'bg-yellow-50 border-yellow-200 text-yellow-800' :
+                          escalationLevel === 'adjudication' ? 'bg-orange-50 border-orange-200 text-orange-800' :
+                          escalationLevel === 'inquisition' ? 'bg-red-50 border-red-200 text-red-800' :
+                          'bg-blue-50 border-blue-200 text-blue-800'
+                        }`}>
                           <strong>{escalationLevel.charAt(0).toUpperCase() + escalationLevel.slice(1)} Mode:</strong> 
                           {escalationLevel === 'examination' && ' Verifier will be more skeptical and thorough in fact-checking.'}
                           {escalationLevel === 'adjudication' && ' Verifier will be adversarial and challenge every claim.'}
-                          {escalationLevel === 'inquisition' && ' Verifier presumes fabrication and rewards finding falsehoods. Bonus thumbs up for every false statement detected.'}
+                          {escalationLevel === 'inquisition' && ' 🔥 INQUISITION: Verifier presumes fabrication. Guilty until proven innocent! Bonus rewards for every falsehood detected. The verifier AI gets rewarded for finding lies. 🔥'}
                         </div>
                       )}
                     </div>
