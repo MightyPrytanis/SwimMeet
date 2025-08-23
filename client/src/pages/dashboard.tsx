@@ -437,8 +437,8 @@ This is the final stage of the work - make it count!`;
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center wave-animation">
-                  <Waves className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                  <img src="/logo.png" alt="SwimMeet" className="w-8 h-8" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-varsity text-white tracking-wide">Swim Meet</h1>

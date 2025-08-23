@@ -9,6 +9,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import session from 'express-session';
 import { localStorage } from './local-storage';
+import localStorageRoutes from './routes/local-storage';
 import multer from 'multer';
 import { isUserWhitelisted } from './whitelist';
 import { adminService } from './admin';
@@ -2753,6 +2754,9 @@ Keep your response professional and constructive.`;
       return res.sendStatus(500);
     }
   });
+
+  // Mount local storage routes
+  app.use('/api/local-storage', localStorageRoutes);
 
   // Performance monitoring endpoints
   app.get("/api/performance/metrics", async (req, res) => {

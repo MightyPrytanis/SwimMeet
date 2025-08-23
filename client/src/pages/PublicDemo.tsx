@@ -1,5 +1,5 @@
 import React from 'react';
-import logoImage from '@assets/Sleek Lettermark SwimMeet Logo for Sports_1755887370233.png';
+import logoImage from '@assets/SwimMeet Logo 3_1755934092349.png';
 import '../styles/glass-ocean.css';
 
 export function PublicDemo() {

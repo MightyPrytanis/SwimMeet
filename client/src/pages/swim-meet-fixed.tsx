@@ -9,7 +9,7 @@ import { WorkflowBuilder } from "@/components/WorkflowBuilder";
 import { Download, FileText, Upload, Play, GitBranch, Users, BarChart3, Settings, Menu, X, Activity, Shield, ThumbsUp, ThumbsDown, Trash2, CheckCircle, AlertTriangle } from "lucide-react";
 import "../styles/glass-ocean.css";
 import { PerformanceOverlay } from "../components/PerformanceOverlay";
-import logoImage from '@assets/Sleek Lettermark SwimMeet Logo for Sports_1755887370233.png';
+import logoImage from '@assets/SwimMeet Logo 3_1755934092349.png';
 
 // Types
 interface AIProvider {
@@ -610,7 +610,7 @@ export default function SwimMeetFixed() {
                 style={{ height: '192px', width: 'auto', maxWidth: '900px', transform: 'scaleX(1.20)' }}
                 onError={(e) => {
                   console.error('Logo failed to load, trying fallback');
-                  e.currentTarget.src = '/swimlogo.png';
+                  e.currentTarget.src = '/logo.png';
                 }}
               />
             </div>

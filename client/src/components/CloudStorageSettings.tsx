@@ -120,7 +120,7 @@ export function CloudStorageSettings({ authToken }: CloudStorageSettingsProps) {
       // Default local filesystem
       return { success: true, provider: 'Local Filesystem', message: 'Using local storage' };
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (data.success) {
         alert(`✓ ${data.provider} connected successfully!\n\n${data.message}`);
         queryClient.invalidateQueries({ queryKey: ['/api/cloud/connections'] });
@@ -184,29 +184,47 @@ export function CloudStorageSettings({ authToken }: CloudStorageSettingsProps) {
           const isConnected = !!connection;
           const isConnecting = connecting === provider.id;
 
+          const isLocalStorage = provider.id === 'local_filesystem';
+          const isInDevelopment = !isLocalStorage;
+          
           return (
-            <Card key={provider.id} className="relative">
+            <Card key={provider.id} className={`relative ${isInDevelopment ? 'opacity-60' : ''}`}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{getProviderIcon(provider.id)}</span>
                     <div>
-                      <CardTitle className="text-lg">{provider.name}</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {provider.name}
+                        {isInDevelopment && (
+                          <Badge variant="outline" className="bg-gray-100 text-gray-600 text-xs">
+                            In Development
+                          </Badge>
+                        )}
+                      </CardTitle>
                       <CardDescription className="text-sm">
                         {provider.description}
                       </CardDescription>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    {isConnected ? (
+                    {isLocalStorage && isConnected ? (
                       <Badge variant="secondary" className="bg-green-100 text-green-800">
                         <CheckCircle className="w-3 h-3 mr-1" />
-                        Connected
+                        Active
+                      </Badge>
+                    ) : isLocalStorage ? (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                        Ready
+                      </Badge>
+                    ) : isConnected ? (
+                      <Badge variant="outline" className="bg-gray-100 text-gray-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Connected (Dev)
                       </Badge>
                     ) : (
-                      <Badge variant="outline">
-                        <AlertCircle className="w-3 h-3 mr-1" />
-                        Not Connected
+                      <Badge variant="outline" className="text-gray-500">
+                        In Development
                       </Badge>
                     )}
                     <Badge variant="outline" className="text-xs">
@@ -233,42 +251,52 @@ export function CloudStorageSettings({ authToken }: CloudStorageSettingsProps) {
                   </div>
 
                   <div className="flex gap-2">
-                    {!isConnected ? (
+                    {isLocalStorage ? (
                       <Button
                         size="sm"
                         onClick={() => connectMutation.mutate(provider.id)}
-                        disabled={isConnecting || !provider.requiresAuth}
+                        disabled={isConnected}
                         className="flex items-center gap-1"
+                        variant={isConnected ? "outline" : "default"}
                       >
-                        {isConnecting ? (
+                        {isConnected ? (
                           <>
-                            <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Connecting...
+                            <CheckCircle className="w-3 h-3" />
+                            Active
                           </>
                         ) : (
                           <>
-                            <ExternalLink className="w-3 h-3" />
-                            {provider.requiresAuth ? 'Connect Account' : 'Use Local Storage'}
+                            <HardDrive className="w-3 h-3" />
+                            Enable Local Storage
                           </>
                         )}
+                      </Button>
+                    ) : !isConnected ? (
+                      <Button
+                        size="sm"
+                        onClick={() => {}}
+                        disabled={true}
+                        className="flex items-center gap-1 opacity-50 cursor-not-allowed"
+                        variant="outline"
+                      >
+                        <span className="text-gray-500">Coming Soon</span>
                       </Button>
                     ) : (
                       <div className="flex gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => updateSettingsMutation.mutate({ 
-                            preferredProvider: provider.id 
-                          })}
-                          disabled={settings?.preferredProvider === provider.id}
+                          onClick={() => {}}
+                          disabled={true}
+                          className="opacity-50"
                         >
-                          {settings?.preferredProvider === provider.id ? 'Default Provider' : 'Set as Default'}
+                          {settings?.preferredProvider === provider.id ? 'Default (Dev)' : 'Set Default (Dev)'}
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
-                          className="px-2"
-                          disabled={provider.id === 'local_filesystem'}
+                          className="px-2 opacity-50"
+                          disabled={true}
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
